@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Fraunces, Inter } from "next/font/google";
+import { Montserrat } from "next/font/google";
 import "./globals.css";
 import { siteConfig, getSiteUrl } from "@/config/site";
 import { Header } from "@/components/layout/Header";
@@ -9,16 +9,12 @@ import { CookieBanner } from "@/components/layout/CookieBanner";
 import { JsonLd } from "@/components/ui/JsonLd";
 import { organizationSchema } from "@/lib/schema";
 
-const heading = Fraunces({
+// Montserrat como única familia: regular (400) para cuerpo y textos,
+// bold (700) para titulares y textos de importancia.
+const montserrat = Montserrat({
   subsets: ["latin"],
-  variable: "--font-heading",
-  display: "swap",
-  axes: ["opsz"],
-});
-
-const body = Inter({
-  subsets: ["latin"],
-  variable: "--font-body",
+  variable: "--font-montserrat",
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -42,7 +38,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="es" className={`${heading.variable} ${body.variable}`}>
+    <html lang="es" className={montserrat.variable}>
       <body>
         <a
           href="#contenido-principal"

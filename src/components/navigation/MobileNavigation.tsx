@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Menu, X, MessageCircle } from "lucide-react";
+import { Logo } from "@/components/layout/Logo";
 import { mainNavigation } from "@/config/navigation";
 import { getWhatsAppUrl, siteConfig } from "@/config/site";
 import { trackEvent } from "@/lib/analytics";
@@ -60,9 +61,7 @@ export function MobileNavigation({ isTransparent }: { isTransparent: boolean }) 
           className="fixed inset-0 z-50 flex flex-col bg-ivory"
         >
           <div className="flex h-16 items-center justify-between px-4 sm:px-6">
-            <span className="font-serif text-2xl uppercase tracking-[0.08em] text-ink">
-              Granalto
-            </span>
+            <Logo size="md" className="text-ink" />
             <button
               type="button"
               onClick={() => setOpen(false)}

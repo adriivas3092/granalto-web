@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { MessageCircle } from "lucide-react";
+import { Logo } from "@/components/layout/Logo";
 import { mainNavigation } from "@/config/navigation";
 import { getWhatsAppUrl, siteConfig } from "@/config/site";
 import { trackEvent } from "@/lib/analytics";
@@ -40,12 +41,8 @@ export function Header() {
       )}
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:h-20 lg:px-8">
-        <Link
-          href="/"
-          className="font-serif text-2xl tracking-[0.08em] uppercase"
-          aria-label="Granalto — inicio"
-        >
-          Granalto
+        <Link href="/" aria-label="Granalto — inicio">
+          <Logo size="md" />
         </Link>
 
         <nav aria-label="Navegación principal" className="hidden lg:block">

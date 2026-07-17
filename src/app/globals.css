@@ -12,9 +12,12 @@
   --color-stone-beige: #d7d0c5; /* Beige piedra */
   --color-mineral: #9b9b96; /* Gris mineral */
 
-  /* Tipografías (definidas con next/font en el layout) */
-  --font-serif: var(--font-heading), Georgia, "Times New Roman", serif;
-  --font-sans: var(--font-body), system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* Tipografía única: Montserrat (definida con next/font en el layout).
+     Se conservan dos tokens por compatibilidad con las utilidades
+     font-serif/font-sans usadas en los componentes; ambas apuntan a
+     Montserrat. Los títulos usan peso 700 (bold), el cuerpo 400 (regular). */
+  --font-serif: var(--font-montserrat), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-sans: var(--font-montserrat), system-ui, -apple-system, "Segoe UI", sans-serif;
 
   /* Ritmo y radios: estética arquitectónica de esquinas discretas */
   --radius-sm: 2px;

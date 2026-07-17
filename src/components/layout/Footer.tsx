@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Logo } from "@/components/layout/Logo";
 import { footerNavigation, legalNavigation } from "@/config/navigation";
 import { siteConfig } from "@/config/site";
 import { getLocations } from "@/data/locations";
@@ -23,7 +24,7 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
           <div className="sm:col-span-2 lg:col-span-1">
-            <p className="font-serif text-2xl uppercase tracking-[0.08em]">Granalto</p>
+            <Logo size="md" />
             <p className="mt-4 text-sm leading-relaxed text-stone-beige">
               Superficies, materiales y soluciones para crear espacios con
               identidad, calidad y diseño.
