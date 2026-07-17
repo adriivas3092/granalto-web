@@ -1,26 +1,83 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+ * Sistema de diseño Granalto.
+ * Paleta editable: modifique estas variables para cambiar la paleta global.
+ */
+@theme {
+  /* Paleta de marca */
+  --color-ink: #111111; /* Negro profundo */
+  --color-charcoal: #252525; /* Carbón */
+  --color-ivory: #f7f5f1; /* Blanco cálido */
+  --color-stone-beige: #d7d0c5; /* Beige piedra */
+  --color-mineral: #9b9b96; /* Gris mineral */
+
+  /* Tipografías (definidas con next/font en el layout) */
+  --font-serif: var(--font-heading), Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-body), system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Ritmo y radios: estética arquitectónica de esquinas discretas */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+
+  /* Transiciones */
+  --ease-elegant: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-ivory);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Titulares editoriales */
+h1,
+h2,
+h3 {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+/* Focus visible consistente y accesible */
+:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 3px;
+}
+
+::selection {
+  background-color: var(--color-stone-beige);
+  color: var(--color-ink);
+}
+
+/* Respeto a prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Utilidad: enlace subrayado editorial */
+.link-editorial {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--color-mineral);
+  transition: text-decoration-color 200ms var(--ease-elegant);
+}
+.link-editorial:hover {
+  text-decoration-color: var(--color-ink);
 }

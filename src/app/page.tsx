@@ -1,103 +1,239 @@
 import Image from "next/image";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+import { HeroSection } from "@/components/sections/HeroSection";
+import { CTASection } from "@/components/sections/CTASection";
+import { SectionHeading } from "@/components/ui/SectionHeading";
+import { ButtonLink } from "@/components/ui/Button";
+import { CollectionCard } from "@/components/cards/CollectionCard";
+import { MaterialCard } from "@/components/cards/MaterialCard";
+import { ProjectCard } from "@/components/cards/ProjectCard";
+import { CatalogCard } from "@/components/cards/CatalogCard";
+import { BlogCard } from "@/components/cards/BlogCard";
+import { BrandCard } from "@/components/cards/BrandCard";
+import { LocationCard } from "@/components/cards/LocationCard";
+import { ContactForm } from "@/components/forms/ContactForm";
+import { getFeaturedCollections } from "@/data/collections";
+import { getFeaturedMaterials } from "@/data/materials";
+import { getActiveBrands } from "@/data/brands";
+import { getFeaturedProjects } from "@/data/projects";
+import { getFeaturedCatalogs } from "@/data/catalogs";
+import { getRecentPosts } from "@/data/blog";
+import { getLocations } from "@/data/locations";
+import { buildMetadata } from "@/lib/metadata";
 
-export default function Home() {
+export const metadata = buildMetadata({ path: "/" });
+
+const container = "mx-auto max-w-7xl px-4 sm:px-6 lg:px-8";
+
+export default function HomePage() {
+  const collections = getFeaturedCollections();
+  const materials = getFeaturedMaterials();
+  const brands = getActiveBrands();
+  const projects = getFeaturedProjects();
+  const catalogs = getFeaturedCatalogs();
+  const posts = getRecentPosts(3);
+  const locations = getLocations();
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <>
+      {/* 8.1 Hero principal */}
+      <HeroSection
+        size="full"
+        showScrollHint
+        image={{
+          src: "/images/placeholders/hero-home.svg",
+          alt: "Superficie de piedra natural en un espacio arquitectónico — imagen pendiente de reemplazo",
+        }}
+        title="Superficies que transforman espacios"
+        description="Descubra materiales, acabados y soluciones seleccionadas para crear cocinas, baños y espacios con identidad propia."
+      >
+        <ButtonLink href="/colecciones" variant="secondary">
+          Explorar colecciones
+        </ButtonLink>
+        <ButtonLink href="/contacto" variant="outline" onDark>
+          Solicitar asesoría
+        </ButtonLink>
+      </HeroSection>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+      {/* 8.2 Introducción a Granalto */}
+      <section className={`${container} py-20 md:py-28`}>
+        <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+          <div>
+            <SectionHeading
+              eyebrow="Granalto"
+              title="Diseño, precisión y materiales excepcionales"
+              description="En Granalto seleccionamos, comercializamos y transformamos superficies para proyectos residenciales y comerciales. Nuestro equipo acompaña cada proyecto desde la elección del material hasta la fabricación e instalación, combinando experiencia técnica, diseño y atención personalizada."
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            <p className="max-w-xl text-base leading-relaxed text-charcoal/80">
+              Nos especializamos en la importación, corte e instalación de
+              superficies premium — piedra natural, cuarzo, porcelánico,
+              superficies sólidas y laminados — con showrooms en Heredia,
+              Escazú y Guanacaste.
+            </p>
+            <Link
+              href="/nosotros"
+              className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-ink underline-offset-4 hover:underline"
+            >
+              Conozca Granalto
+              <ArrowRight aria-hidden="true" className="h-4 w-4" />
+            </Link>
+          </div>
+          <div className="relative aspect-[4/3] overflow-hidden rounded-sm bg-stone-beige">
+            <Image
+              src="/images/placeholders/nosotros.svg"
+              alt="Showroom de Granalto — imagen pendiente de reemplazo"
+              fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className="object-cover"
+            />
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+      </section>
+
+      {/* 8.3 Colecciones */}
+      <section className="bg-white py-20 md:py-28">
+        <div className={container}>
+          <SectionHeading
+            eyebrow="Colecciones"
+            title="Explore por tipo de espacio"
+            description="Soluciones y superficies organizadas según el espacio que quiere transformar."
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
+          <div className="grid gap-6 md:grid-cols-3">
+            {collections.map((collection) => (
+              <CollectionCard key={collection.id} collection={collection} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 8.4 Materiales */}
+      <section className={`${container} py-20 md:py-28`}>
+        <div className="flex flex-wrap items-end justify-between gap-6">
+          <SectionHeading
+            eyebrow="Materiales"
+            title="Materiales seleccionados para proyectos únicos"
+            description="Explore una selección de superficies naturales, técnicas y decorativas para cocinas, baños, mobiliario, revestimientos y espacios arquitectónicos."
           />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
+        </div>
+        <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-5">
+          {materials.map((material) => (
+            <MaterialCard key={material.id} material={material} />
+          ))}
+        </div>
+        <div className="mt-12">
+          <ButtonLink href="/materiales" variant="outline">
+            Explorar materiales
+          </ButtonLink>
+        </div>
+      </section>
+
+      {/* 8.5 Marcas */}
+      <section className="bg-white py-20 md:py-28">
+        <div className={container}>
+          <SectionHeading
+            eyebrow="Marcas"
+            title="Marcas que representamos y comercializamos"
+            description="Trabajamos con fabricantes seleccionados de superficies, grifería, sanitarios y productos para el cuidado de la piedra."
           />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {brands.map((brand) => (
+              <BrandCard key={brand.id} brand={brand} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 8.6 Proyectos destacados */}
+      <section className={`${container} py-20 md:py-28`}>
+        <SectionHeading
+          eyebrow="Proyectos"
+          title="Proyectos que hablan por nosotros"
+          description="Una selección de espacios transformados con nuestras superficies. Los proyectos mostrados son de demostración y serán reemplazados por proyectos reales documentados."
+        />
+        <div className="grid gap-8 md:grid-cols-3">
+          {projects.map((project) => (
+            <ProjectCard key={project.id} project={project} />
+          ))}
+        </div>
+      </section>
+
+      {/* 8.7 Catálogos destacados */}
+      <section className="bg-ivory py-20 md:py-28">
+        <div className={container}>
+          <SectionHeading
+            eyebrow="Recursos"
+            title="Catálogos y recursos"
+            description="Consulte colecciones, fichas y soluciones disponibles para desarrollar su próximo proyecto."
+          />
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {catalogs.map((catalog) => (
+              <CatalogCard key={catalog.id} catalog={catalog} />
+            ))}
+          </div>
+          <div className="mt-12">
+            <ButtonLink href="/catalogos" variant="outline">
+              Ver todos los catálogos
+            </ButtonLink>
+          </div>
+        </div>
+      </section>
+
+      {/* 8.8 Blog */}
+      <section className="bg-white py-20 md:py-28">
+        <div className={container}>
+          <SectionHeading
+            eyebrow="Blog"
+            title="Ideas, materiales e inspiración"
+            description="Información para elegir, utilizar y cuidar las superficies de cada espacio."
+          />
+          <div className="grid gap-8 md:grid-cols-3">
+            {posts.map((post) => (
+              <BlogCard key={post.id} post={post} />
+            ))}
+          </div>
+          <div className="mt-12">
+            <ButtonLink href="/blog" variant="outline">
+              Ver todos los artículos
+            </ButtonLink>
+          </div>
+        </div>
+      </section>
+
+      {/* 8.9 Showrooms */}
+      <section className={`${container} py-20 md:py-28`}>
+        <SectionHeading
+          eyebrow="Showrooms"
+          title="Visítenos y viva los materiales"
+          description="En piedra natural, cada lámina es única. Le esperamos en nuestros showrooms para acompañarle en la selección."
+        />
+        <div className="grid gap-6 md:grid-cols-3">
+          {locations.map((location) => (
+            <LocationCard key={location.id} location={location} />
+          ))}
+        </div>
+      </section>
+
+      {/* 8.10 Formulario de contacto */}
+      <section className="bg-white py-20 md:py-28">
+        <div className={container}>
+          <div className="grid gap-12 lg:grid-cols-5">
+            <div className="lg:col-span-2">
+              <SectionHeading
+                eyebrow="Contacto"
+                title="Solicite asesoría personalizada"
+                description="Cuéntenos sobre su proyecto y nuestro equipo le acompañará desde la selección del material hasta la instalación."
+              />
+            </div>
+            <div className="lg:col-span-3">
+              <ContactForm />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 8.11 CTA final */}
+      <CTASection source="home" />
+    </>
   );
 }

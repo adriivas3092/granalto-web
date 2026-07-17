@@ -1,7 +1,23 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    // Los placeholders temporales son SVG locales; al reemplazarlos por
+    // fotografías (JPG/WebP/AVIF) esta excepción puede eliminarse.
+    dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    formats: ["image/avif", "image/webp"],
+  },
+  async redirects() {
+    // Redirecciones desde URLs del sitio anterior (granaltocr.net).
+    // PENDIENTE_VALIDAR: completar con el inventario final de URLs antiguas.
+    return [
+      { source: "/granito", destination: "/materiales/granito", permanent: true },
+      { source: "/onix", destination: "/materiales/onix", permanent: true },
+      { source: "/travertinos", destination: "/materiales/travertino", permanent: true },
+      { source: "/cambria", destination: "/materiales/cuarzo", permanent: true },
+    ];
+  },
 };
 
 export default nextConfig;
