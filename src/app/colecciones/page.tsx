@@ -24,8 +24,8 @@ export default function CollectionsPage() {
       <HeroSection
         size="medium"
         image={{
-          src: "/images/placeholders/coleccion-hogar.svg",
-          alt: "Espacio residencial con superficies premium — imagen pendiente de reemplazo",
+          src: "/images/photos/hero-3.jpg",
+          alt: "Cocina contemporánea en negro con isla de piedra oscura y detalles dorados",
         }}
         eyebrow="Colecciones"
         title="Un material para cada espacio"

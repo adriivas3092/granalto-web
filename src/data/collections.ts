@@ -14,17 +14,21 @@ export const collections: Collection[] = [
     description:
       "La cocina es el espacio donde el material trabaja más y se ve más. Seleccionamos superficies que resisten el uso diario sin renunciar al carácter: cuarcitas y granitos naturales, cuarzos técnicos, porcelánicos de gran formato y superficies sólidas. Nuestro equipo acompaña la elección del sobre, la isla, el salpicadero y cada detalle, desde la lámina hasta la instalación final.",
     coverImage: {
-      src: "/images/placeholders/coleccion-cocina.svg",
-      alt: "Cocina con sobre de piedra natural — imagen pendiente de reemplazo",
+      src: "/images/photos/hero-1.jpg",
+      alt: "Cocina con isla y salpicadero en cuarcita taupe y mobiliario de madera",
     },
     gallery: [
       {
-        src: "/images/placeholders/coleccion-cocina-1.svg",
-        alt: "Detalle de isla de cocina — imagen pendiente de reemplazo",
+        src: "/images/photos/hero-3.jpg",
+        alt: "Cocina contemporánea en negro con isla de piedra oscura y detalles dorados",
       },
       {
-        src: "/images/placeholders/coleccion-cocina-2.svg",
-        alt: "Salpicadero de porcelánico de gran formato — imagen pendiente de reemplazo",
+        src: "/images/photos/hero-5.jpg",
+        alt: "Isla de cocina en cuarcita beige con mobiliario de madera clara",
+      },
+      {
+        src: "/images/photos/hero-2.jpg",
+        alt: "Cocina exterior junto a la piscina con isla en piedra de vetas doradas",
       },
     ],
     subcategories: [
@@ -52,8 +56,8 @@ export const collections: Collection[] = [
     description:
       "En el baño, el material define la atmósfera. Trabajamos sobres de baño en piedra natural y superficies técnicas, revestimientos de pared y piso, lavamanos integrados y esculpidos, y complementos de grifería y sanitarios de marcas seleccionadas. Cada proyecto se resuelve a la medida, cuidando la continuidad de vetas y el detalle de los encuentros.",
     coverImage: {
-      src: "/images/placeholders/coleccion-bano.svg",
-      alt: "Baño con revestimiento de mármol — imagen pendiente de reemplazo",
+      src: "/images/photos/hero-4.jpg",
+      alt: "Baño principal con sobre de piedra clara, tina esculpida y grifería dorada",
     },
     gallery: [
       {

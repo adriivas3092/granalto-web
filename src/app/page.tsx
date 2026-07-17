@@ -1,8 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { HeroSection } from "@/components/sections/HeroSection";
+import { HeroCarousel } from "@/components/sections/HeroCarousel";
 import { CTASection } from "@/components/sections/CTASection";
+import { heroSlides } from "@/data/hero";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ButtonLink } from "@/components/ui/Button";
 import { CollectionCard } from "@/components/cards/CollectionCard";
@@ -37,14 +38,9 @@ export default function HomePage() {
 
   return (
     <>
-      {/* 8.1 Hero principal */}
-      <HeroSection
-        size="full"
-        showScrollHint
-        image={{
-          src: "/images/placeholders/hero-home.svg",
-          alt: "Superficie de piedra natural en un espacio arquitectónico — imagen pendiente de reemplazo",
-        }}
+      {/* 8.1 Hero principal: carrusel automático con transición suave */}
+      <HeroCarousel
+        slides={heroSlides}
         title="Superficies que transforman espacios"
         description="Descubra materiales, acabados y soluciones seleccionadas para crear cocinas, baños y espacios con identidad propia."
       >
@@ -54,7 +50,7 @@ export default function HomePage() {
         <ButtonLink href="/contacto" variant="outline" onDark>
           Solicitar asesoría
         </ButtonLink>
-      </HeroSection>
+      </HeroCarousel>
 
       {/* 8.2 Introducción a Granalto */}
       <section className={`${container} py-20 md:py-28`}>

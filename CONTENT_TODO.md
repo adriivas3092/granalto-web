@@ -5,6 +5,20 @@ validar antes de publicar el sitio en producción. Los datos ya integrados
 que requieren confirmación están marcados con `PENDIENTE_VALIDAR` en el
 código (buscar ese texto en `src/`).
 
+## Fotografías del carrusel del hero (recibidas — falta el archivo)
+
+Granalto compartió 5 fotografías reales para el hero de portada. Las rutas
+ya están integradas; falta subir los archivos definitivos (los actuales en
+`public/images/photos/` son provisionales generados en código):
+
+- [ ] `public/images/photos/hero-1.jpg` — cocina con isla en cuarcita taupe y cielo de madera
+- [ ] `public/images/photos/hero-2.jpg` — cocina exterior junto a piscina, isla con vetas doradas
+- [ ] `public/images/photos/hero-3.jpg` — cocina contemporánea negra con isla de piedra oscura
+- [ ] `public/images/photos/hero-4.jpg` — baño con tina esculpida y grifería dorada
+- [ ] `public/images/photos/hero-5.jpg` — isla en cuarcita beige con madera clara
+- [ ] Confirmar material y datos reales de cada proyecto mostrado (hoy se
+      describen de forma genérica y prudente)
+
 ## Fotografías faltantes
 
 Todos los archivos en `public/images/placeholders/` son SVG temporales que

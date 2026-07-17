@@ -27,10 +27,10 @@ export const projects: Project[] = [
     location: undefined, // PENDIENTE_VALIDAR: publicar solo con autorización
     materials: ["cuarcita"],
     description:
-      "Proyecto de demostración: isla protagonista en cuarcita natural con veta continua y salpicadero a juego. Pendiente de reemplazo por un proyecto real documentado.",
+      "Isla protagonista y salpicadero en piedra natural con veta continua, integrados con mobiliario de madera. (Datos del proyecto pendientes de validación.)",
     coverImage: {
-      src: "/images/placeholders/proyecto-cocina.svg",
-      alt: "Cocina con isla en cuarcita — imagen pendiente de reemplazo",
+      src: "/images/photos/hero-5.jpg",
+      alt: "Cocina con isla en cuarcita beige y mobiliario de madera clara",
     },
     gallery: [],
     featured: true,
@@ -42,25 +42,25 @@ export const projects: Project[] = [
     category: "bano",
     materials: ["marmol"],
     description:
-      "Proyecto de demostración: sobre de baño y revestimiento de pared en mármol con lavamanos de diseño. Pendiente de reemplazo por un proyecto real documentado.",
+      "Sobre de baño y revestimientos en piedra clara con tina esculpida y grifería dorada. (Datos del proyecto pendientes de validación.)",
     coverImage: {
-      src: "/images/placeholders/proyecto-bano.svg",
-      alt: "Baño principal en mármol — imagen pendiente de reemplazo",
+      src: "/images/photos/hero-4.jpg",
+      alt: "Baño principal con sobre de piedra clara, tina esculpida y grifería dorada",
     },
     gallery: [],
     featured: true,
   },
   {
-    id: "proj-hogar-chimenea",
-    slug: "chimenea-porcelanico-gran-formato",
-    title: "Chimenea en porcelánico de gran formato",
-    category: "hogar",
-    materials: ["porcelanico"],
+    id: "proj-cocina-exterior",
+    slug: "cocina-exterior-piscina",
+    title: "Cocina exterior junto a la piscina",
+    category: "exteriores",
+    materials: [],
     description:
-      "Proyecto de demostración: muro de chimenea revestido en porcelánico de gran formato con juntas mínimas. Pendiente de reemplazo por un proyecto real documentado.",
+      "Isla exterior en piedra de vetas doradas con área de asado integrada, resistente a la intemperie. (Datos del proyecto pendientes de validación.)",
     coverImage: {
-      src: "/images/placeholders/proyecto-hogar.svg",
-      alt: "Chimenea revestida en porcelánico — imagen pendiente de reemplazo",
+      src: "/images/photos/hero-2.jpg",
+      alt: "Cocina exterior junto a la piscina con isla en piedra de vetas doradas",
     },
     gallery: [],
     featured: true,
