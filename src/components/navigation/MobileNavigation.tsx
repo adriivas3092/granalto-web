@@ -61,7 +61,7 @@ export function MobileNavigation({ isTransparent }: { isTransparent: boolean }) 
           className="fixed inset-0 z-50 flex flex-col bg-ivory"
         >
           <div className="flex h-16 items-center justify-between px-4 sm:px-6">
-            <Logo size="md" className="text-ink" />
+            <Logo variant="dark" size="md" />
             <button
               type="button"
               onClick={() => setOpen(false)}

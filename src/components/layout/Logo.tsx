@@ -1,47 +1,44 @@
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 /**
- * Logotipo de Granalto como marca denominativa vectorial.
- * Usa `currentColor`, por lo que hereda el color del contexto: blanco sobre
- * el hero y fondos oscuros (footer), negro sobre el header claro. Reproduce
- * el wordmark "GRANALTO®" con la línea inferior característica en Montserrat.
- *
- * Si Granalto prefiere usar su archivo de logo exacto, basta reemplazar este
- * componente por un <Image>/SVG; toda la app lo consume desde aquí.
+ * Logotipo oficial de Granalto (archivo provisto por la marca).
+ * Dos variantes según el fondo:
+ *  - "white": para fondos oscuros (hero, footer).
+ *  - "dark": para fondos claros (header con scroll, menú móvil).
+ * Los archivos viven en public/images/logo/.
  */
+const sizeClasses = {
+  sm: "h-5",
+  md: "h-7",
+  lg: "h-9",
+} as const;
+
 export function Logo({
-  className,
+  variant = "dark",
   size = "md",
+  priority = false,
+  className,
 }: {
+  variant?: "white" | "dark";
+  size?: keyof typeof sizeClasses;
+  priority?: boolean;
   className?: string;
-  size?: "sm" | "md" | "lg";
 }) {
-  const sizeClasses = {
-    sm: "text-lg",
-    md: "text-2xl",
-    lg: "text-3xl",
-  }[size];
+  const src =
+    variant === "white"
+      ? "/images/logo/logo-granalto-white.png"
+      : "/images/logo/logo-granalto-dark.png";
 
   return (
-    <span
-      className={cn(
-        "inline-flex flex-col text-current",
-        className,
-      )}
-      aria-hidden="true"
-    >
-      <span
-        className={cn(
-          "font-sans font-bold uppercase leading-none tracking-[0.14em]",
-          sizeClasses,
-        )}
-      >
-        Granalto
-        <sup className="ml-[0.15em] align-top text-[0.42em] font-semibold tracking-normal">
-          ®
-        </sup>
-      </span>
-      <span className="mt-1 h-px w-full bg-current" />
-    </span>
+    <Image
+      src={src}
+      alt="Granalto"
+      width={900}
+      height={143}
+      priority={priority}
+      sizes="220px"
+      className={cn("w-auto", sizeClasses[size], className)}
+    />
   );
 }

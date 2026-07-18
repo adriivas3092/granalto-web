@@ -42,7 +42,7 @@ export function Header() {
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:h-20 lg:px-8">
         <Link href="/" aria-label="Granalto — inicio">
-          <Logo size="md" />
+          <Logo variant={isTransparent ? "white" : "dark"} size="md" priority />
         </Link>
 
         <nav aria-label="Navegación principal" className="hidden lg:block">
