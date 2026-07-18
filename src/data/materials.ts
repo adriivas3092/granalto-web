@@ -312,80 +312,66 @@ export const materials: Material[] = [
     },
   },
   {
-    id: "mat-onix",
-    slug: "onix",
-    name: "Ónix",
-    category: "natural",
+    id: "mat-cambria",
+    slug: "cambria",
+    name: "Cambria",
+    category: "tecnico",
     shortDescription:
-      "Piedra translúcida de lujo que cobra vida con iluminación integrada.",
+      "Cuarzo natural de alta gama, no poroso y de diseños exclusivos.",
     description:
-      "El ónix es una piedra natural de lujo, translúcida, que al integrarse con técnicas de iluminación revela la profundidad de sus tonalidades. Es el material por excelencia para barras retroiluminadas, muros protagonistas y piezas escultóricas.",
+      "Cambria es una superficie de cuarzo natural de alta gama, fabricada con estándares exigentes. Al ser no porosa, resiste manchas y no requiere sellado, y ofrece una amplia gama de diseños exclusivos —incluidos aspectos que evocan mármoles y piedras naturales— con gran uniformidad y desempeño para cocinas y baños.",
     features: [
-      "Translucidez natural: permite retroiluminación",
-      "Tonalidades y vetas dramáticas",
-      "Cada pieza es única",
+      "Cuarzo natural no poroso: no requiere sellado",
+      "Alta resistencia a manchas y al uso diario",
+      "Diseños exclusivos, muchos de aspecto mármol",
+      "Color y patrón uniformes y predecibles",
     ],
     applications: [
-      "Barras y muros retroiluminados",
-      "Recepciones y piezas protagonistas",
-      "Detalles decorativos de lujo",
+      "Sobres de cocina e islas",
+      "Sobres de baño",
+      "Mobiliario y comercios",
+      "Revestimientos interiores",
     ],
     considerations: [
-      "Es una piedra delicada: se recomienda para superficies de uso decorativo o moderado",
-      "Requiere diseño de iluminación y soporte especializados",
+      "Sensible al calor directo: usar protección bajo ollas calientes",
+      "No recomendado para exteriores con exposición solar directa",
     ],
-    finishes: ["Pulido"],
-    colors: ["Blancos", "Miel", "Verdes", "Multicolor"],
-    brands: [],
-    coverImage: placeholder("Ónix", "material-onix"),
-    gallery: [placeholder("Ambiente con ónix retroiluminado", "material-onix-1")],
+    finishes: ["Pulido", "Mate"],
+    colors: ["Blancos", "Grises", "Negros", "Aspecto mármol"],
+    brands: ["Cambria"],
+    coverImage: placeholder("Cambria", "material-cambria"),
+    gallery: [placeholder("Ambiente con superficie Cambria", "material-cambria-1")],
     catalogIds: [],
-    featured: false,
+    featured: true,
     seo: {
-      title: "Ónix en Costa Rica | Piedra translúcida de lujo",
+      title: "Cambria en Costa Rica | Cuarzo de alta gama",
       description:
-        "Ónix natural translúcido para barras retroiluminadas, muros y piezas de lujo. Selección e instalación especializada en Costa Rica.",
-    },
-  },
-  {
-    id: "mat-terrazzo",
-    slug: "terrazzo",
-    name: "Terrazzo",
-    category: "decorativo",
-    shortDescription:
-      "Composición de mármol y agregados con carácter gráfico y contemporáneo.",
-    description:
-      "El terrazzo combina fragmentos de mármol y otros agregados en una matriz de cemento o resina, creando superficies de carácter gráfico que hoy viven un renacimiento en el diseño contemporáneo. Funciona en pisos, sobres y revestimientos con personalidad.",
-    features: [
-      "Estética gráfica y contemporánea",
-      "Gran variedad de combinaciones de color y agregado",
-      "Superficie continua en pisos",
-    ],
-    applications: [
-      "Pisos",
-      "Sobres y mesas",
-      "Revestimientos y detalles decorativos",
-    ],
-    considerations: [
-      "El desempeño depende de la matriz (cementicia o resina): consultar según aplicación",
-    ],
-    finishes: ["Pulido", "Honed (mate)"],
-    colors: ["Claros", "Grises", "Combinaciones a la medida"],
-    brands: ["Santa Margherita"],
-    coverImage: placeholder("Terrazzo", "material-terrazzo"),
-    gallery: [placeholder("Ambiente con terrazzo", "material-terrazzo-1")],
-    catalogIds: [],
-    featured: false,
-    seo: {
-      title: "Terrazzo en Costa Rica | Superficies decorativas",
-      description:
-        "Terrazzo para pisos, sobres y revestimientos con carácter gráfico y contemporáneo. Asesoría y fabricación en Costa Rica.",
+        "Superficies de cuarzo Cambria: no porosas, de bajo mantenimiento y diseños exclusivos para cocinas y baños en Costa Rica.",
     },
   },
 ];
 
+/** Orden de presentación de los materiales (catálogo de Granalto). */
+const materialOrder = [
+  "cuarzo",
+  "cuarcita",
+  "marmol",
+  "granito",
+  "cambria",
+  "superficie-solida",
+  "porcelanico",
+  "travertino",
+  "hpl",
+];
+
+function orderMaterials(list: Material[]): Material[] {
+  return [...list].sort(
+    (a, b) => materialOrder.indexOf(a.slug) - materialOrder.indexOf(b.slug),
+  );
+}
+
 export function getMaterials(): Material[] {
-  return materials;
+  return orderMaterials(materials);
 }
 
 export function getMaterialBySlug(slug: string): Material | undefined {
@@ -393,7 +379,7 @@ export function getMaterialBySlug(slug: string): Material | undefined {
 }
 
 export function getFeaturedMaterials(): Material[] {
-  return materials.filter((m) => m.featured);
+  return orderMaterials(materials.filter((m) => m.featured));
 }
 
 /** Nota legal/técnica configurable que se muestra en páginas de material. */

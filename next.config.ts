@@ -13,9 +13,9 @@ const nextConfig: NextConfig = {
     // PENDIENTE_VALIDAR: completar con el inventario final de URLs antiguas.
     return [
       { source: "/granito", destination: "/materiales/granito", permanent: true },
-      { source: "/onix", destination: "/materiales/onix", permanent: true },
+      { source: "/onix", destination: "/materiales", permanent: true },
       { source: "/travertinos", destination: "/materiales/travertino", permanent: true },
-      { source: "/cambria", destination: "/materiales/cuarzo", permanent: true },
+      { source: "/cambria", destination: "/materiales/cambria", permanent: true },
     ];
   },
 };

@@ -7,7 +7,7 @@ import { heroSlides } from "@/data/hero";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ButtonLink } from "@/components/ui/Button";
 import { CollectionCard } from "@/components/cards/CollectionCard";
-import { MaterialCard } from "@/components/cards/MaterialCard";
+import { MaterialsCarousel3D } from "@/components/sections/MaterialsCarousel3D";
 import { ProjectCard } from "@/components/cards/ProjectCard";
 import { CatalogCard } from "@/components/cards/CatalogCard";
 import { BlogCard } from "@/components/cards/BlogCard";
@@ -15,7 +15,7 @@ import { BrandCard } from "@/components/cards/BrandCard";
 import { LocationCard } from "@/components/cards/LocationCard";
 import { ContactForm } from "@/components/forms/ContactForm";
 import { getFeaturedCollections } from "@/data/collections";
-import { getFeaturedMaterials } from "@/data/materials";
+import { getMaterials } from "@/data/materials";
 import { getActiveBrands } from "@/data/brands";
 import { getFeaturedProjects } from "@/data/projects";
 import { getFeaturedCatalogs } from "@/data/catalogs";
@@ -29,7 +29,7 @@ const container = "mx-auto max-w-7xl px-4 sm:px-6 lg:px-8";
 
 export default function HomePage() {
   const collections = getFeaturedCollections();
-  const materials = getFeaturedMaterials();
+  const materials = getMaterials();
   const brands = getActiveBrands();
   const projects = getFeaturedProjects();
   const catalogs = getFeaturedCatalogs();
@@ -105,19 +105,13 @@ export default function HomePage() {
 
       {/* 8.4 Materiales */}
       <section className={`${container} py-20 md:py-28`}>
-        <div className="flex flex-wrap items-end justify-between gap-6">
-          <SectionHeading
-            eyebrow="Materiales"
-            title="Materiales seleccionados para proyectos únicos"
-            description="Explore una selección de superficies naturales, técnicas y decorativas para cocinas, baños, mobiliario, revestimientos y espacios arquitectónicos."
-          />
-        </div>
-        <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-5">
-          {materials.map((material) => (
-            <MaterialCard key={material.id} material={material} />
-          ))}
-        </div>
-        <div className="mt-12">
+        <SectionHeading
+          eyebrow="Materiales"
+          title="Materiales seleccionados para proyectos únicos"
+          description="Explore una selección de superficies naturales, técnicas y decorativas para cocinas, baños, mobiliario, revestimientos y espacios arquitectónicos."
+        />
+        <MaterialsCarousel3D materials={materials} />
+        <div className="mt-12 text-center">
           <ButtonLink href="/materiales" variant="outline">
             Explorar materiales
           </ButtonLink>

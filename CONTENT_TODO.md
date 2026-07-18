@@ -30,9 +30,9 @@ de ancho para imágenes de ambiente):
 - [ ] Colección Cocina: portada + 2 de galería
 - [ ] Colección Baño: portada + 2 de galería
 - [ ] Colección Hogar: portada + 2 de galería
-- [ ] 10 materiales: portada + 1 ambiente por material (cuarcita, granito,
-      mármol, cuarzo, porcelánico, superficie sólida, HPL, travertino,
-      ónix, terrazzo)
+- [ ] 9 materiales: portada + 1 ambiente por material (cuarzo, cuarcita,
+      mármol, granito, Cambria, superficie sólida, porcelánico, travertino,
+      HPL) — catálogo confirmado por Granalto
 - [ ] 3 showrooms (Lagunilla, Escazú, Liberia)
 - [ ] Portadas de catálogos (Granalto, Tenax, Wilsonart)
 - [ ] Imágenes de los 3 artículos del blog
