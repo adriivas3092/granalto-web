@@ -11,17 +11,19 @@ export const catalogs: Catalog[] = [
   {
     id: "cat-granalto-superficies",
     slug: "granalto-superficies",
-    title: "Catálogo de superficies Granalto",
+    title: "Catálogo Granalto 2026",
     brand: "Granalto",
     category: "Superficies",
     description:
       "Selección de piedras naturales y superficies técnicas disponibles para sobres, revestimientos y proyectos a la medida.",
+    year: 2026,
     language: "Español",
+    fileSize: "18 MB",
     coverImage: {
-      src: "/images/placeholders/catalogo-granalto.svg",
-      alt: "Portada del catálogo de superficies Granalto — pendiente de reemplazo",
+      src: "/images/catalogs/catalogo-granalto-portada.jpg",
+      alt: "Portada del Catálogo Granalto 2026",
     },
-    fileUrl: "", // PENDIENTE_VALIDAR: colocar PDF en public/catalogs/
+    fileUrl: "/catalogs/Catalogo-Granalto-2026_compressed.pdf",
     featured: true,
   },
   {
