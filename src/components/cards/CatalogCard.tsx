@@ -14,12 +14,12 @@ export function CatalogCard({ catalog }: { catalog: Catalog }) {
 
   return (
     <article className="flex flex-col overflow-hidden rounded-sm border border-stone-beige bg-white">
-      <div className="relative aspect-[4/5] bg-stone-beige">
+      <div className="relative aspect-video bg-stone-beige">
         <Image
           src={catalog.coverImage.src}
           alt={catalog.coverImage.alt}
           fill
-          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           className="object-cover"
         />
       </div>
