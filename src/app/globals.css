@@ -73,6 +73,15 @@ h3 {
   }
 }
 
+/* Utilidad: ocultar la barra de desplazamiento (carruseles horizontales) */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 /* Utilidad: enlace subrayado editorial */
 .link-editorial {
   text-decoration: underline;

@@ -7,7 +7,7 @@ import { heroSlides } from "@/data/hero";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ButtonLink } from "@/components/ui/Button";
 import { CollectionCard } from "@/components/cards/CollectionCard";
-import { MaterialsCarousel3D } from "@/components/sections/MaterialsCarousel3D";
+import { MaterialsCarousel } from "@/components/sections/MaterialsCarousel";
 import { ProjectCard } from "@/components/cards/ProjectCard";
 import { CatalogCard } from "@/components/cards/CatalogCard";
 import { BlogCard } from "@/components/cards/BlogCard";
@@ -110,7 +110,7 @@ export default function HomePage() {
           title="Materiales seleccionados para proyectos únicos"
           description="Explore una selección de superficies naturales, técnicas y decorativas para cocinas, baños, mobiliario, revestimientos y espacios arquitectónicos."
         />
-        <MaterialsCarousel3D materials={materials} />
+        <MaterialsCarousel materials={materials} />
         <div className="mt-12 text-center">
           <ButtonLink href="/materiales" variant="outline">
             Explorar materiales
