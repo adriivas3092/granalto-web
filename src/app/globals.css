@@ -73,19 +73,6 @@ h3 {
   }
 }
 
-/* Zoom sutil (Ken Burns) para el carrusel del hero */
-@keyframes hero-zoom {
-  from {
-    transform: scale(1);
-  }
-  to {
-    transform: scale(1.06);
-  }
-}
-.animate-hero-zoom {
-  animation: hero-zoom 9s var(--ease-elegant) forwards;
-}
-
 /* Utilidad: enlace subrayado editorial */
 .link-editorial {
   text-decoration: underline;

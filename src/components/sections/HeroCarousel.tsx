@@ -62,7 +62,7 @@ export function HeroCarousel({
           key={slide.src}
           aria-hidden={i !== active}
           className={cn(
-            "absolute inset-0 transition-opacity duration-[1500ms] ease-in-out",
+            "absolute inset-0 transition-opacity duration-[1600ms] ease-in-out",
             i === active ? "opacity-100" : "opacity-0",
           )}
         >
@@ -73,8 +73,13 @@ export function HeroCarousel({
             priority={i === 0}
             sizes="100vw"
             className={cn(
-              "object-cover",
-              !reducedMotion && i === active && "animate-hero-zoom",
+              "object-cover will-change-transform",
+              // Zoom continuo mediante transición de transform (no keyframe):
+              // la escala cambia de forma animada al activar/desactivar, sin
+              // el reinicio brusco que producía el "golpe" en el cambio.
+              !reducedMotion &&
+                "transition-transform duration-[7000ms] ease-out motion-reduce:transition-none",
+              !reducedMotion && (i === active ? "scale-[1.06]" : "scale-100"),
             )}
           />
         </div>
