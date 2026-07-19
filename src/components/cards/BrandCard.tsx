@@ -1,18 +1,30 @@
 import Image from "next/image";
 import type { Brand } from "@/types";
 
-/** Tarjeta de marca: logo, categoría y descripción breve. */
+/**
+ * Tarjeta de marca. Muestra el logo oficial cuando la marca lo tiene
+ * (`officialLogo`); mientras tanto, presenta el nombre como wordmark en
+ * Montserrat bold para mantener coherencia tipográfica.
+ */
 export function BrandCard({ brand }: { brand: Brand }) {
   return (
     <article className="flex flex-col rounded-sm border border-stone-beige bg-white p-6">
-      <div className="relative mb-5 h-14">
-        <Image
-          src={brand.logo.src}
-          alt={brand.logo.alt}
-          fill
-          sizes="200px"
-          className="object-contain object-left"
-        />
+      <div className="mb-5 flex h-14 items-center">
+        {brand.officialLogo ? (
+          <div className="relative h-full w-full max-w-[180px]">
+            <Image
+              src={brand.officialLogo.src}
+              alt={brand.officialLogo.alt}
+              fill
+              sizes="180px"
+              className="object-contain object-left"
+            />
+          </div>
+        ) : (
+          <span className="font-sans text-2xl font-bold uppercase tracking-[0.08em] text-ink">
+            {brand.name}
+          </span>
+        )}
       </div>
       <p className="text-xs uppercase tracking-[0.15em] text-mineral">
         {brand.category}

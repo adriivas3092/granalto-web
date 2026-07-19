@@ -111,6 +111,12 @@ export type Brand = {
   description: string;
   category: string;
   logo: Media;
+  /**
+   * Logo oficial de la marca (archivo provisto). Si está presente se muestra
+   * la imagen; si no, se muestra el nombre de la marca como wordmark en
+   * Montserrat. Ver public/images/brands/.
+   */
+  officialLogo?: Media;
   website?: string;
   catalogIds: string[];
   active: boolean;
