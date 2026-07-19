@@ -15,6 +15,7 @@ export const brands: Brand[] = [
       "Nuestra propia línea de superficies y fabricación a la medida: selección de piedra natural, corte de precisión e instalación profesional.",
     category: "Superficies y fabricación",
     logo: { src: "/images/placeholders/logo-granalto.svg", alt: "Logo Granalto" },
+    officialLogo: { src: "/images/logo/logo-granalto-dark.png", alt: "Logo Granalto" },
     website: "",
     catalogIds: [],
     active: true,
@@ -27,6 +28,7 @@ export const brands: Brand[] = [
       "Productos para el tratamiento, mantenimiento y cuidado de la piedra: selladores, adhesivos, abrasivos y químicos especializados.",
     category: "Cuidado y tratamiento de piedra",
     logo: { src: "/images/placeholders/logo-tenax.svg", alt: "Logo Tenax" },
+    officialLogo: { src: "/images/brands/tenax.png", alt: "Logo Tenax" },
     website: "", // PENDIENTE_VALIDAR
     catalogIds: [],
     active: true,
@@ -39,6 +41,7 @@ export const brands: Brand[] = [
       "Láminas decorativas HPL y superficies sólidas para mobiliario, paneles y proyectos comerciales y residenciales.",
     category: "Laminados y superficies sólidas",
     logo: { src: "/images/placeholders/logo-wilsonart.svg", alt: "Logo Wilsonart" },
+    officialLogo: { src: "/images/brands/wilsonart.avif", alt: "Logo Wilsonart" },
     website: "", // PENDIENTE_VALIDAR
     catalogIds: [],
     active: true,
@@ -51,6 +54,7 @@ export const brands: Brand[] = [
       "Porcelánico italiano de gran formato para pisos, paredes, fachadas y sobres, con diseños inspirados en piedras naturales.",
     category: "Porcelánico",
     logo: { src: "/images/placeholders/logo-abk.svg", alt: "Logo ABK" },
+    officialLogo: { src: "/images/brands/abk.png", alt: "Logo ABK" },
     website: "", // PENDIENTE_VALIDAR
     catalogIds: [],
     active: true,
@@ -63,6 +67,7 @@ export const brands: Brand[] = [
       "Grifería italiana de diseño para cocina y baño, con acabados contemporáneos.",
     category: "Grifería",
     logo: { src: "/images/placeholders/logo-newform.svg", alt: "Logo Newform" },
+    officialLogo: { src: "/images/brands/newform.jpg", alt: "Logo Newform" },
     website: "", // PENDIENTE_VALIDAR
     catalogIds: [],
     active: true,
@@ -75,6 +80,7 @@ export const brands: Brand[] = [
       "Sanitarios y lavamanos de cerámica italiana con diseño de autor.",
     category: "Sanitarios",
     logo: { src: "/images/placeholders/logo-flaminia.svg", alt: "Logo Flaminia" },
+    officialLogo: { src: "/images/brands/flaminia.png", alt: "Logo Flaminia" },
     website: "", // PENDIENTE_VALIDAR
     catalogIds: [],
     active: true,
@@ -90,6 +96,10 @@ export const brands: Brand[] = [
       src: "/images/placeholders/logo-santa-margherita.svg",
       alt: "Logo Santa Margherita",
     },
+    officialLogo: {
+      src: "/images/brands/santa-margherita.png",
+      alt: "Logo Santa Margherita",
+    },
     website: "", // PENDIENTE_VALIDAR
     catalogIds: [],
     active: true,
@@ -102,6 +112,7 @@ export const brands: Brand[] = [
       "Superficies de cuarzo de alta gama fabricadas en Estados Unidos, con diseños exclusivos.",
     category: "Cuarzo",
     logo: { src: "/images/placeholders/logo-cambria.svg", alt: "Logo Cambria" },
+    officialLogo: { src: "/images/brands/cambria.webp", alt: "Logo Cambria" },
     website: "", // PENDIENTE_VALIDAR
     catalogIds: [],
     active: true,
