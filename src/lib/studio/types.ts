@@ -29,6 +29,24 @@ export type StudioSurface = {
   productId?: string;
   transform: SurfaceTransform;
   hidden?: boolean;
+  /** Superficie bloqueada: no se puede editar ni cambiar su producto. */
+  locked?: boolean;
+};
+
+/** Herramienta activa del editor. */
+export type EditorTool = "select" | "draw";
+
+/** Estado de la carga de imagen. */
+export type UploadState =
+  | { status: "idle" }
+  | { status: "loading" }
+  | { status: "error"; message: string }
+  | { status: "ready"; dataUrl: string };
+
+/** Historial de deshacer/rehacer (instantáneas de superficies). */
+export type EditorHistory = {
+  past: StudioSurface[][];
+  future: StudioSurface[][];
 };
 
 export type StudioProduct = {

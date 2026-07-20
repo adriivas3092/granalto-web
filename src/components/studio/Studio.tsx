@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import {
   Upload,
   ImageIcon,
@@ -12,218 +12,60 @@ import {
   RotateCcw,
   SplitSquareHorizontal,
   Eye,
+  Trash2,
+  History,
 } from "lucide-react";
-import type {
-  StudioSurface,
-  StudioProduct,
-  StudioProject,
-  SurfaceTransform,
-  Point,
-} from "@/lib/studio/types";
-import { defaultTransform } from "@/lib/studio/types";
 import { getStudioRooms } from "@/data/studioRooms";
 import { getStudioProducts, getStudioProductById } from "@/data/studioProducts";
 import { renderScene } from "@/lib/studio/render";
-import { loadProjects, saveProject } from "@/lib/studio/storage";
+import { prepareImageFile } from "@/lib/studio/upload";
+import { useStudioStore } from "@/store/studioStore";
+import { useStudioPersistence } from "@/hooks/useStudioPersistence";
+import { useSceneImages } from "@/hooks/useSceneImages";
 import { trackEvent } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 import { CanvasStage } from "@/components/studio/CanvasStage";
 import { ProductCatalog } from "@/components/studio/ProductCatalog";
 import { SurfacePanel } from "@/components/studio/SurfacePanel";
 
-const MAX_DIM = 2000;
 const rooms = getStudioRooms();
 const products = getStudioProducts();
 const productById = (id: string) => getStudioProductById(id);
 
-type CompareMode = "off" | "split" | "original";
-
 export function Studio() {
-  const [screen, setScreen] = useState<"start" | "editor">("start");
-  const [baseSrc, setBaseSrc] = useState<string | null>(null);
-  const [roomId, setRoomId] = useState<string | undefined>();
-  const [projectName, setProjectName] = useState("Mi proyecto");
-  const [savedProjects, setSavedProjects] = useState<StudioProject[]>([]);
+  // Estado global (Zustand)
+  const screen = useStudioStore((s) => s.screen);
+  const baseSrc = useStudioStore((s) => s.baseSrc);
+  const name = useStudioStore((s) => s.name);
+  const surfaces = useStudioStore((s) => s.surfaces);
+  const selectedId = useStudioStore((s) => s.selectedId);
+  const tool = useStudioStore((s) => s.tool);
+  const draft = useStudioStore((s) => s.draft);
+  const compare = useStudioStore((s) => s.compare);
+  const canUndo = useStudioStore((s) => s.history.past.length > 0);
+  const canRedo = useStudioStore((s) => s.history.future.length > 0);
+  const a = useStudioStore(); // acciones (referencias estables)
 
-  const [baseImg, setBaseImg] = useState<HTMLImageElement | null>(null);
-  const [grayBase, setGrayBase] = useState<HTMLCanvasElement | null>(null);
-  const [version, setVersion] = useState(0);
-  const textures = useRef(new Map<string, HTMLImageElement>());
+  const { baseImg, grayBase, textures, version } = useSceneImages(baseSrc);
+  const { projects, recoverable, setRecoverable, saveNamed, remove, clearDraft } =
+    useStudioPersistence();
 
-  const [surfaces, setSurfaces] = useState<StudioSurface[]>([]);
-  const [selectedId, setSelectedId] = useState<string | undefined>();
-  const [tool, setTool] = useState<"draw" | "select">("select");
-  const [draft, setDraft] = useState<Point[]>([]);
-  const [compare, setCompare] = useState<{ mode: CompareMode; x: number }>({
-    mode: "off",
-    x: 0.5,
-  });
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
 
-  const history = useRef<{ stack: StudioSurface[][]; index: number }>({
-    stack: [[]],
-    index: 0,
-  });
-
-  useEffect(() => setSavedProjects(loadProjects()), []);
-
-  // Precarga de texturas.
-  useEffect(() => {
-    products.forEach((p) => {
-      if (!textures.current.has(p.texture)) {
-        const im = new window.Image();
-        im.onload = () => setVersion((v) => v + 1);
-        im.src = p.texture;
-        textures.current.set(p.texture, im);
-      }
-    });
-  }, []);
-
-  // Carga de la imagen base + versión en gris para conservar sombras.
-  useEffect(() => {
-    if (!baseSrc) {
-      setBaseImg(null);
-      setGrayBase(null);
+  const onFile = async (file: File) => {
+    setBusy(true);
+    setUploadError(null);
+    const res = await prepareImageFile(file);
+    setBusy(false);
+    if (!res.ok) {
+      setUploadError(res.message);
       return;
     }
-    const im = new window.Image();
-    im.crossOrigin = "anonymous";
-    im.onload = () => {
-      setBaseImg(im);
-      const c = document.createElement("canvas");
-      c.width = im.naturalWidth;
-      c.height = im.naturalHeight;
-      const g = c.getContext("2d");
-      if (g) {
-        g.filter = "grayscale(1) contrast(1.05) brightness(1.08)";
-        g.drawImage(im, 0, 0);
-      }
-      setGrayBase(c);
-      setVersion((v) => v + 1);
-    };
-    im.src = baseSrc;
-  }, [baseSrc]);
-
-  /* ---- Historial ---- */
-  const commit = useCallback((next: StudioSurface[]) => {
-    setSurfaces(next);
-    const h = history.current;
-    const stack = h.stack.slice(0, h.index + 1);
-    stack.push(next);
-    history.current = { stack, index: stack.length - 1 };
-  }, []);
-
-  const undo = () => {
-    const h = history.current;
-    if (h.index > 0) {
-      h.index -= 1;
-      setSurfaces(h.stack[h.index]);
-    }
-  };
-  const redo = () => {
-    const h = history.current;
-    if (h.index < h.stack.length - 1) {
-      h.index += 1;
-      setSurfaces(h.stack[h.index]);
-    }
+    a.openRoom(res.dataUrl, undefined, "Mi espacio");
+    trackEvent({ name: "material_view", params: { materialSlug: "foto-propia" } });
   };
 
-  /* ---- Entrada ---- */
-  const openRoom = (image: string, id?: string, name?: string) => {
-    setBaseSrc(image);
-    setRoomId(id);
-    if (name) setProjectName(name);
-    setSurfaces([]);
-    history.current = { stack: [[]], index: 0 };
-    setSelectedId(undefined);
-    setDraft([]);
-    setTool("select");
-    setScreen("editor");
-  };
-
-  const handleFile = (file: File) => {
-    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
-      alert("Formato no válido. Use JPG, PNG o WebP.");
-      return;
-    }
-    if (file.size > 12 * 1024 * 1024) {
-      alert("La imagen supera 12 MB. Use una más liviana.");
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = () => {
-      const im = new window.Image();
-      im.onload = () => {
-        // Redimensionar y re-exportar: acota tamaño y elimina metadatos EXIF.
-        const scale = Math.min(1, MAX_DIM / Math.max(im.naturalWidth, im.naturalHeight));
-        const c = document.createElement("canvas");
-        c.width = Math.round(im.naturalWidth * scale);
-        c.height = Math.round(im.naturalHeight * scale);
-        c.getContext("2d")?.drawImage(im, 0, 0, c.width, c.height);
-        openRoom(c.toDataURL("image/jpeg", 0.9), undefined, "Mi espacio");
-        trackEvent({ name: "material_view", params: { materialSlug: "foto-propia" } });
-      };
-      im.src = reader.result as string;
-    };
-    reader.readAsDataURL(file);
-  };
-
-  /* ---- Superficies ---- */
-  const newSurface = () => {
-    setTool("draw");
-    setDraft([]);
-  };
-  const addPoint = (p: Point) => setDraft((d) => [...d, p]);
-  const cancelDraft = () => {
-    setDraft([]);
-    setTool("select");
-  };
-  const closeDraft = () => {
-    if (draft.length < 3) return;
-    const surface: StudioSurface = {
-      id: `surf-${Date.now()}`,
-      name: `Superficie ${surfaces.length + 1}`,
-      kind: "otro",
-      points: draft,
-      transform: { ...defaultTransform },
-    };
-    commit([...surfaces, surface]);
-    setSelectedId(surface.id);
-    setDraft([]);
-    setTool("select");
-  };
-  const deleteSurface = (id: string) => {
-    commit(surfaces.filter((s) => s.id !== id));
-    if (selectedId === id) setSelectedId(undefined);
-  };
-  const renameSurface = (id: string, name: string) =>
-    setSurfaces((ss) => ss.map((s) => (s.id === id ? { ...s, name } : s)));
-  const toggleHidden = (id: string) =>
-    commit(surfaces.map((s) => (s.id === id ? { ...s, hidden: !s.hidden } : s)));
-  const vertexDrag = (surfaceId: string, index: number, p: Point) =>
-    setSurfaces((ss) =>
-      ss.map((s) =>
-        s.id === surfaceId
-          ? { ...s, points: s.points.map((pt, i) => (i === index ? p : pt)) }
-          : s,
-      ),
-    );
-  const changeTransform = (patch: Partial<SurfaceTransform>) =>
-    setSurfaces((ss) =>
-      ss.map((s) =>
-        s.id === selectedId ? { ...s, transform: { ...s.transform, ...patch } } : s,
-      ),
-    );
-  const applyProduct = (product: StudioProduct) => {
-    if (!selectedId) return;
-    commit(
-      surfaces.map((s) =>
-        s.id === selectedId ? { ...s, productId: product.id } : s,
-      ),
-    );
-    trackEvent({ name: "material_view", params: { materialSlug: product.sku } });
-  };
-
-  /* ---- Exportar / guardar ---- */
   const download = () => {
     if (!baseImg) return;
     const c = document.createElement("canvas");
@@ -238,53 +80,53 @@ export function Studio() {
       grayBase: grayBase ?? undefined,
       surfaces,
       productById,
-      textures: textures.current,
+      textures,
       showOverlay: false,
     });
-    const a = document.createElement("a");
-    a.href = c.toDataURL("image/jpeg", 0.92);
-    a.download = `${projectName || "diseno"}.jpg`;
-    a.click();
+    const link = document.createElement("a");
+    link.href = c.toDataURL("image/jpeg", 0.92);
+    link.download = `${name || "diseno"}.jpg`;
+    link.click();
     trackEvent({ name: "catalog_download", params: { catalogId: "studio-export" } });
   };
 
-  const persist = () => {
-    if (!baseSrc) return;
-    const now = new Date().toISOString();
-    const project: StudioProject = {
-      id: `proj-${Date.now()}`,
-      name: projectName || "Mi proyecto",
-      roomId,
-      image: baseSrc,
-      surfaces,
-      createdAt: now,
-      updatedAt: now,
-    };
-    setSavedProjects(saveProject(project));
-    alert("Proyecto guardado en este navegador.");
-  };
-
-  const loadProject = (p: StudioProject) => {
-    setProjectName(p.name);
-    setRoomId(p.roomId);
-    setBaseSrc(p.image);
-    setSurfaces(p.surfaces);
-    history.current = { stack: [p.surfaces], index: 0 };
-    setSelectedId(undefined);
-    setTool("select");
-    setScreen("editor");
-  };
-
-  const productNameFor = (s: StudioSurface) =>
-    s.productId ? productById(s.productId)?.name : undefined;
-  const activeProductId = surfaces.find((s) => s.id === selectedId)?.productId;
   const revealFrom =
     compare.mode === "split" ? compare.x : compare.mode === "original" ? 1 : undefined;
+  const productNameFor = (id?: string) => (id ? productById(id)?.name : undefined);
+  const activeProductId = surfaces.find((s) => s.id === selectedId)?.productId;
 
   /* ---------- Pantalla de inicio ---------- */
   if (screen === "start") {
     return (
       <div className="space-y-12">
+        {recoverable && (
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-sm border border-ink/30 bg-ink/5 p-4">
+            <p className="flex items-center gap-2 text-sm text-charcoal">
+              <History aria-hidden="true" className="h-4 w-4" />
+              Tiene un proyecto sin terminar (“{recoverable.name}”). ¿Desea continuarlo?
+            </p>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  a.openProject(recoverable);
+                  setRecoverable(null);
+                }}
+                className="rounded-sm bg-ink px-4 py-2 text-sm font-medium text-ivory"
+              >
+                Continuar
+              </button>
+              <button
+                type="button"
+                onClick={() => void clearDraft()}
+                className="rounded-sm border border-stone-beige px-4 py-2 text-sm text-charcoal"
+              >
+                Descartar
+              </button>
+            </div>
+          </div>
+        )}
+
         <div className="grid gap-6 md:grid-cols-2">
           <div className="rounded-sm border border-stone-beige bg-white p-6">
             <ImageIcon aria-hidden="true" className="h-7 w-7 text-mineral" />
@@ -292,10 +134,10 @@ export function Studio() {
               Explorar un ambiente
             </h3>
             <p className="mt-1 text-sm text-charcoal/80">
-              Elija un espacio prediseñado y aplíquele materiales.
+              Elija un espacio de demostración y aplíquele materiales.
             </p>
           </div>
-          <UploadCard onFile={handleFile} />
+          <UploadCard onFile={onFile} busy={busy} error={uploadError} />
         </div>
 
         <div>
@@ -305,7 +147,7 @@ export function Studio() {
               <li key={r.id}>
                 <button
                   type="button"
-                  onClick={() => openRoom(r.image, r.id, r.name)}
+                  onClick={() => a.openRoom(r.image, r.id, r.name)}
                   className="group block w-full text-left"
                 >
                   <span className="relative block aspect-[4/3] overflow-hidden rounded-sm bg-stone-beige">
@@ -317,9 +159,7 @@ export function Studio() {
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                   </span>
-                  <span className="mt-2 block text-sm font-medium text-ink">
-                    {r.name}
-                  </span>
+                  <span className="mt-2 block text-sm font-medium text-ink">{r.name}</span>
                   <span className="block text-xs text-mineral">
                     {r.style} · {r.surfacesCount} superficies
                   </span>
@@ -329,23 +169,30 @@ export function Studio() {
           </ul>
         </div>
 
-        {savedProjects.length > 0 && (
+        {projects.length > 0 && (
           <div>
-            <h3 className="mb-4 font-sans text-xl font-bold text-ink">
-              Mis proyectos guardados
-            </h3>
+            <h3 className="mb-4 font-sans text-xl font-bold text-ink">Mis proyectos</h3>
             <ul className="flex flex-wrap gap-3">
-              {savedProjects.map((p) => (
-                <li key={p.id}>
+              {projects.map((p) => (
+                <li
+                  key={p.id}
+                  className="flex items-center gap-2 rounded-sm border border-stone-beige bg-white px-3 py-2"
+                >
                   <button
                     type="button"
-                    onClick={() => loadProject(p)}
-                    className="rounded-sm border border-stone-beige bg-white px-4 py-2.5 text-sm text-ink hover:border-mineral"
+                    onClick={() => a.openProject(p)}
+                    className="text-sm text-ink"
                   >
                     {p.name}
-                    <span className="ml-2 text-xs text-mineral">
-                      {p.surfaces.length} sup.
-                    </span>
+                    <span className="ml-2 text-xs text-mineral">{p.surfaces.length} sup.</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void remove(p.id)}
+                    aria-label={`Borrar ${p.name}`}
+                    className="text-mineral hover:text-[#a03826]"
+                  >
+                    <Trash2 aria-hidden="true" className="h-4 w-4" />
                   </button>
                 </li>
               ))}
@@ -359,51 +206,42 @@ export function Studio() {
   /* ---------- Editor ---------- */
   return (
     <div className="rounded-sm border border-stone-beige bg-white">
-      {/* Barra superior */}
       <div className="flex flex-wrap items-center gap-2 border-b border-stone-beige p-3">
         <button
           type="button"
-          onClick={() => setScreen("start")}
+          onClick={() => a.setScreen("start")}
           className="rounded-sm border border-stone-beige px-3 py-1.5 text-sm text-charcoal hover:border-mineral"
         >
           ← Ambientes
         </button>
         <input
           aria-label="Nombre del proyecto"
-          value={projectName}
-          onChange={(e) => setProjectName(e.target.value)}
+          value={name}
+          onChange={(e) => a.setName(e.target.value)}
           className="min-w-0 flex-1 rounded-sm border border-transparent px-2 py-1.5 text-sm font-medium text-ink hover:border-stone-beige focus:border-ink focus:outline-none"
         />
         <div className="flex items-center gap-1">
-          <IconBtn label="Deshacer" onClick={undo} disabled={history.current.index === 0}>
+          <IconBtn label="Deshacer" onClick={a.undo} disabled={!canUndo}>
             <Undo2 aria-hidden="true" className="h-4 w-4" />
           </IconBtn>
-          <IconBtn
-            label="Rehacer"
-            onClick={redo}
-            disabled={history.current.index >= history.current.stack.length - 1}
-          >
+          <IconBtn label="Rehacer" onClick={a.redo} disabled={!canRedo}>
             <Redo2 aria-hidden="true" className="h-4 w-4" />
           </IconBtn>
           <IconBtn
             label="Ver original"
             active={compare.mode === "original"}
-            onClick={() =>
-              setCompare((c) => ({ ...c, mode: c.mode === "original" ? "off" : "original" }))
-            }
+            onClick={() => a.setCompareMode(compare.mode === "original" ? "off" : "original")}
           >
             <Eye aria-hidden="true" className="h-4 w-4" />
           </IconBtn>
           <IconBtn
             label="Antes y después"
             active={compare.mode === "split"}
-            onClick={() =>
-              setCompare((c) => ({ ...c, mode: c.mode === "split" ? "off" : "split" }))
-            }
+            onClick={() => a.setCompareMode(compare.mode === "split" ? "off" : "split")}
           >
             <SplitSquareHorizontal aria-hidden="true" className="h-4 w-4" />
           </IconBtn>
-          <IconBtn label="Guardar" onClick={persist}>
+          <IconBtn label="Guardar proyecto" onClick={() => void saveNamed()}>
             <Save aria-hidden="true" className="h-4 w-4" />
           </IconBtn>
           <IconBtn label="Descargar imagen" onClick={download}>
@@ -413,33 +251,32 @@ export function Studio() {
       </div>
 
       <div className="grid lg:grid-cols-[280px_1fr_300px]">
-        {/* Panel superficies */}
         <div className="order-2 border-t border-stone-beige p-4 lg:order-1 lg:border-r lg:border-t-0">
           <SurfacePanel
             surfaces={surfaces}
             selectedId={selectedId}
             tool={tool}
             draftLength={draft.length}
-            productNameFor={productNameFor}
-            onNewSurface={newSurface}
-            onCloseDraft={closeDraft}
-            onCancelDraft={cancelDraft}
-            onSelect={setSelectedId}
-            onDelete={deleteSurface}
-            onRename={renameSurface}
-            onToggleHidden={toggleHidden}
-            onChangeTransform={changeTransform}
+            productNameFor={(s) => productNameFor(s.productId)}
+            onNewSurface={a.newSurface}
+            onCloseDraft={a.closeDraft}
+            onCancelDraft={a.cancelDraft}
+            onSelect={a.selectSurface}
+            onDelete={a.deleteSurface}
+            onRename={a.renameSurface}
+            onToggleHidden={a.toggleHidden}
+            onToggleLocked={a.toggleLocked}
+            onChangeTransform={a.setTransform}
           />
         </div>
 
-        {/* Lienzo */}
         <div className="order-1 lg:order-2">
           <div className="relative aspect-[4/3] w-full bg-ink/5">
             {baseImg ? (
               <CanvasStage
                 baseImg={baseImg}
                 grayBase={grayBase}
-                textures={textures.current}
+                textures={textures}
                 version={version}
                 surfaces={surfaces}
                 productById={productById}
@@ -447,9 +284,9 @@ export function Studio() {
                 tool={tool}
                 draft={draft}
                 compareX={revealFrom ?? null}
-                onAddPoint={addPoint}
-                onVertexDrag={vertexDrag}
-                onSelectSurface={setSelectedId}
+                onAddPoint={a.addPoint}
+                onVertexDrag={a.vertexDrag}
+                onSelectSurface={a.selectSurface}
               />
             ) : (
               <div className="flex h-full items-center justify-center text-sm text-mineral">
@@ -467,9 +304,7 @@ export function Studio() {
                   max={1}
                   step={0.01}
                   value={compare.x}
-                  onChange={(e) =>
-                    setCompare((c) => ({ ...c, x: parseFloat(e.target.value) }))
-                  }
+                  onChange={(e) => a.setCompareX(parseFloat(e.target.value))}
                   className="flex-1 accent-ink"
                   aria-label="Control antes y después"
                 />
@@ -480,36 +315,31 @@ export function Studio() {
           <p className="border-t border-stone-beige px-3 py-2 text-xs text-mineral">
             {tool === "draw"
               ? "Marque el contorno tocando la imagen."
-              : "Seleccione una superficie (o cree una) y aplique un material del catálogo. Arrastre los puntos para ajustar."}
+              : "Seleccione o cree una superficie y aplique un material. Arrastre los puntos para ajustar."}
           </p>
         </div>
 
-        {/* Catálogo */}
         <div className="order-3 border-t border-stone-beige lg:border-l lg:border-t-0">
           <ProductCatalog
             products={products}
             activeProductId={activeProductId}
             disabled={!selectedId}
-            onApply={applyProduct}
+            onApply={(p) => a.applyProduct(p.id)}
           />
         </div>
       </div>
 
-      <div className="flex items-center justify-between gap-3 border-t border-stone-beige p-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-stone-beige p-3">
         <button
           type="button"
-          onClick={() => {
-            setSurfaces([]);
-            history.current = { stack: [[]], index: 0 };
-            setSelectedId(undefined);
-          }}
+          onClick={a.resetSurfaces}
           className="inline-flex items-center gap-1.5 text-xs text-charcoal/70 hover:text-ink"
         >
           <RotateCcw aria-hidden="true" className="h-3.5 w-3.5" />
           Reiniciar superficies
         </button>
         <span className="text-xs text-mineral">
-          Vista referencial · los materiales aplicados son una simulación
+          Autoguardado activo · vista referencial (simulación)
         </span>
       </div>
     </div>
@@ -548,9 +378,17 @@ function IconBtn({
   );
 }
 
-function UploadCard({ onFile }: { onFile: (file: File) => void }) {
+function UploadCard({
+  onFile,
+  busy,
+  error,
+}: {
+  onFile: (file: File) => void;
+  busy: boolean;
+  error: string | null;
+}) {
   const [over, setOver] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [inputEl, setInputEl] = useState<HTMLInputElement | null>(null);
   return (
     <div
       onDragOver={(e) => {
@@ -570,21 +408,25 @@ function UploadCard({ onFile }: { onFile: (file: File) => void }) {
       )}
     >
       <Upload aria-hidden="true" className="h-7 w-7 text-mineral" />
-      <h3 className="mt-3 font-sans text-xl font-bold text-ink">
-        Cargar mi fotografía
-      </h3>
+      <h3 className="mt-3 font-sans text-xl font-bold text-ink">Cargar mi fotografía</h3>
       <p className="mt-1 text-sm text-charcoal/80">
         Arrastre una imagen aquí o selecciónela. JPG, PNG o WebP, hasta 12 MB.
       </p>
       <button
         type="button"
-        onClick={() => inputRef.current?.click()}
-        className="mt-4 inline-flex min-h-[44px] items-center rounded-sm bg-ink px-5 py-2.5 text-sm font-medium text-ivory hover:bg-charcoal"
+        onClick={() => inputEl?.click()}
+        disabled={busy}
+        className="mt-4 inline-flex min-h-[44px] items-center rounded-sm bg-ink px-5 py-2.5 text-sm font-medium text-ivory hover:bg-charcoal disabled:opacity-50"
       >
-        Seleccionar imagen
+        {busy ? "Procesando…" : "Seleccionar imagen"}
       </button>
+      {error && (
+        <p role="alert" className="mt-3 text-sm text-[#a03826]">
+          {error}
+        </p>
+      )}
       <input
-        ref={inputRef}
+        ref={setInputEl}
         type="file"
         accept="image/jpeg,image/png,image/webp"
         className="hidden"

@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, Trash2, Eye, EyeOff, Check, X, RotateCw } from "lucide-react";
+import { Plus, Trash2, Eye, EyeOff, Check, X, RotateCw, Lock, Unlock } from "lucide-react";
 import type { StudioSurface, SurfaceTransform } from "@/lib/studio/types";
 import { cn } from "@/lib/utils";
 
@@ -17,6 +17,7 @@ type Props = {
   onDelete: (id: string) => void;
   onRename: (id: string, name: string) => void;
   onToggleHidden: (id: string) => void;
+  onToggleLocked: (id: string) => void;
   onChangeTransform: (patch: Partial<SurfaceTransform>) => void;
 };
 
@@ -69,6 +70,7 @@ export function SurfacePanel({
   onDelete,
   onRename,
   onToggleHidden,
+  onToggleLocked,
   onChangeTransform,
 }: Props) {
   const selected = surfaces.find((s) => s.id === selectedId);
@@ -145,6 +147,18 @@ export function SurfacePanel({
               </button>
               <button
                 type="button"
+                onClick={() => onToggleLocked(s.id)}
+                aria-label={s.locked ? "Desbloquear superficie" : "Bloquear superficie"}
+                className={cn("hover:text-ink", s.locked ? "text-ink" : "text-mineral")}
+              >
+                {s.locked ? (
+                  <Lock aria-hidden="true" className="h-4 w-4" />
+                ) : (
+                  <Unlock aria-hidden="true" className="h-4 w-4" />
+                )}
+              </button>
+              <button
+                type="button"
                 onClick={() => onToggleHidden(s.id)}
                 aria-label={s.hidden ? "Mostrar superficie" : "Ocultar superficie"}
                 className="text-mineral hover:text-ink"
@@ -169,7 +183,16 @@ export function SurfacePanel({
       </div>
 
       {selected && (
-        <div className="space-y-4 border-t border-stone-beige pt-4">
+        <fieldset
+          disabled={selected.locked}
+          className="space-y-4 border-t border-stone-beige pt-4 disabled:opacity-60"
+        >
+          {selected.locked && (
+            <p className="flex items-center gap-1.5 text-xs text-mineral">
+              <Lock aria-hidden="true" className="h-3.5 w-3.5" />
+              Superficie bloqueada. Desbloquéela para editarla.
+            </p>
+          )}
           <div>
             <label htmlFor="surf-name" className="text-xs text-charcoal">
               Nombre
@@ -252,7 +275,7 @@ export function SurfacePanel({
             display={selected.transform.brightness.toFixed(2)}
             onChange={(v) => onChangeTransform({ brightness: v })}
           />
-        </div>
+        </fieldset>
       )}
     </div>
   );
