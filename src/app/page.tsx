@@ -77,8 +77,8 @@ export default function HomePage() {
           </div>
           <div className="relative aspect-[4/3] overflow-hidden rounded-sm bg-stone-beige">
             <Image
-              src="/images/placeholders/nosotros.svg"
-              alt="Showroom de Granalto — imagen pendiente de reemplazo"
+              src="/images/photos/nosotros.jpg"
+              alt="Equipo y trabajo de Granalto"
               fill
               sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover"

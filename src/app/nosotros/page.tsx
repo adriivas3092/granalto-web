@@ -49,8 +49,8 @@ export default function AboutPage() {
       <HeroSection
         size="large"
         image={{
-          src: "/images/placeholders/nosotros.svg",
-          alt: "Planta y showroom de Granalto — imagen pendiente de reemplazo",
+          src: "/images/photos/nosotros.jpg",
+          alt: "Equipo y trabajo de Granalto",
         }}
         eyebrow="Nosotros"
         title="Diseño, precisión y materiales excepcionales"
