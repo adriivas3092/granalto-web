@@ -9,15 +9,15 @@ import type { Brand } from "@/types";
 export function BrandCard({ brand }: { brand: Brand }) {
   return (
     <article className="flex flex-col rounded-sm border border-stone-beige bg-white p-6">
-      <div className="mb-5 flex h-14 items-center">
+      <div className="mb-5 flex h-16 items-center justify-center">
         {brand.officialLogo ? (
-          <div className="relative h-full w-full max-w-[180px]">
+          <div className="relative h-full w-full">
             <Image
               src={brand.officialLogo.src}
               alt={brand.officialLogo.alt}
               fill
-              sizes="180px"
-              className="object-contain object-left"
+              sizes="(max-width: 768px) 45vw, 240px"
+              className="object-contain object-center"
             />
           </div>
         ) : (
