@@ -7,6 +7,8 @@ const nextConfig: NextConfig = {
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     formats: ["image/avif", "image/webp"],
+    // Imágenes de productos alojadas en Supabase Storage.
+    remotePatterns: [{ protocol: "https", hostname: "*.supabase.co" }],
   },
   async redirects() {
     // Redirecciones desde URLs del sitio anterior (granaltocr.net).
