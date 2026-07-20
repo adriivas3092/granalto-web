@@ -111,7 +111,8 @@ export default function HomePage() {
           description="Explore una selección de superficies naturales, técnicas y decorativas para cocinas, baños, mobiliario, revestimientos y espacios arquitectónicos."
         />
         <MaterialsCarousel materials={materials} />
-        <div className="mt-12 text-center">
+        <div className="mt-12 flex flex-wrap justify-center gap-3">
+          <ButtonLink href="/configurador">Probar el configurador</ButtonLink>
           <ButtonLink href="/materiales" variant="outline">
             Explorar materiales
           </ButtonLink>
