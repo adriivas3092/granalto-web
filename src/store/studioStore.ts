@@ -38,7 +38,9 @@ type StudioState = PersistentSlice &
     openProject: (project: StudioProject) => void;
     hydrate: (project: StudioProject) => void;
     // superficies
+    setTool: (tool: EditorTool) => void;
     newSurface: () => void;
+    addSurfaceFromPoints: (points: Point[], name?: string) => void;
     addPoint: (p: Point) => void;
     closeDraft: () => void;
     cancelDraft: () => void;
@@ -120,7 +122,21 @@ export const useStudioStore = create<StudioState>((set, get) => {
         tool: "select",
       }),
 
+    setTool: (tool) => set({ tool, draft: [] }),
     newSurface: () => set({ tool: "draw", draft: [] }),
+    addSurfaceFromPoints: (points, name) => {
+      if (points.length < 3) return;
+      const surfaces = get().surfaces;
+      const surface: StudioSurface = {
+        id: `surf-${Date.now()}`,
+        name: name ?? `Superficie ${surfaces.length + 1}`,
+        kind: "otro",
+        points,
+        transform: { ...defaultTransform },
+      };
+      commit([...surfaces, surface]);
+      set({ selectedId: surface.id, tool: "select", draft: [] });
+    },
     addPoint: (p) => set((s) => ({ draft: [...s.draft, p] })),
     cancelDraft: () => set({ draft: [], tool: "select" }),
     closeDraft: () => {

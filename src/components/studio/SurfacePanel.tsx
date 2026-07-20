@@ -1,13 +1,13 @@
 "use client";
 
 import { Plus, Trash2, Eye, EyeOff, Check, X, RotateCw, Lock, Unlock } from "lucide-react";
-import type { StudioSurface, SurfaceTransform } from "@/lib/studio/types";
+import type { StudioSurface, SurfaceTransform, EditorTool } from "@/lib/studio/types";
 import { cn } from "@/lib/utils";
 
 type Props = {
   surfaces: StudioSurface[];
   selectedId?: string;
-  tool: "draw" | "select";
+  tool: EditorTool;
   draftLength: number;
   productNameFor: (s: StudioSurface) => string | undefined;
   onNewSurface: () => void;

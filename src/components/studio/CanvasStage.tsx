@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
-import type { StudioSurface, StudioProduct, Point } from "@/lib/studio/types";
+import type { StudioSurface, StudioProduct, Point, EditorTool } from "@/lib/studio/types";
 import { renderScene } from "@/lib/studio/render";
 import {
   containRect,
@@ -19,10 +19,11 @@ type Props = {
   surfaces: StudioSurface[];
   productById: (id: string) => StudioProduct | undefined;
   selectedId?: string;
-  tool: "draw" | "select";
+  tool: EditorTool;
   draft: Point[];
   compareX: number | null;
   onAddPoint: (p: Point) => void;
+  onAiPoint: (p: Point) => void;
   onVertexDrag: (surfaceId: string, index: number, p: Point) => void;
   onSelectSurface: (id: string) => void;
 };
@@ -40,6 +41,7 @@ export function CanvasStage(props: Props) {
     draft,
     compareX,
     onAddPoint,
+    onAiPoint,
     onVertexDrag,
     onSelectSurface,
   } = props;
@@ -123,6 +125,10 @@ export function CanvasStage(props: Props) {
       onAddPoint(toNormalized(x, y, rect));
       return;
     }
+    if (tool === "ai") {
+      onAiPoint(toNormalized(x, y, rect));
+      return;
+    }
     // select: primero intentar arrastrar un vértice de la superficie activa
     const active = surfaces.find((s) => s.id === selectedId);
     if (active) {
@@ -166,7 +172,7 @@ export function CanvasStage(props: Props) {
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
-        className={tool === "draw" ? "cursor-crosshair" : "cursor-pointer"}
+        className={tool === "draw" || tool === "ai" ? "cursor-crosshair" : "cursor-pointer"}
         aria-label="Lienzo del configurador"
       />
     </div>

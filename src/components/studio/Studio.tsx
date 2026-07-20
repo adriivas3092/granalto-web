@@ -14,11 +14,16 @@ import {
   Eye,
   Trash2,
   History,
+  Sparkles,
+  Loader2,
 } from "lucide-react";
+import type { Point } from "@/lib/studio/types";
 import { getStudioRooms } from "@/data/studioRooms";
 import { getStudioProducts, getStudioProductById } from "@/data/studioProducts";
 import { renderScene } from "@/lib/studio/render";
 import { prepareImageFile } from "@/lib/studio/upload";
+import { maskToPolygon } from "@/lib/studio/mask";
+import { prepareImage, segmentAtPoint } from "@/lib/studio/segmentation";
 import { useStudioStore } from "@/store/studioStore";
 import { useStudioPersistence } from "@/hooks/useStudioPersistence";
 import { useSceneImages } from "@/hooks/useSceneImages";
@@ -52,6 +57,44 @@ export function Studio() {
 
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [ai, setAi] = useState<{
+    phase: "idle" | "loading" | "ready" | "working" | "error";
+    message?: string;
+  }>({ phase: "idle" });
+
+  const enableAi = async () => {
+    a.setTool("ai");
+    if (!baseSrc) return;
+    if (ai.phase === "ready") return;
+    setAi({ phase: "loading", message: "Cargando IA (primera vez, puede tardar)…" });
+    try {
+      await prepareImage(baseSrc, () => {});
+      setAi({ phase: "ready", message: "Toque una superficie (piso, pared…) para detectarla." });
+    } catch {
+      setAi({
+        phase: "error",
+        message: "No se pudo cargar el modelo de IA en este dispositivo. Use el modo manual.",
+      });
+    }
+  };
+
+  const onAiPoint = async (p: Point) => {
+    if (!baseSrc || ai.phase === "working" || ai.phase === "loading") return;
+    setAi({ phase: "working", message: "Detectando superficie…" });
+    try {
+      await prepareImage(baseSrc, () => {});
+      const { mask, width, height } = await segmentAtPoint(p.x, p.y);
+      const poly = maskToPolygon(mask, width, height);
+      if (poly.length < 3) {
+        setAi({ phase: "ready", message: "No se detectó una superficie clara. Pruebe otro punto." });
+        return;
+      }
+      a.addSurfaceFromPoints(poly, "Superficie IA");
+      setAi({ phase: "ready", message: "Superficie detectada. Elija un material del catálogo." });
+    } catch {
+      setAi({ phase: "error", message: "Falló la detección. Intente de nuevo o use el modo manual." });
+    }
+  };
 
   const onFile = async (file: File) => {
     setBusy(true);
@@ -214,6 +257,24 @@ export function Studio() {
         >
           ← Ambientes
         </button>
+        <button
+          type="button"
+          onClick={enableAi}
+          aria-pressed={tool === "ai"}
+          className={cn(
+            "inline-flex items-center gap-1.5 rounded-sm border px-3 py-1.5 text-sm font-medium transition-colors",
+            tool === "ai"
+              ? "border-ink bg-ink text-ivory"
+              : "border-ink text-ink hover:bg-ink hover:text-ivory",
+          )}
+        >
+          {ai.phase === "loading" || ai.phase === "working" ? (
+            <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" />
+          ) : (
+            <Sparkles aria-hidden="true" className="h-4 w-4" />
+          )}
+          Detectar con IA
+        </button>
         <input
           aria-label="Nombre del proyecto"
           value={name}
@@ -285,6 +346,7 @@ export function Studio() {
                 draft={draft}
                 compareX={revealFrom ?? null}
                 onAddPoint={a.addPoint}
+                onAiPoint={onAiPoint}
                 onVertexDrag={a.vertexDrag}
                 onSelectSurface={a.selectSurface}
               />
@@ -293,6 +355,18 @@ export function Studio() {
                 Cargando imagen…
               </div>
             )}
+            {(tool === "ai" || ai.phase === "loading" || ai.phase === "working" || ai.phase === "error") &&
+              ai.message && (
+                <div
+                  role="status"
+                  className="pointer-events-none absolute inset-x-3 top-3 flex items-center gap-2 rounded-sm bg-ink/85 px-3 py-2 text-xs text-ivory"
+                >
+                  {(ai.phase === "loading" || ai.phase === "working") && (
+                    <Loader2 aria-hidden="true" className="h-3.5 w-3.5 animate-spin" />
+                  )}
+                  {ai.message}
+                </div>
+              )}
           </div>
           {compare.mode === "split" && (
             <div className="border-t border-stone-beige p-3">
