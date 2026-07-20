@@ -275,6 +275,75 @@ export function SurfacePanel({
             display={selected.transform.brightness.toFixed(2)}
             onChange={(v) => onChangeTransform({ brightness: v })}
           />
+
+          <div>
+            <span className="text-xs text-charcoal">Patrón de colocación</span>
+            <div className="mt-1 grid grid-cols-2 gap-1.5">
+              {(
+                [
+                  ["recto", "Recto"],
+                  ["desplazado", "Desplazado"],
+                  ["diagonal", "Diagonal"],
+                  ["mosaico", "Mosaico"],
+                ] as const
+              ).map(([value, label]) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => onChangeTransform({ pattern: value })}
+                  aria-pressed={selected.transform.pattern === value}
+                  className={cn(
+                    "rounded-sm border px-2 py-1.5 text-xs transition-colors",
+                    selected.transform.pattern === value
+                      ? "border-ink bg-ink text-ivory"
+                      : "border-stone-beige text-charcoal hover:border-mineral",
+                  )}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <Slider
+            label="Ancho de junta"
+            value={selected.transform.groutWidth}
+            min={0}
+            max={10}
+            step={0.5}
+            display={selected.transform.groutWidth === 0 ? "Sin junta" : `${selected.transform.groutWidth}`}
+            onChange={(v) => onChangeTransform({ groutWidth: v })}
+          />
+
+          <label className="flex items-center justify-between text-xs text-charcoal">
+            <span>Color de junta</span>
+            <input
+              type="color"
+              value={selected.transform.groutColor}
+              onChange={(e) => onChangeTransform({ groutColor: e.target.value })}
+              className="h-7 w-12 cursor-pointer rounded-sm border border-stone-beige bg-white"
+              aria-label="Color de junta"
+            />
+          </label>
+
+          <label
+            className={cn(
+              "flex items-start gap-2 text-xs",
+              selected.points.length === 4 ? "text-charcoal" : "text-mineral",
+            )}
+          >
+            <input
+              type="checkbox"
+              checked={selected.transform.perspective}
+              disabled={selected.points.length !== 4}
+              onChange={(e) => onChangeTransform({ perspective: e.target.checked })}
+              className="mt-0.5 h-4 w-4 accent-ink"
+            />
+            <span>
+              Ajustar a la perspectiva
+              {selected.points.length !== 4 && " (marque la superficie con 4 puntos)"}
+            </span>
+          </label>
         </fieldset>
       )}
     </div>

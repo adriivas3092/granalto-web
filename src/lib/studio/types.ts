@@ -10,6 +10,9 @@ export type SurfaceKind =
   | "encimera"
   | "otro";
 
+/** Patrón de colocación de las piezas. */
+export type LayingPattern = "recto" | "desplazado" | "diagonal" | "mosaico";
+
 export type SurfaceTransform = {
   /** Escala del patrón (tamaño del formato). */
   scale: number;
@@ -19,6 +22,14 @@ export type SurfaceTransform = {
   opacity: number;
   /** Brillo de la textura (0.5..1.5). */
   brightness: number;
+  /** Ancho de la junta en píxeles de textura (0 = sin junta). */
+  groutWidth: number;
+  /** Color de la junta. */
+  groutColor: string;
+  /** Patrón de colocación. */
+  pattern: LayingPattern;
+  /** Deformar la textura a la perspectiva de los 4 puntos (si aplica). */
+  perspective: boolean;
 };
 
 export type StudioSurface = {
@@ -92,4 +103,8 @@ export const defaultTransform: SurfaceTransform = {
   rotation: 0,
   opacity: 1,
   brightness: 1,
+  groutWidth: 0,
+  groutColor: "#d8d4cc",
+  pattern: "recto",
+  perspective: false,
 };
