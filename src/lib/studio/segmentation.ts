@@ -27,7 +27,7 @@ async function load(onProgress?: (p: number) => void): Promise<Loaded> {
         if (onProgress && typeof data.progress === "number") onProgress(data.progress);
       };
       const [model, processor] = await Promise.all([
-        tf.SamModel.from_pretrained(MODEL_ID, { dtype: "fp16", progress_callback }),
+        tf.SamModel.from_pretrained(MODEL_ID, { dtype: "q8", progress_callback }),
         tf.AutoProcessor.from_pretrained(MODEL_ID),
       ]);
       return { tf, model, processor };

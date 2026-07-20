@@ -16,6 +16,7 @@ import {
   History,
   Sparkles,
   Loader2,
+  Wand2,
 } from "lucide-react";
 import type { Point } from "@/lib/studio/types";
 import { getStudioRooms } from "@/data/studioRooms";
@@ -24,6 +25,7 @@ import { renderScene } from "@/lib/studio/render";
 import { prepareImageFile } from "@/lib/studio/upload";
 import { maskToPolygon } from "@/lib/studio/mask";
 import { prepareImage, segmentAtPoint } from "@/lib/studio/segmentation";
+import { detectByColor } from "@/lib/studio/wand";
 import { useStudioStore } from "@/store/studioStore";
 import { useStudioPersistence } from "@/hooks/useStudioPersistence";
 import { useSceneImages } from "@/hooks/useSceneImages";
@@ -61,6 +63,28 @@ export function Studio() {
     phase: "idle" | "loading" | "ready" | "working" | "error";
     message?: string;
   }>({ phase: "idle" });
+  const [wandTol, setWandTol] = useState(30);
+  const [detectMsg, setDetectMsg] = useState<string | null>(null);
+
+  const enableWand = () => {
+    a.setTool("wand");
+    setDetectMsg(
+      "Toque una superficie (piso, pared). Ajuste la tolerancia si toma de más o de menos.",
+    );
+  };
+
+  const onWandPoint = (p: Point) => {
+    if (!baseImg) return;
+    const res = detectByColor(baseImg, p.x, p.y, wandTol);
+    if (!res) return;
+    const poly = maskToPolygon(res.mask, res.width, res.height);
+    if (poly.length < 3) {
+      setDetectMsg("No se detectó una superficie. Suba la tolerancia o toque otra zona.");
+      return;
+    }
+    a.addSurfaceFromPoints(poly, "Superficie");
+    setDetectMsg("Superficie detectada. Elija un material del catálogo.");
+  };
 
   const enableAi = async () => {
     a.setTool("ai");
@@ -259,13 +283,28 @@ export function Studio() {
         </button>
         <button
           type="button"
-          onClick={enableAi}
-          aria-pressed={tool === "ai"}
+          onClick={enableWand}
+          aria-pressed={tool === "wand"}
           className={cn(
             "inline-flex items-center gap-1.5 rounded-sm border px-3 py-1.5 text-sm font-medium transition-colors",
-            tool === "ai"
+            tool === "wand"
               ? "border-ink bg-ink text-ivory"
               : "border-ink text-ink hover:bg-ink hover:text-ivory",
+          )}
+        >
+          <Wand2 aria-hidden="true" className="h-4 w-4" />
+          Detectar superficie
+        </button>
+        <button
+          type="button"
+          onClick={enableAi}
+          aria-pressed={tool === "ai"}
+          title="Detección con IA (experimental; requiere descargar un modelo)"
+          className={cn(
+            "inline-flex items-center gap-1.5 rounded-sm border px-2.5 py-1.5 text-sm transition-colors",
+            tool === "ai"
+              ? "border-ink bg-ink text-ivory"
+              : "border-stone-beige text-charcoal hover:border-ink",
           )}
         >
           {ai.phase === "loading" || ai.phase === "working" ? (
@@ -273,7 +312,7 @@ export function Studio() {
           ) : (
             <Sparkles aria-hidden="true" className="h-4 w-4" />
           )}
-          Detectar con IA
+          IA (beta)
         </button>
         <input
           aria-label="Nombre del proyecto"
@@ -347,6 +386,7 @@ export function Studio() {
                 compareX={revealFrom ?? null}
                 onAddPoint={a.addPoint}
                 onAiPoint={onAiPoint}
+                onWandPoint={onWandPoint}
                 onVertexDrag={a.vertexDrag}
                 onSelectSurface={a.selectSurface}
               />
@@ -355,8 +395,18 @@ export function Studio() {
                 Cargando imagen…
               </div>
             )}
-            {(tool === "ai" || ai.phase === "loading" || ai.phase === "working" || ai.phase === "error") &&
-              ai.message && (
+            {(() => {
+              const msg =
+                tool === "wand"
+                  ? detectMsg
+                  : tool === "ai" ||
+                      ai.phase === "loading" ||
+                      ai.phase === "working" ||
+                      ai.phase === "error"
+                    ? ai.message
+                    : null;
+              if (!msg) return null;
+              return (
                 <div
                   role="status"
                   className="pointer-events-none absolute inset-x-3 top-3 flex items-center gap-2 rounded-sm bg-ink/85 px-3 py-2 text-xs text-ivory"
@@ -364,10 +414,29 @@ export function Studio() {
                   {(ai.phase === "loading" || ai.phase === "working") && (
                     <Loader2 aria-hidden="true" className="h-3.5 w-3.5 animate-spin" />
                   )}
-                  {ai.message}
+                  {msg}
                 </div>
-              )}
+              );
+            })()}
           </div>
+          {tool === "wand" && (
+            <div className="border-t border-stone-beige p-3">
+              <label className="flex items-center gap-3 text-xs text-charcoal">
+                Tolerancia
+                <input
+                  type="range"
+                  min={5}
+                  max={80}
+                  step={1}
+                  value={wandTol}
+                  onChange={(e) => setWandTol(parseInt(e.target.value, 10))}
+                  className="flex-1 accent-ink"
+                  aria-label="Tolerancia de la varita mágica"
+                />
+                <span className="w-8 text-right text-mineral">{wandTol}</span>
+              </label>
+            </div>
+          )}
           {compare.mode === "split" && (
             <div className="border-t border-stone-beige p-3">
               <label className="flex items-center gap-3 text-xs text-charcoal">

@@ -45,7 +45,7 @@ export type StudioSurface = {
 };
 
 /** Herramienta activa del editor. */
-export type EditorTool = "select" | "draw" | "ai";
+export type EditorTool = "select" | "draw" | "ai" | "wand";
 
 /** Estado de la carga de imagen. */
 export type UploadState =

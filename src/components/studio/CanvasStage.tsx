@@ -24,6 +24,7 @@ type Props = {
   compareX: number | null;
   onAddPoint: (p: Point) => void;
   onAiPoint: (p: Point) => void;
+  onWandPoint: (p: Point) => void;
   onVertexDrag: (surfaceId: string, index: number, p: Point) => void;
   onSelectSurface: (id: string) => void;
 };
@@ -42,6 +43,7 @@ export function CanvasStage(props: Props) {
     compareX,
     onAddPoint,
     onAiPoint,
+    onWandPoint,
     onVertexDrag,
     onSelectSurface,
   } = props;
@@ -129,6 +131,10 @@ export function CanvasStage(props: Props) {
       onAiPoint(toNormalized(x, y, rect));
       return;
     }
+    if (tool === "wand") {
+      onWandPoint(toNormalized(x, y, rect));
+      return;
+    }
     // select: primero intentar arrastrar un vértice de la superficie activa
     const active = surfaces.find((s) => s.id === selectedId);
     if (active) {
@@ -172,7 +178,11 @@ export function CanvasStage(props: Props) {
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
-        className={tool === "draw" || tool === "ai" ? "cursor-crosshair" : "cursor-pointer"}
+        className={
+          tool === "draw" || tool === "ai" || tool === "wand"
+            ? "cursor-crosshair"
+            : "cursor-pointer"
+        }
         aria-label="Lienzo del configurador"
       />
     </div>
