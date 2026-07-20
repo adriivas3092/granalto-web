@@ -18,6 +18,9 @@ export async function requireAdmin() {
     .eq("user_id", user.id)
     .maybeSingle();
 
-  if (!data) redirect("/admin/login?e=unauthorized");
+  // Usuario autenticado pero sin permisos de admin: enviamos a una página
+  // dentro de /admin (no a /login) para evitar el bucle de redirección con
+  // el middleware, que devuelve /admin/login → /admin cuando hay sesión.
+  if (!data) redirect("/admin/no-autorizado");
   return user;
 }
