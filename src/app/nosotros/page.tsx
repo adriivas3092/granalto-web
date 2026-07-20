@@ -101,8 +101,8 @@ export default function AboutPage() {
         <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
           <div className="relative aspect-[4/3] overflow-hidden rounded-sm bg-stone-beige">
             <Image
-              src="/images/placeholders/showroom-lagunilla.svg"
-              alt="Showroom de Granalto en Lagunilla, Heredia — imagen pendiente de reemplazo"
+              src="/images/photos/showroom-lagunilla.jpg"
+              alt="Showroom de Granalto en Lagunilla, Heredia"
               fill
               sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover"

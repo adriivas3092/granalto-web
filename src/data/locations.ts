@@ -21,8 +21,8 @@ export const locations: Location[] = [
     mapUrl: undefined, // PENDIENTE_VALIDAR: URL de Google Maps
     coordinates: undefined, // PENDIENTE_VALIDAR
     image: {
-      src: "/images/placeholders/showroom-lagunilla.svg",
-      alt: "Showroom Granalto en Lagunilla, Heredia — imagen pendiente de reemplazo",
+      src: "/images/photos/showroom-lagunilla.jpg",
+      alt: "Showroom Granalto en Lagunilla, Heredia",
     },
     services: ["Showroom", "Asesoría personalizada", "Selección de materiales"],
   },
@@ -39,8 +39,8 @@ export const locations: Location[] = [
     mapUrl: undefined, // PENDIENTE_VALIDAR
     coordinates: undefined, // PENDIENTE_VALIDAR
     image: {
-      src: "/images/placeholders/showroom-escazu.svg",
-      alt: "Showroom Granalto en Guachipelín, Escazú — imagen pendiente de reemplazo",
+      src: "/images/photos/showroom-escazu.jpg",
+      alt: "Showroom Granalto en Guachipelín, Escazú",
     },
     services: ["Showroom", "Asesoría personalizada", "Selección de materiales"],
   },
@@ -57,8 +57,8 @@ export const locations: Location[] = [
     mapUrl: undefined, // PENDIENTE_VALIDAR
     coordinates: undefined, // PENDIENTE_VALIDAR
     image: {
-      src: "/images/placeholders/showroom-liberia.svg",
-      alt: "Showroom Granalto en Liberia, Guanacaste — imagen pendiente de reemplazo",
+      src: "/images/photos/showroom-liberia.jpg",
+      alt: "Showroom Granalto en Liberia, Guanacaste",
     },
     services: ["Showroom", "Asesoría personalizada", "Selección de materiales"],
   },

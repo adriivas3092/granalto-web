@@ -20,8 +20,8 @@ export default function LocationsPage() {
       <HeroSection
         size="medium"
         image={{
-          src: "/images/placeholders/showroom-escazu.svg",
-          alt: "Showroom de Granalto — imagen pendiente de reemplazo",
+          src: "/images/photos/showroom-escazu.jpg",
+          alt: "Showroom de Granalto en Guachipelín, Escazú",
         }}
         eyebrow="Ubicaciones"
         title="Visítenos y viva los materiales"
