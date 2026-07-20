@@ -63,7 +63,7 @@ export function Studio() {
     phase: "idle" | "loading" | "ready" | "working" | "error";
     message?: string;
   }>({ phase: "idle" });
-  const [wandTol, setWandTol] = useState(30);
+  const [wandTol, setWandTol] = useState(38);
   const [detectMsg, setDetectMsg] = useState<string | null>(null);
 
   const enableWand = () => {
@@ -77,13 +77,23 @@ export function Studio() {
     if (!baseImg) return;
     const res = detectByColor(baseImg, p.x, p.y, wandTol);
     if (!res) return;
+    if (res.coverage < 0.004) {
+      setDetectMsg("Selección muy pequeña. Suba la tolerancia y vuelva a tocar.");
+      return;
+    }
+    if (res.coverage > 0.92) {
+      setDetectMsg("Seleccionó casi toda la imagen. Baje la tolerancia y vuelva a tocar.");
+      return;
+    }
     const poly = maskToPolygon(res.mask, res.width, res.height);
     if (poly.length < 3) {
-      setDetectMsg("No se detectó una superficie. Suba la tolerancia o toque otra zona.");
+      setDetectMsg("No se detectó una superficie. Ajuste la tolerancia o toque otra zona.");
       return;
     }
     a.addSurfaceFromPoints(poly, "Superficie");
-    setDetectMsg("Superficie detectada. Elija un material del catálogo.");
+    setDetectMsg("Superficie detectada. Elija un material del catálogo. Toque otra para agregar más.");
+    // Permanece en modo varita para seguir seleccionando superficies.
+    a.setTool("wand");
   };
 
   const enableAi = async () => {
