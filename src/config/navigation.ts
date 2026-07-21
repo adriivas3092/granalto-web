@@ -13,6 +13,7 @@ export const mainNavigation: NavItem[] = [
   },
   { label: "Materiales", href: "/materiales" },
   { label: "Tienda", href: "/tienda" },
+  { label: "Visualizador", href: "/visualizador" },
   { label: "Catálogos", href: "/catalogos" },
   { label: "Blog", href: "/blog" },
   { label: "Contacto", href: "/contacto" },
