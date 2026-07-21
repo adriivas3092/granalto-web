@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Check, MessageCircle } from "lucide-react";
 import { CTASection } from "@/components/sections/CTASection";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
+import { AddToCartButton } from "@/components/store/AddToCartButton";
 import { getProductBySlug, formatPrice } from "@/lib/store/queries";
 import { getWhatsAppUrl } from "@/config/site";
 import { buildMetadata } from "@/lib/metadata";
@@ -106,20 +107,25 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               </dl>
             )}
 
-            <div className="mt-8 flex flex-wrap gap-3">
+            <div className="mt-8">
+              <AddToCartButton product={product} />
+            </div>
+
+            <div className="mt-4">
               <a
                 href={getWhatsAppUrl(waMessage)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex min-h-[48px] items-center gap-2 rounded-sm bg-ink px-7 py-3 text-sm font-medium text-ivory transition-colors hover:bg-charcoal"
+                className="inline-flex min-h-[44px] items-center gap-2 rounded-sm border border-stone-beige px-6 py-2.5 text-sm font-medium text-charcoal transition-colors hover:border-ink"
               >
                 <MessageCircle aria-hidden="true" className="h-4 w-4" />
                 Consultar por WhatsApp
               </a>
             </div>
             <p className="mt-3 text-xs text-mineral">
-              El pago en línea estará disponible próximamente. Por ahora, coordine
-              su compra por WhatsApp o solicitando una cotización.
+              Agregue al carrito y finalice su pedido en línea. El pago con tarjeta
+              estará disponible próximamente; por ahora coordinamos el pago al
+              confirmar el pedido.
             </p>
           </div>
         </div>

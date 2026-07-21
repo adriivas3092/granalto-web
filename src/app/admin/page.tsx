@@ -3,15 +3,25 @@ import { Plus, Pencil } from "lucide-react";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { DeleteProductButton } from "@/components/admin/DeleteProductButton";
 import { getAllProducts } from "@/lib/store/admin";
-import { formatPrice } from "@/lib/store/queries";
+import { getCategories } from "@/lib/store/queries";
+import { formatPrice } from "@/lib/store/format";
 import { requireAdmin } from "@/lib/supabase/admin-guard";
+import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Admin | Productos", robots: { index: false } };
 
-export default async function AdminDashboard() {
+export default async function AdminDashboard({
+  searchParams,
+}: {
+  searchParams: Promise<{ categoria?: string }>;
+}) {
   await requireAdmin();
-  const products = await getAllProducts();
+  const { categoria } = await searchParams;
+  const categories = await getCategories();
+  const activeCat = categoria ? categories.find((c) => c.slug === categoria) : undefined;
+  const products = await getAllProducts(activeCat?.id);
+  const catName = (id: string | null) => categories.find((c) => c.id === id)?.name ?? "—";
 
   return (
     <AdminShell>
@@ -29,11 +39,38 @@ export default async function AdminDashboard() {
         </Link>
       </div>
 
+      <div className="mt-5 flex flex-wrap gap-2">
+        <Link
+          href="/admin"
+          className={cn(
+            "rounded-sm border px-3 py-1.5 text-sm",
+            !activeCat ? "border-ink bg-ink text-ivory" : "border-stone-beige text-charcoal hover:border-mineral",
+          )}
+        >
+          Todas
+        </Link>
+        {categories.map((c) => (
+          <Link
+            key={c.id}
+            href={`/admin?categoria=${c.slug}`}
+            className={cn(
+              "rounded-sm border px-3 py-1.5 text-sm",
+              activeCat?.id === c.id
+                ? "border-ink bg-ink text-ivory"
+                : "border-stone-beige text-charcoal hover:border-mineral",
+            )}
+          >
+            {c.name}
+          </Link>
+        ))}
+      </div>
+
       <div className="mt-6 overflow-x-auto rounded-sm border border-stone-beige bg-white">
-        <table className="w-full min-w-[640px] text-sm">
+        <table className="w-full min-w-[720px] text-sm">
           <thead>
             <tr className="border-b border-stone-beige text-left text-xs uppercase tracking-wide text-mineral">
               <th className="px-4 py-3 font-medium">Producto</th>
+              <th className="px-4 py-3 font-medium">Categoría</th>
               <th className="px-4 py-3 font-medium">Precio</th>
               <th className="px-4 py-3 font-medium">Stock</th>
               <th className="px-4 py-3 font-medium">Estado</th>
@@ -47,6 +84,7 @@ export default async function AdminDashboard() {
                   <span className="font-medium text-ink">{p.name}</span>
                   {p.sku && <span className="ml-2 text-xs text-mineral">{p.sku}</span>}
                 </td>
+                <td className="px-4 py-3 text-charcoal">{catName(p.category_id)}</td>
                 <td className="px-4 py-3 text-ink">{formatPrice(p.price, p.currency)}</td>
                 <td className="px-4 py-3 text-charcoal">{p.stock}</td>
                 <td className="px-4 py-3">
@@ -76,8 +114,8 @@ export default async function AdminDashboard() {
             ))}
             {products.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-10 text-center text-sm text-mineral">
-                  No hay productos. Pulse “Nuevo producto” para agregar el primero.
+                <td colSpan={6} className="px-4 py-10 text-center text-sm text-mineral">
+                  No hay productos en esta categoría. Pulse “Nuevo producto” para agregar uno.
                 </td>
               </tr>
             )}

@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, User } from "lucide-react";
 import { Logo } from "@/components/layout/Logo";
+import { CartButton } from "@/components/store/CartButton";
 import { mainNavigation } from "@/config/navigation";
 import { getWhatsAppUrl, siteConfig } from "@/config/site";
 import { trackEvent } from "@/lib/analytics";
@@ -83,6 +84,19 @@ export function Header() {
           >
             <MessageCircle aria-hidden="true" className="h-5 w-5" />
           </a>
+          <CartButton isTransparent={isTransparent} />
+          <Link
+            href="/cuenta"
+            aria-label="Mi cuenta"
+            className={cn(
+              "flex h-11 w-11 items-center justify-center rounded-sm transition-colors",
+              isTransparent
+                ? "text-ivory hover:bg-white/10"
+                : "text-charcoal hover:bg-stone-beige/60",
+            )}
+          >
+            <User aria-hidden="true" className="h-5 w-5" />
+          </Link>
           <Link
             href="/contacto"
             onClick={() => trackEvent({ name: "cta_advisory_click", params: { source: "header" } })}
@@ -97,7 +111,10 @@ export function Header() {
           </Link>
         </div>
 
-        <MobileNavigation isTransparent={isTransparent} />
+        <div className="flex items-center gap-1 lg:hidden">
+          <CartButton isTransparent={isTransparent} />
+          <MobileNavigation isTransparent={isTransparent} />
+        </div>
       </div>
     </header>
   );

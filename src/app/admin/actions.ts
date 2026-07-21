@@ -72,6 +72,16 @@ export async function deleteProduct(id: string) {
   revalidatePath("/tienda");
 }
 
+export async function updateOrderStatus(id: string, formData: FormData) {
+  const status = (formData.get("status") as string) || "pendiente";
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.from("orders").update({ status }).eq("id", id);
+  if (error) throw new Error(error.message);
+  revalidatePath("/admin/pedidos");
+  revalidatePath(`/admin/pedidos/${id}`);
+  redirect(`/admin/pedidos/${id}`);
+}
+
 export async function signOut() {
   const supabase = await createSupabaseServerClient();
   await supabase.auth.signOut();

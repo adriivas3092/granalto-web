@@ -8,13 +8,16 @@ export function AdminShell({ children }: { children: ReactNode }) {
     <div className="min-h-svh bg-ivory">
       <header className="border-b border-stone-beige bg-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
             <Link href="/admin" className="font-serif text-lg uppercase tracking-[0.1em] text-ink">
               Granalto · Admin
             </Link>
-            <Link href="/tienda" className="text-sm text-mineral hover:text-ink">
-              Ver tienda ↗
-            </Link>
+            <nav className="flex items-center gap-4 text-sm">
+              <Link href="/admin" className="text-charcoal hover:text-ink">Productos</Link>
+              <Link href="/admin/pedidos" className="text-charcoal hover:text-ink">Pedidos</Link>
+              <Link href="/admin/clientes" className="text-charcoal hover:text-ink">Clientes</Link>
+              <Link href="/tienda" className="text-mineral hover:text-ink">Ver tienda ↗</Link>
+            </nav>
           </div>
           <form action={signOut}>
             <button

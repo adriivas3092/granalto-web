@@ -1,14 +1,8 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { Category, Product } from "@/types/store";
 
-/** Formatea un precio en la moneda del producto. */
-export function formatPrice(amount: number, currency = "CRC"): string {
-  return new Intl.NumberFormat("es-CR", {
-    style: "currency",
-    currency,
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
+// Reexportado para conservar compatibilidad con importaciones existentes.
+export { formatPrice } from "@/lib/store/format";
 
 export async function getCategories(): Promise<Category[]> {
   const supabase = await createSupabaseServerClient();

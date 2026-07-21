@@ -29,17 +29,34 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const path = request.nextUrl.pathname;
-  const isAdmin = path.startsWith("/admin");
-  const isLogin = path === "/admin/login";
 
-  if (isAdmin && !isLogin && !user) {
+  // --- Panel de administración ---
+  const isAdmin = path.startsWith("/admin");
+  const isAdminLogin = path === "/admin/login";
+  if (isAdmin && !isAdminLogin && !user) {
     const url = request.nextUrl.clone();
     url.pathname = "/admin/login";
     return NextResponse.redirect(url);
   }
-  if (isLogin && user) {
+  if (isAdminLogin && user) {
     const url = request.nextUrl.clone();
     url.pathname = "/admin";
+    return NextResponse.redirect(url);
+  }
+
+  // --- Cuenta de clientes / checkout ---
+  const isAccountAuth = path === "/cuenta/login" || path === "/cuenta/registro";
+  const needsCustomer = path.startsWith("/cuenta") || path.startsWith("/checkout");
+  if (needsCustomer && !isAccountAuth && !user) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/cuenta/login";
+    url.searchParams.set("next", path);
+    return NextResponse.redirect(url);
+  }
+  if (isAccountAuth && user) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/cuenta";
+    url.search = "";
     return NextResponse.redirect(url);
   }
 
