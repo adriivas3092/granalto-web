@@ -13,6 +13,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "",
     "/colecciones",
     "/materiales",
+    "/cotizar",
     "/catalogos",
     "/blog",
     "/contacto",

@@ -167,4 +167,16 @@ export type AnalyticsEvent =
   | { name: "directions_click"; params: { locationId: string } }
   | { name: "material_view"; params: { materialSlug: string } }
   | { name: "collection_view"; params: { collectionSlug: string } }
-  | { name: "cta_advisory_click"; params?: { source?: string } };
+  | { name: "cta_advisory_click"; params?: { source?: string } }
+  // Cotizador de superficies (/cotizar)
+  | { name: "quote_started" }
+  | { name: "quote_step_viewed"; params: { step: number; stepName?: string } }
+  | { name: "quote_product_added"; params: { category?: string; count: number } }
+  | { name: "quote_product_removed"; params: { count: number } }
+  | { name: "quote_dimensions_added"; params: { area?: number } }
+  | { name: "quote_extra_selected"; params: { type: string } }
+  | { name: "quote_estimate_viewed"; params: { options: number; area?: number; total?: number } }
+  | { name: "quote_option_selected"; params: { total?: number } }
+  | { name: "quote_contact_started" }
+  | { name: "quote_submitted"; params: { total?: number; options?: number } }
+  | { name: "quote_abandoned"; params?: { step?: number } };
