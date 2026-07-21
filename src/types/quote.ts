@@ -17,6 +17,8 @@ export interface SurfaceProduct {
   gallery?: string[];
   /** Precio base por m². PENDIENTE: reemplazar por tarifa real de Granalto. */
   pricePerSquareMeter: number;
+  /** Precio por metro lineal (fondo estándar). Si falta, se estima desde el m². */
+  pricePerLinearMeter?: number;
   availableThicknesses: number[];
   finishes: string[];
   colors?: string[];
@@ -87,8 +89,13 @@ export interface ServiceSelection {
   serviceId: string;
 }
 
+/** Base de cotización elegida por el cliente. */
+export type PricingBasis = "m2" | "linear";
+
 export interface QuoteConfiguration {
   selectedThickness: number;
+  /** Cotizar por metro cuadrado o por metro lineal. Por defecto "m2". */
+  pricingBasis?: PricingBasis;
   finish?: string;
   edges: EdgeSelection[];
   cutouts: CutoutSelection[];
@@ -114,6 +121,10 @@ export interface ProductQuoteResult {
   category: string;
   materialArea: number;
   billableArea: number;
+  /** Metros lineales facturables (relevante en base "linear"). */
+  linearMeters: number;
+  /** Base con la que se cotizó el material. */
+  pricingBasis: PricingBasis;
   materialCost: number;
   fabricationCost: number;
   edgeCost: number;

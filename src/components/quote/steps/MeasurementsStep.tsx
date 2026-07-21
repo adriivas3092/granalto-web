@@ -21,6 +21,8 @@ export function MeasurementsStep() {
   const updateConfiguration = useQuote((s) => s.updateConfiguration);
   const shape = getWorktopShape(layoutId);
   const waste = configuration.wastePercentage ?? DEFAULT_WASTE_PERCENTAGE;
+  const basis = configuration.pricingBasis ?? "m2";
+  const setBasis = (b: "m2" | "linear") => updateConfiguration({ pricingBasis: b });
 
   // --- Fase 1: elegir la forma ---
   if (!shape) {
@@ -30,6 +32,10 @@ export function MeasurementsStep() {
         <p className="mt-2 text-sm text-charcoal/80">
           Elegí la distribución que más se parezca a tu espacio. La mayoría usa una o dos.
         </p>
+
+        <div className="mx-auto mt-6 max-w-md">
+          <BasisToggle basis={basis} onChange={setBasis} />
+        </div>
 
         <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3">
           {WORKTOP_SHAPES.map((s) => (
@@ -70,6 +76,10 @@ export function MeasurementsStep() {
         Medidas aproximadas en milímetros están bien; confirmamos en sitio. El fondo estándar de un sobre
         es <strong className="text-charcoal">600&nbsp;mm</strong> (islas 800–900&nbsp;mm).
       </p>
+
+      <div className="mt-5">
+        <BasisToggle basis={basis} onChange={setBasis} />
+      </div>
 
       <div className="mt-6 grid gap-6 md:grid-cols-[16rem_1fr]">
         <div className="rounded-sm border border-stone-beige bg-white p-4">
@@ -154,5 +164,35 @@ export function MeasurementsStep() {
         <p className={cn("mt-3 text-sm text-[#a03826]")}>Ingresá el largo y el fondo de cada parte para continuar.</p>
       )}
     </div>
+  );
+}
+
+/** Selector de base de cotización: por metro cuadrado o por metro lineal. */
+function BasisToggle({ basis, onChange }: { basis: "m2" | "linear"; onChange: (b: "m2" | "linear") => void }) {
+  const options: { value: "m2" | "linear"; label: string; hint: string }[] = [
+    { value: "m2", label: "Por metro cuadrado", hint: "Se cobra el área total (m²)" },
+    { value: "linear", label: "Por metro lineal", hint: "Se cobra el largo del sobre (ml)" },
+  ];
+  return (
+    <fieldset>
+      <legend className="mb-2 text-sm font-medium text-ink">¿Cómo querés cotizar?</legend>
+      <div className="grid grid-cols-2 gap-2">
+        {options.map((o) => (
+          <button
+            key={o.value}
+            type="button"
+            aria-pressed={basis === o.value}
+            onClick={() => onChange(o.value)}
+            className={cn(
+              "rounded-sm border px-4 py-3 text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2",
+              basis === o.value ? "border-ink bg-ink text-ivory" : "border-stone-beige bg-white text-charcoal hover:border-mineral",
+            )}
+          >
+            <span className="block text-sm font-medium">{o.label}</span>
+            <span className={cn("block text-xs", basis === o.value ? "text-ivory/80" : "text-mineral")}>{o.hint}</span>
+          </button>
+        ))}
+      </div>
+    </fieldset>
   );
 }

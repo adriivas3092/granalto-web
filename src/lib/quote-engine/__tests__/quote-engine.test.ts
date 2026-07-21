@@ -70,6 +70,15 @@ describe("cotización completa", () => {
     expect(r.materialCost).toBeGreaterThan(0);
   });
 
+  it("cotiza por metro lineal cuando la base es 'linear'", () => {
+    const p = { ...product, pricePerLinearMeter: 50000 };
+    const linear = calculateQuote({ products: [p], pieces: [piece({ length: 200, width: 60, unit: "cm" })], configuration: { ...baseConfig, pricingBasis: "linear", wastePercentage: 0 } });
+    // 2 m de largo × ₡50.000 = ₡100.000 de material
+    expect(linear[0].pricingBasis).toBe("linear");
+    expect(linear[0].linearMeters).toBeCloseTo(2);
+    expect(linear[0].materialCost).toBe(100000);
+  });
+
   it("aplica la misma configuración a varios productos", () => {
     const p2 = { ...product, id: "p2", pricePerSquareMeter: 200000 };
     const results = calculateQuote({ products: [product, p2], configuration: baseConfig, pieces: [piece()] });

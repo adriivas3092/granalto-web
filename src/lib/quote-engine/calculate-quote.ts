@@ -1,6 +1,6 @@
 import type { QuoteCalculationInput, ProductQuoteResult } from "@/types/quote";
 import { QUOTE_CURRENCY } from "@/data/quote-config";
-import { calculateArea, estimatePerimeter } from "./calculate-area";
+import { calculateArea, calculateLinearMeters, estimatePerimeter } from "./calculate-area";
 import { calculateMaterialCost, calculateFabricationCost } from "./calculate-material";
 import { calculateEdgeCost } from "./calculate-edges";
 import { calculateCutoutCost, calculateExtrasCost } from "./calculate-cutouts";
@@ -16,7 +16,9 @@ import { calculateTaxes } from "./calculate-taxes";
  */
 export function calculateQuote(input: QuoteCalculationInput): ProductQuoteResult[] {
   const { products, pieces, configuration } = input;
+  const basis = configuration.pricingBasis ?? "m2";
   const { netArea, billableArea } = calculateArea(pieces, configuration.wastePercentage);
+  const billableLinearMeters = calculateLinearMeters(pieces, configuration.wastePercentage);
 
   // Costos independientes del producto (compartidos entre opciones).
   const perimeter = estimatePerimeter(pieces);
@@ -35,7 +37,7 @@ export function calculateQuote(input: QuoteCalculationInput): ProductQuoteResult
   const fabricationCost = calculateFabricationCost(billableArea);
 
   return products.map((product) => {
-    const materialCost = calculateMaterialCost(product, billableArea);
+    const materialCost = calculateMaterialCost(product, basis, billableArea, billableLinearMeters);
     const subtotal =
       materialCost +
       fabricationCost +
@@ -55,6 +57,8 @@ export function calculateQuote(input: QuoteCalculationInput): ProductQuoteResult
       category: product.category,
       materialArea: netArea,
       billableArea,
+      linearMeters: billableLinearMeters,
+      pricingBasis: basis,
       materialCost,
       fabricationCost,
       edgeCost,

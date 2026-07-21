@@ -18,6 +18,12 @@ export const DEFAULT_WASTE_PERCENTAGE = 12;
 /** Área mínima facturable (m²). */
 export const MINIMUM_BILLABLE_AREA = 0.5;
 
+/**
+ * Fondo estándar (m) usado para estimar el precio por metro lineal a partir
+ * del precio por m² cuando el producto no trae una tarifa lineal propia.
+ */
+export const LINEAR_STANDARD_DEPTH_M = 0.62;
+
 /** Costo de fabricación por m² (corte, pulido de superficie, manejo). */
 export const FABRICATION_COST_PER_M2 = 45000;
 

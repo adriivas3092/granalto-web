@@ -34,6 +34,15 @@ export function calculateArea(pieces: ProjectPiece[], wastePercentage = DEFAULT_
   return { netArea: round2(netArea), billableArea: round2(billableArea) };
 }
 
+/**
+ * Metros lineales facturables: suma de los largos × cantidad (el fondo no
+ * cuenta en la base lineal), con desperdicio aplicado.
+ */
+export function calculateLinearMeters(pieces: ProjectPiece[], wastePercentage = DEFAULT_WASTE_PERCENTAGE): number {
+  const net = pieces.reduce((sum, p) => sum + toMeters(p.length, p.unit) * p.quantity, 0);
+  return round2(net > 0 ? net * (1 + wastePercentage / 100) : 0);
+}
+
 /** Perímetro total aproximado (m) — útil para estimar metros lineales de canto. */
 export function estimatePerimeter(pieces: ProjectPiece[]): number {
   return round2(

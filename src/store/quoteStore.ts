@@ -31,6 +31,7 @@ export const TOTAL_STEPS = QUOTE_STEPS.length;
 
 const defaultConfiguration: QuoteConfiguration = {
   selectedThickness: 20,
+  pricingBasis: "m2",
   finish: undefined,
   edges: [],
   cutouts: [],

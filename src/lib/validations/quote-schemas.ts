@@ -33,6 +33,7 @@ export const additionalElementSchema = z.object({
 
 export const configurationSchema = z.object({
   selectedThickness: z.coerce.number().positive(),
+  pricingBasis: z.enum(["m2", "linear"]).optional(),
   finish: z.string().optional(),
   edges: z.array(z.object({ edgeId: z.string(), linearMeters: z.coerce.number().min(0) })),
   cutouts: z.array(z.object({ cutoutId: z.string(), quantity: z.coerce.number().int().min(1), notes: z.string().optional() })),
@@ -82,6 +83,7 @@ export const submissionProductSchema = z.object({
   imageUrl: z.string(),
   gallery: z.array(z.string()).optional(),
   pricePerSquareMeter: z.coerce.number(),
+  pricePerLinearMeter: z.coerce.number().optional(),
   availableThicknesses: z.array(z.number()),
   finishes: z.array(z.string()),
   colors: z.array(z.string()).optional(),

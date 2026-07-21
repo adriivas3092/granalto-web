@@ -46,7 +46,11 @@ export function QuoteResultCard({
       <div className="flex flex-1 flex-col p-4">
         <p className="text-[0.7rem] uppercase tracking-wide text-mineral">{result.category}</p>
         <h3 className="text-base font-bold text-ink">{result.productName}</h3>
-        <p className="mt-1 text-xs text-mineral">Área facturable: {result.billableArea} m²</p>
+        <p className="mt-1 text-xs text-mineral">
+          {result.pricingBasis === "linear"
+            ? `Metros lineales: ${result.linearMeters} ml`
+            : `Área facturable: ${result.billableArea} m²`}
+        </p>
 
         <p className="mt-3 text-2xl font-bold text-ink">{formatPrice(result.total, result.currency)}</p>
         <p className="text-xs text-mineral">Total estimado (IVA incluido)</p>
