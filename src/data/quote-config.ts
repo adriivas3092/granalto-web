@@ -24,6 +24,9 @@ export const FABRICATION_COST_PER_M2 = 45000;
 /** Grosores disponibles (mm) a nivel global (cada producto puede limitar). */
 export const THICKNESS_OPTIONS = [12, 20, 30];
 
+/** Acabados disponibles para las superficies. Configurable. */
+export const FINISH_OPTIONS = ["Pulido", "Honed", "Tronchado", "Ranurado"];
+
 export type EdgeOption = {
   id: string;
   name: string;

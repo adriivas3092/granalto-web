@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { useQuote } from "@/store/quoteStore";
-import { EDGE_OPTIONS, THICKNESS_OPTIONS } from "@/data/quote-config";
+import { EDGE_OPTIONS, THICKNESS_OPTIONS, FINISH_OPTIONS } from "@/data/quote-config";
 import { formatPrice } from "@/lib/store/format";
 import { cn } from "@/lib/utils";
 
@@ -19,10 +19,8 @@ export function FinishStep() {
     return common.length ? common : Array.from(new Set(products.flatMap((p) => p.availableThicknesses)));
   }, [products]);
 
-  const finishes = useMemo(
-    () => Array.from(new Set(products.flatMap((p) => p.finishes))),
-    [products],
-  );
+  // Acabados fijos disponibles para todas las superficies.
+  const finishes = FINISH_OPTIONS;
 
   const currentEdge = configuration.edges[0]?.edgeId ?? "recto";
 
