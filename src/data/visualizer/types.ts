@@ -74,7 +74,15 @@ export interface Environment {
   /** Subtipo para "Enchape de pared": sala, comedor, etc. */
   subtype?: string;
   viewBox: string;
-  /** Color base del lienzo detrás de las capas. */
+  /**
+   * Fotografía real de fondo (ruta en /public). Si está presente, el ambiente
+   * se renderiza en modo foto: los materiales se componen sobre la foto tomando
+   * su iluminación real (blend "luminosity"). Si falta, se usa el modo vectorial.
+   */
+  photo?: string;
+  /** Opacidad de la iluminación de la foto sobre el material (0–1, def. 0.9). */
+  photoLightStrength?: number;
+  /** Color base del lienzo detrás de las capas (modo vectorial). */
   baseFill: string;
   /** SVG decorativo de fondo, detrás de las superficies (ventanas, muebles). */
   decor?: string;

@@ -1,0 +1,2 @@
+Sube aquí las fotografías reales de cada ambiente (JPG o WebP, horizontal).
+Nombres sugeridos: cocina-1.jpg, bano-1.jpg, pared-sala.jpg, bbq-1.jpg, etc.
