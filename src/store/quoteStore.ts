@@ -10,6 +10,7 @@ import type {
   ProductQuoteResult,
   CustomerInformation,
 } from "@/types/quote";
+import { getWorktopShape } from "@/data/worktop-shapes";
 
 export const MAX_PRODUCTS = 4;
 
@@ -43,6 +44,7 @@ type QuoteState = {
   currentStep: number;
   selectedProducts: SurfaceProduct[];
   project: ProjectInformation | null;
+  layoutId?: string;
   pieces: ProjectPiece[];
   configuration: QuoteConfiguration;
   estimates: ProductQuoteResult[];
@@ -60,6 +62,8 @@ type QuoteState = {
 
   setProject: (project: ProjectInformation) => void;
 
+  setLayout: (layoutId: string) => void;
+  clearLayout: () => void;
   addPiece: (piece: ProjectPiece) => void;
   updatePiece: (id: string, data: Partial<ProjectPiece>) => void;
   removePiece: (id: string) => void;
@@ -103,6 +107,23 @@ export const useQuote = create<QuoteState>()(
 
       setProject: (project) => set({ project }),
 
+      setLayout: (layoutId) =>
+        set((st) => {
+          const shape = getWorktopShape(layoutId);
+          if (!shape) return {};
+          const pieces: ProjectPiece[] = shape.parts.map((p, i) => ({
+            id: uid(),
+            name: p.label || `Parte ${i + 1}`,
+            shape: shape.pieceShape,
+            length: 0,
+            width: shape.defaultDepth,
+            quantity: 1,
+            unit: "mm",
+            thickness: st.configuration.selectedThickness,
+          }));
+          return { layoutId, pieces };
+        }),
+      clearLayout: () => set({ layoutId: undefined, pieces: [] }),
       addPiece: (piece) => set((s) => ({ pieces: [...s.pieces, { ...piece, id: piece.id || uid() }] })),
       updatePiece: (id, data) => set((s) => ({ pieces: s.pieces.map((p) => (p.id === id ? { ...p, ...data } : p)) })),
       removePiece: (id) => set((s) => ({ pieces: s.pieces.filter((p) => p.id !== id) })),
@@ -128,6 +149,7 @@ export const useQuote = create<QuoteState>()(
           currentStep: 0,
           selectedProducts: [],
           project: null,
+          layoutId: undefined,
           pieces: [],
           configuration: defaultConfiguration,
           estimates: [],
@@ -143,6 +165,7 @@ export const useQuote = create<QuoteState>()(
         currentStep: s.currentStep,
         selectedProducts: s.selectedProducts,
         project: s.project,
+        layoutId: s.layoutId,
         pieces: s.pieces,
         configuration: s.configuration,
       }),

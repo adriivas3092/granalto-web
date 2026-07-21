@@ -48,7 +48,7 @@ export function QuoteWizard() {
       case 2:
         return Boolean(project?.kind && project?.stage);
       case 3:
-        return pieces.length >= 1;
+        return pieces.length >= 1 && pieces.every((p) => p.length > 0 && p.width > 0);
       case 7:
         return estimates.length > 0;
       default:
