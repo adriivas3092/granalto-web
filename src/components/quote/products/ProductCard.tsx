@@ -59,8 +59,14 @@ export function ProductCard({
         <span className="mt-0.5 text-sm font-bold text-ink">{product.name}</span>
         {product.collection && <span className="text-xs text-mineral">{product.collection}</span>}
         <span className="mt-2 text-sm font-semibold text-ink">
-          {formatPrice(product.pricePerSquareMeter)}
-          <span className="text-xs font-normal text-mineral"> /m²</span>
+          {product.pricePerSquareMeter > 0 ? (
+            <>
+              {formatPrice(product.pricePerSquareMeter)}
+              <span className="text-xs font-normal text-mineral"> /m²</span>
+            </>
+          ) : (
+            <span className="text-xs font-normal text-mineral">Precio a confirmar</span>
+          )}
         </span>
       </span>
     </button>

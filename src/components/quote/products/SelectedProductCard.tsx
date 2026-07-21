@@ -27,7 +27,11 @@ export function SelectedProductCard({
           <p className="truncate text-xs text-mineral">{product.collection ?? product.brand}</p>
         )}
         <p className="mt-1 text-sm font-semibold text-ink">
-          {formatPrice(product.pricePerSquareMeter)}<span className="text-xs font-normal text-mineral"> /m²</span>
+          {product.pricePerSquareMeter > 0 ? (
+            <>{formatPrice(product.pricePerSquareMeter)}<span className="text-xs font-normal text-mineral"> /m²</span></>
+          ) : (
+            <span className="text-xs font-normal text-mineral">Precio a confirmar</span>
+          )}
         </p>
       </div>
       <div className="flex flex-col gap-1.5">
