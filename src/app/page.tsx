@@ -112,10 +112,7 @@ export default function HomePage() {
         />
         <MaterialsCarousel materials={materials} />
         <div className="mt-12 flex flex-wrap justify-center gap-3">
-          <ButtonLink href="/configurador">Probar el configurador</ButtonLink>
-          <ButtonLink href="/materiales" variant="outline">
-            Explorar materiales
-          </ButtonLink>
+          <ButtonLink href="/materiales">Explorar materiales</ButtonLink>
         </div>
       </section>
 

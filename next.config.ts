@@ -14,6 +14,7 @@ const nextConfig: NextConfig = {
     // Redirecciones desde URLs del sitio anterior (granaltocr.net).
     // PENDIENTE_VALIDAR: completar con el inventario final de URLs antiguas.
     return [
+      { source: "/configurador", destination: "/materiales", permanent: true },
       { source: "/granito", destination: "/materiales/granito", permanent: true },
       { source: "/onix", destination: "/materiales", permanent: true },
       { source: "/travertinos", destination: "/materiales/travertino", permanent: true },
