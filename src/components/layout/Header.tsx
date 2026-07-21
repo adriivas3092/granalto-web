@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import { MessageCircle, User } from "lucide-react";
 import { Logo } from "@/components/layout/Logo";
 import { CartButton } from "@/components/store/CartButton";
-import { mainNavigation } from "@/config/navigation";
 import { getWhatsAppUrl, siteConfig } from "@/config/site";
 import { trackEvent } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
@@ -46,29 +45,8 @@ export function Header() {
           <Logo variant={isTransparent ? "white" : "dark"} size="md" priority />
         </Link>
 
-        <nav aria-label="Navegación principal" className="hidden lg:block">
-          <ul className="flex items-center gap-8">
-            {mainNavigation.map((item) => (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  className={cn(
-                    "text-sm tracking-wide transition-colors",
-                    isTransparent
-                      ? "text-ivory/90 hover:text-white"
-                      : "text-charcoal hover:text-ink",
-                    pathname.startsWith(item.href) && "font-semibold",
-                  )}
-                  aria-current={pathname === item.href ? "page" : undefined}
-                >
-                  {item.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
-
-        <div className="hidden items-center gap-3 lg:flex">
+        {/* Cluster derecho unificado: acciones visibles + menú hamburguesa en todas las pantallas. */}
+        <div className="flex items-center gap-1 sm:gap-2">
           <a
             href={getWhatsAppUrl(siteConfig.whatsappMessages.default)}
             target="_blank"
@@ -76,43 +54,37 @@ export function Header() {
             onClick={() => trackEvent({ name: "whatsapp_click", params: { source: "header" } })}
             aria-label="Escribir a Granalto por WhatsApp"
             className={cn(
-              "flex h-11 w-11 items-center justify-center rounded-sm transition-colors",
-              isTransparent
-                ? "text-ivory hover:bg-white/10"
-                : "text-charcoal hover:bg-stone-beige/60",
+              "hidden h-11 w-11 items-center justify-center rounded-sm transition-colors sm:flex",
+              isTransparent ? "text-ivory hover:bg-white/10" : "text-charcoal hover:bg-stone-beige/60",
             )}
           >
             <MessageCircle aria-hidden="true" className="h-5 w-5" />
           </a>
+
           <CartButton isTransparent={isTransparent} />
+
           <Link
             href="/cuenta"
             aria-label="Mi cuenta"
             className={cn(
-              "flex h-11 w-11 items-center justify-center rounded-sm transition-colors",
-              isTransparent
-                ? "text-ivory hover:bg-white/10"
-                : "text-charcoal hover:bg-stone-beige/60",
+              "hidden h-11 w-11 items-center justify-center rounded-sm transition-colors sm:flex",
+              isTransparent ? "text-ivory hover:bg-white/10" : "text-charcoal hover:bg-stone-beige/60",
             )}
           >
             <User aria-hidden="true" className="h-5 w-5" />
           </Link>
+
           <Link
             href="/contacto"
             onClick={() => trackEvent({ name: "cta_advisory_click", params: { source: "header" } })}
             className={cn(
-              "rounded-sm px-5 py-2.5 text-sm font-medium tracking-wide transition-colors",
-              isTransparent
-                ? "bg-ivory text-ink hover:bg-stone-beige"
-                : "bg-ink text-ivory hover:bg-charcoal",
+              "hidden rounded-sm px-5 py-2.5 text-sm font-medium tracking-wide transition-colors md:inline-flex",
+              isTransparent ? "bg-ivory text-ink hover:bg-stone-beige" : "bg-ink text-ivory hover:bg-charcoal",
             )}
           >
             Solicitar asesoría
           </Link>
-        </div>
 
-        <div className="flex items-center gap-1 lg:hidden">
-          <CartButton isTransparent={isTransparent} />
           <MobileNavigation isTransparent={isTransparent} />
         </div>
       </div>

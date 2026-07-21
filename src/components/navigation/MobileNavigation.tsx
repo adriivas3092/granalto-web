@@ -36,7 +36,7 @@ export function MobileNavigation({ isTransparent }: { isTransparent: boolean }) 
   }, [open]);
 
   return (
-    <div className="lg:hidden">
+    <div>
       <button
         type="button"
         onClick={() => setOpen(true)}
@@ -117,6 +117,15 @@ export function MobileNavigation({ isTransparent }: { isTransparent: boolean }) 
                   className="block py-3 font-serif text-2xl text-ink"
                 >
                   Ubicaciones
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/cuenta"
+                  onClick={() => setOpen(false)}
+                  className="block py-3 font-serif text-2xl text-ink"
+                >
+                  Mi cuenta
                 </Link>
               </li>
             </ul>
