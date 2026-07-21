@@ -34,12 +34,14 @@ export const catalogs: Catalog[] = [
     category: "Mantenimiento",
     description:
       "Selladores, limpiadores y productos especializados para el tratamiento y mantenimiento de superficies de piedra.",
+    year: 2026,
     language: "Español",
+    fileSize: "708 KB",
     coverImage: {
-      src: "/images/placeholders/catalogo-tenax.svg",
-      alt: "Portada del catálogo Tenax — pendiente de reemplazo",
+      src: "/images/catalogs/catalogo-tenax-portada.jpg",
+      alt: "Portada del catálogo de productos Tenax",
     },
-    fileUrl: "", // PENDIENTE_VALIDAR
+    fileUrl: "/catalogs/Catalogo-Tenax_compressed.pdf",
     featured: true,
   },
   {
@@ -50,12 +52,14 @@ export const catalogs: Catalog[] = [
     category: "Superficies",
     description:
       "Diseños y texturas de laminado de alta presión para mobiliario, paneles y superficies verticales.",
+    year: 2026,
     language: "Español",
+    fileSize: "1.9 MB",
     coverImage: {
-      src: "/images/placeholders/catalogo-wilsonart.svg",
-      alt: "Portada del catálogo Wilsonart — pendiente de reemplazo",
+      src: "/images/catalogs/catalogo-wilsonart-portada.jpg",
+      alt: "Portada del catálogo Wilsonart",
     },
-    fileUrl: "", // PENDIENTE_VALIDAR
+    fileUrl: "/catalogs/Catalogo-Wilsonart_compressed.pdf",
     featured: true,
   },
 ];

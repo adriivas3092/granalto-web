@@ -19,7 +19,10 @@ function parseForm(formData: FormData): ProductInput {
       if (key && val) attributes[key] = val;
     });
 
-  const compareRaw = formData.get("compare_at_price");
+  // "En oferta": el precio regular (compare_at_price) solo se guarda si el
+  // producto está marcado como oferta; así la tienda muestra la etiqueta.
+  const onSale = formData.get("on_sale") === "on";
+  const compareRaw = onSale ? formData.get("compare_at_price") : null;
   const gallery = ((formData.get("gallery") as string) || "")
     .split("\n")
     .map((s) => s.trim())

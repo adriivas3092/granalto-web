@@ -8,6 +8,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ButtonLink } from "@/components/ui/Button";
 import { CollectionCard } from "@/components/cards/CollectionCard";
 import { MaterialsCarousel } from "@/components/sections/MaterialsCarousel";
+import { GoogleReviews } from "@/components/sections/GoogleReviews";
 import { ProjectCard } from "@/components/cards/ProjectCard";
 import { CatalogCard } from "@/components/cards/CatalogCard";
 import { BlogCard } from "@/components/cards/BlogCard";
@@ -145,6 +146,9 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+
+      {/* 8.6b Reseñas de Google */}
+      <GoogleReviews />
 
       {/* 8.7 Catálogos destacados */}
       <section className="bg-ivory py-20 md:py-28">

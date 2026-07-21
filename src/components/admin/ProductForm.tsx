@@ -156,7 +156,7 @@ export function ProductForm({
           </div>
           <div>
             <label htmlFor="compare_at_price" className={label}>
-              Precio anterior
+              Precio regular (antes)
             </label>
             <input
               id="compare_at_price"
@@ -183,6 +183,24 @@ export function ProductForm({
             </select>
           </div>
         </div>
+
+        <label className="flex items-start gap-2 rounded-sm border border-stone-beige bg-white p-3 text-sm text-charcoal">
+          <input
+            type="checkbox"
+            name="on_sale"
+            defaultChecked={
+              product ? product.compare_at_price != null && product.compare_at_price > product.price : false
+            }
+            className="mt-0.5 h-4 w-4 accent-ink"
+          />
+          <span>
+            <span className="font-medium text-ink">En oferta</span>
+            <span className="block text-xs text-mineral">
+              Marca el producto como oferta: en la tienda se muestra una etiqueta «Oferta» y el «Precio
+              regular» tachado. Completá el «Precio regular (antes)» arriba, mayor que el precio actual.
+            </span>
+          </span>
+        </label>
 
         <div className="grid gap-4 sm:grid-cols-3">
           <div>

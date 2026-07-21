@@ -5,6 +5,10 @@ import { formatPrice } from "@/lib/store/queries";
 
 /** Tarjeta de producto para la tienda pública. */
 export function StoreProductCard({ product }: { product: Product }) {
+  const onSale = product.compare_at_price != null && product.compare_at_price > product.price;
+  const discountPct = onSale
+    ? Math.round(((product.compare_at_price! - product.price) / product.compare_at_price!) * 100)
+    : 0;
   return (
     <Link
       href={`/tienda/${product.slug}`}
@@ -24,8 +28,13 @@ export function StoreProductCard({ product }: { product: Product }) {
             Sin imagen
           </div>
         )}
+        {onSale && (
+          <span className="absolute left-2 top-2 rounded-sm bg-[#a03826] px-2 py-1 text-[0.65rem] font-semibold uppercase tracking-wide text-white">
+            Oferta{discountPct > 0 ? ` -${discountPct}%` : ""}
+          </span>
+        )}
         {!product.available && (
-          <span className="absolute left-2 top-2 rounded-sm bg-ink/80 px-2 py-1 text-[0.65rem] uppercase tracking-wide text-ivory">
+          <span className="absolute right-2 top-2 rounded-sm bg-ink/80 px-2 py-1 text-[0.65rem] uppercase tracking-wide text-ivory">
             No disponible
           </span>
         )}

@@ -14,6 +14,8 @@ export const mainNavigation: NavItem[] = [
   { label: "Materiales", href: "/materiales" },
   { label: "Tienda", href: "/tienda" },
   { label: "Cotizador", href: "/cotizar" },
+  { label: "Cómo funciona", href: "/como-funciona" },
+  { label: "Portafolio", href: "/portafolio" },
   { label: "Catálogos", href: "/catalogos" },
   { label: "Blog", href: "/blog" },
   { label: "Contacto", href: "/contacto" },
@@ -21,10 +23,10 @@ export const mainNavigation: NavItem[] = [
 
 export const footerNavigation: NavItem[] = [
   { label: "Nosotros", href: "/nosotros" },
-  { label: "Colecciones", href: "/colecciones" },
+  { label: "Cómo funciona", href: "/como-funciona" },
   { label: "Materiales", href: "/materiales" },
+  { label: "Portafolio", href: "/portafolio" },
   { label: "Catálogos", href: "/catalogos" },
-  { label: "Blog", href: "/blog" },
   { label: "Contacto", href: "/contacto" },
 ];
 
