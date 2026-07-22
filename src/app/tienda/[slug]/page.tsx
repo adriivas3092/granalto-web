@@ -70,7 +70,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             {product.sku && <p className="mt-2 text-sm text-mineral">Código: {product.sku}</p>}
 
             <div className="mt-5 flex flex-wrap items-baseline gap-3">
-              {product.compare_at_price && product.compare_at_price > product.price && (
+              {product.compare_at_price != null && product.compare_at_price >= product.price && (
                 <span className="self-center rounded-sm bg-[#a03826] px-2 py-1 text-xs font-semibold uppercase tracking-wide text-white">
                   Oferta
                 </span>

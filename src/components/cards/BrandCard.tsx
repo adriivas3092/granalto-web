@@ -1,14 +1,14 @@
 import Image from "next/image";
+import { ArrowUpRight } from "lucide-react";
 import type { Brand } from "@/types";
 
 /**
- * Tarjeta de marca. Muestra el logo oficial cuando la marca lo tiene
- * (`officialLogo`); mientras tanto, presenta el nombre como wordmark en
- * Montserrat bold para mantener coherencia tipográfica.
+ * Tarjeta de marca. Si la marca tiene sitio oficial, toda la tarjeta es un
+ * enlace que abre la web de la marca en una pestaña nueva.
  */
 export function BrandCard({ brand }: { brand: Brand }) {
-  return (
-    <article className="flex flex-col rounded-sm border border-stone-beige bg-white p-6">
+  const inner = (
+    <>
       <div className="mb-5 flex h-16 items-center justify-center">
         {brand.officialLogo ? (
           <div className="relative h-full w-full">
@@ -26,22 +26,32 @@ export function BrandCard({ brand }: { brand: Brand }) {
           </span>
         )}
       </div>
-      <p className="text-xs uppercase tracking-[0.15em] text-mineral">
-        {brand.category}
-      </p>
-      <p className="mt-2 flex-1 text-sm leading-relaxed text-charcoal/80">
-        {brand.description}
-      </p>
+      <p className="text-xs uppercase tracking-[0.15em] text-mineral">{brand.category}</p>
+      <p className="mt-2 flex-1 text-sm leading-relaxed text-charcoal/80">{brand.description}</p>
       {brand.website && (
-        <a
-          href={brand.website}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="link-editorial mt-4 text-sm text-ink"
-        >
-          Sitio oficial
-        </a>
+        <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-ink">
+          Visitar sitio oficial
+          <ArrowUpRight aria-hidden="true" className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+        </span>
       )}
-    </article>
+    </>
+  );
+
+  if (brand.website) {
+    return (
+      <a
+        href={brand.website}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={`Visitar el sitio oficial de ${brand.name}`}
+        className="group flex flex-col rounded-sm border border-stone-beige bg-white p-6 transition-colors hover:border-ink focus-visible:outline-2 focus-visible:outline-offset-2"
+      >
+        {inner}
+      </a>
+    );
+  }
+
+  return (
+    <article className="flex flex-col rounded-sm border border-stone-beige bg-white p-6">{inner}</article>
   );
 }

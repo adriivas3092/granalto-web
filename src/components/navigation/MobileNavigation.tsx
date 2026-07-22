@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Menu, X, MessageCircle } from "lucide-react";
 import { Logo } from "@/components/layout/Logo";
 import { mainNavigation } from "@/config/navigation";
@@ -13,8 +14,11 @@ import { cn } from "@/lib/utils";
 /** Menú móvil accesible: se cierra al navegar y con Escape. */
 export function MobileNavigation({ isTransparent }: { isTransparent: boolean }) {
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
   const panelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => setMounted(true), []);
 
   // Cerrar al cambiar de ruta.
   useEffect(() => {
@@ -51,15 +55,17 @@ export function MobileNavigation({ isTransparent }: { isTransparent: boolean }) 
         <Menu aria-hidden="true" className="h-6 w-6" />
       </button>
 
-      {open && (
-        <div
-          id="mobile-menu"
-          ref={panelRef}
-          role="dialog"
-          aria-modal="true"
-          aria-label="Menú de navegación"
-          className="fixed inset-0 z-50 flex flex-col bg-ivory"
-        >
+      {open &&
+        mounted &&
+        createPortal(
+          <div
+            id="mobile-menu"
+            ref={panelRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Menú de navegación"
+            className="fixed inset-0 z-[100] flex flex-col bg-ivory"
+          >
           <div className="flex h-16 items-center justify-between px-4 sm:px-6">
             <Logo variant="dark" size="md" />
             <button
@@ -153,8 +159,9 @@ export function MobileNavigation({ isTransparent }: { isTransparent: boolean }) 
               Escribir por WhatsApp
             </a>
           </div>
-        </div>
-      )}
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }

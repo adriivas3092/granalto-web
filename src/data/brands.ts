@@ -29,7 +29,7 @@ export const brands: Brand[] = [
     category: "Cuidado y tratamiento de piedra",
     logo: { src: "/images/placeholders/logo-tenax.svg", alt: "Logo Tenax" },
     officialLogo: { src: "/images/brands/tenax.png", alt: "Logo Tenax" },
-    website: "", // PENDIENTE_VALIDAR
+    website: "https://www.tenax.it/es/",
     catalogIds: [],
     active: true,
   },
@@ -42,7 +42,7 @@ export const brands: Brand[] = [
     category: "Laminados y superficies sólidas",
     logo: { src: "/images/placeholders/logo-wilsonart.svg", alt: "Logo Wilsonart" },
     officialLogo: { src: "/images/brands/wilsonart.avif", alt: "Logo Wilsonart" },
-    website: "", // PENDIENTE_VALIDAR
+    website: "https://www.wilsonart.com/",
     catalogIds: [],
     active: true,
   },
@@ -55,7 +55,7 @@ export const brands: Brand[] = [
     category: "Porcelánico",
     logo: { src: "/images/placeholders/logo-abk.svg", alt: "Logo ABK" },
     officialLogo: { src: "/images/brands/abk.png", alt: "Logo ABK" },
-    website: "", // PENDIENTE_VALIDAR
+    website: "https://www.abk.it/en/",
     catalogIds: [],
     active: true,
   },
@@ -68,7 +68,7 @@ export const brands: Brand[] = [
     category: "Grifería",
     logo: { src: "/images/placeholders/logo-newform.svg", alt: "Logo Newform" },
     officialLogo: { src: "/images/brands/newform.jpg", alt: "Logo Newform" },
-    website: "", // PENDIENTE_VALIDAR
+    website: "https://www.newform.it/",
     catalogIds: [],
     active: true,
   },
@@ -81,7 +81,7 @@ export const brands: Brand[] = [
     category: "Sanitarios",
     logo: { src: "/images/placeholders/logo-flaminia.svg", alt: "Logo Flaminia" },
     officialLogo: { src: "/images/brands/flaminia.png", alt: "Logo Flaminia" },
-    website: "", // PENDIENTE_VALIDAR
+    website: "https://www.ceramicaflaminia.it/en/",
     catalogIds: [],
     active: true,
   },
@@ -100,7 +100,7 @@ export const brands: Brand[] = [
       src: "/images/brands/santa-margherita.png",
       alt: "Logo Santa Margherita",
     },
-    website: "", // PENDIENTE_VALIDAR
+    website: "https://www.santamargherita.net/es/",
     catalogIds: [],
     active: true,
   },
@@ -113,7 +113,7 @@ export const brands: Brand[] = [
     category: "Cuarzo",
     logo: { src: "/images/placeholders/logo-cambria.svg", alt: "Logo Cambria" },
     officialLogo: { src: "/images/brands/cambria.webp", alt: "Logo Cambria" },
-    website: "", // PENDIENTE_VALIDAR
+    website: "https://www.cambriausa.com/",
     catalogIds: [],
     active: true,
   },

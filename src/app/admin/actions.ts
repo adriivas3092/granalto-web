@@ -19,10 +19,19 @@ function parseForm(formData: FormData): ProductInput {
       if (key && val) attributes[key] = val;
     });
 
-  // "En oferta": el precio regular (compare_at_price) solo se guarda si el
-  // producto está marcado como oferta; así la tienda muestra la etiqueta.
+  const price = num(formData.get("price"));
+
+  // "En oferta": basta con marcar la casilla para que la tienda muestre la
+  // etiqueta. Si además hay un "precio regular" mayor, se usa para el tachado
+  // y el %. Codificamos la oferta en compare_at_price (>= precio) para no
+  // requerir cambios en la base de datos.
   const onSale = formData.get("on_sale") === "on";
-  const compareRaw = onSale ? formData.get("compare_at_price") : null;
+  let compare_at_price: number | null = null;
+  if (onSale) {
+    const regular = num(formData.get("compare_at_price"));
+    compare_at_price = regular && regular > price ? regular : price;
+  }
+
   const gallery = ((formData.get("gallery") as string) || "")
     .split("\n")
     .map((s) => s.trim())
@@ -34,9 +43,9 @@ function parseForm(formData: FormData): ProductInput {
     sku: ((formData.get("sku") as string) || "").trim() || null,
     category_id: ((formData.get("category_id") as string) || "") || null,
     description: ((formData.get("description") as string) || "").trim() || null,
-    price: num(formData.get("price")),
+    price,
     currency: (formData.get("currency") as string) || "CRC",
-    compare_at_price: compareRaw ? num(compareRaw) || null : null,
+    compare_at_price,
     stock: Math.round(num(formData.get("stock"))),
     available: formData.get("available") === "on",
     featured: formData.get("featured") === "on",

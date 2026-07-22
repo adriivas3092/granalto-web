@@ -5,8 +5,9 @@ import { formatPrice } from "@/lib/store/queries";
 
 /** Tarjeta de producto para la tienda pública. */
 export function StoreProductCard({ product }: { product: Product }) {
-  const onSale = product.compare_at_price != null && product.compare_at_price > product.price;
-  const discountPct = onSale
+  const onSale = product.compare_at_price != null && product.compare_at_price >= product.price;
+  const hasDiscount = product.compare_at_price != null && product.compare_at_price > product.price;
+  const discountPct = hasDiscount
     ? Math.round(((product.compare_at_price! - product.price) / product.compare_at_price!) * 100)
     : 0;
   return (

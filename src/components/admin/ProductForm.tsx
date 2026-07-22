@@ -189,7 +189,7 @@ export function ProductForm({
             type="checkbox"
             name="on_sale"
             defaultChecked={
-              product ? product.compare_at_price != null && product.compare_at_price > product.price : false
+              product ? product.compare_at_price != null && product.compare_at_price >= product.price : false
             }
             className="mt-0.5 h-4 w-4 accent-ink"
           />
