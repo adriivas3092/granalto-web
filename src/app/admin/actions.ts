@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/supabase/admin-guard";
 import type { ProductInput } from "@/types/store";
 
 function parseForm(formData: FormData): ProductInput {
@@ -82,6 +83,43 @@ export async function deleteProduct(id: string) {
   if (error) throw new Error(error.message);
   revalidatePath("/admin");
   revalidatePath("/tienda");
+}
+
+/** Muestra u oculta UN producto (interruptor rápido de la lista). */
+export async function toggleAvailability(id: string, next: boolean) {
+  await requireAdmin();
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.from("products").update({ available: next }).eq("id", id);
+  if (error) throw new Error(error.message);
+  revalidatePath("/admin");
+  revalidatePath("/tienda");
+}
+
+/**
+ * Muestra u oculta TODOS los productos (o los de una categoría si se filtró).
+ * `available` = "true" | "false"; `categoria` = slug opcional.
+ */
+export async function bulkAvailability(formData: FormData) {
+  await requireAdmin();
+  const available = formData.get("available") === "true";
+  const categorySlug = ((formData.get("categoria") as string) || "").trim();
+  const supabase = await createSupabaseServerClient();
+
+  let categoryId: string | undefined;
+  if (categorySlug) {
+    const { data } = await supabase.from("categories").select("id").eq("slug", categorySlug).maybeSingle();
+    categoryId = data?.id;
+  }
+
+  const base = supabase.from("products").update({ available });
+  const { error } = categoryId
+    ? await base.eq("category_id", categoryId)
+    : await base.not("id", "is", null);
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/admin");
+  revalidatePath("/tienda");
+  redirect(categorySlug ? `/admin?categoria=${categorySlug}` : "/admin");
 }
 
 export async function updateOrderStatus(id: string, formData: FormData) {
