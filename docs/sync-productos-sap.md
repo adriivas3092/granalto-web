@@ -68,6 +68,27 @@ curl -X POST https://<tu-dominio>/api/sync/products \
   -d '{"items":[{"sku":"9642","price":12000,"stock":19}]}'
 ```
 
+## Integración con SAP Business One 10 (HANA)
+
+La empresa usa **SAP Business One 10.0 for SAP HANA**. Recomendaciones concretas:
+
+### Origen de los datos en B1
+- **SKU** → `ItemCode` (tabla `OITM` / entidad `Items`).
+- **name** → `ItemName`.
+- **stock** → `QuantityOnStock` del ítem (o la suma por bodega en `ItemWarehouseInfoCollection`).
+- **price** → precio de una **lista de precios** concreta (`ItemPrices` / `Item_Prices`); definir cuál lista de precios se publica en la web.
+- **category** → mapear el **grupo de artículos** (`ItemsGroupCode` / `OITB.ItmsGrpNam`) a un slug (`tenax`, `wilsonart`, `granalto`).
+- **discontinued** → usar el campo `Frozen`/`Valid` del artículo (artículo inactivo → `discontinued: true`).
+
+### Cómo enviarlo (2 caminos, ambos nativos de B1)
+1. **B1if — Integration Framework** (viene incluido con B1): crear un escenario **programado** (cada hora/noche) que consulte los artículos y haga un **POST** por lotes a `/api/sync/products` con el header `x-api-key`. No requiere software adicional.
+2. **Service Layer** (API OData v4 de B1 sobre HANA): un conector/middleware consulta `GET /b1s/v2/Items` (con los campos necesarios y paginación con `$top`/`$skip`), arma el JSON y lo envía al endpoint.
+
+### Consejo
+- Elegir **una lista de precios** oficial para la web y publicar solo esa.
+- Enviar por **lotes** (p. ej. 500–1000 ítems por llamada).
+- Filtrar en B1 los artículos que sí van a la web (por grupo o por un campo de usuario `U_Web = Y`), para no subir todo el maestro.
+
 ## Recomendación de operación
 
 - SAP es la fuente de verdad de **precio y stock**; la tienda conserva **fotos y curación**.
