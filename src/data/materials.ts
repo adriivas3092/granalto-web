@@ -122,8 +122,8 @@ export const materials: Material[] = [
     finishes: ["Pulido", "Honed (mate)"],
     colors: ["Blancos", "Grises", "Negros", "Tonos crema"],
     brands: [],
-    coverImage: placeholder("Mármol", "material-marmol"),
-    gallery: [placeholder("Ambiente con mármol", "material-marmol-1")],
+    coverImage: real("Mármol", "marmol"),
+    gallery: [real("Mármol — detalle de veta", "marmol", "Mármol rosado con vetas — detalle")],
     catalogIds: [],
     featured: true,
     seo: {
@@ -233,8 +233,8 @@ export const materials: Material[] = [
     finishes: ["Mate", "Semibrillo"],
     colors: ["Blancos", "Colores sólidos", "Aspecto piedra"],
     brands: ["Wilsonart"],
-    coverImage: placeholder("Superficie sólida", "material-superficie-solida"),
-    gallery: [placeholder("Ambiente con superficie sólida", "material-superficie-solida-1")],
+    coverImage: real("Superficie sólida", "superficie-solida"),
+    gallery: [real("Superficie sólida — detalle", "superficie-solida", "Superficie sólida de color liso — detalle")],
     catalogIds: [],
     featured: false,
     seo: {
@@ -270,8 +270,8 @@ export const materials: Material[] = [
     finishes: ["Mate", "Texturizado", "Alto brillo"],
     colors: ["Aspecto madera", "Colores sólidos", "Aspecto piedra", "Metálicos"],
     brands: ["Wilsonart"],
-    coverImage: placeholder("HPL", "material-hpl"),
-    gallery: [placeholder("Ambiente con HPL", "material-hpl-1")],
+    coverImage: real("HPL", "hpl"),
+    gallery: [real("HPL — detalle de textura", "hpl", "HPL con aspecto de madera nogal — detalle")],
     catalogIds: [],
     featured: false,
     seo: {
