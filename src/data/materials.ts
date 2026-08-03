@@ -12,6 +12,12 @@ const placeholder = (name: string, file: string) => ({
   alt: `${name} — imagen pendiente de reemplazo`,
 });
 
+/** Foto real de material (slab/textura), guardada en public/images/materiales. */
+const real = (name: string, slug: string, alt?: string) => ({
+  src: `/images/materiales/${slug}.jpg`,
+  alt: alt ?? `${name} — textura real del material`,
+});
+
 export const materials: Material[] = [
   {
     id: "mat-cuarcita",
@@ -41,8 +47,8 @@ export const materials: Material[] = [
     finishes: ["Pulido", "Honed (mate)", "Leather"],
     colors: ["Blancos", "Grises", "Tonos tierra", "Verdes", "Azules"],
     brands: [],
-    coverImage: placeholder("Cuarcita", "material-cuarcita"),
-    gallery: [placeholder("Ambiente con cuarcita", "material-cuarcita-1")],
+    coverImage: real("Cuarcita", "cuarcita"),
+    gallery: [real("Cuarcita — detalle de veta", "cuarcita", "Cuarcita blanca con vetas doradas — detalle")],
     catalogIds: [],
     featured: true,
     seo: {
@@ -116,8 +122,8 @@ export const materials: Material[] = [
     finishes: ["Pulido", "Honed (mate)"],
     colors: ["Blancos", "Grises", "Negros", "Tonos crema"],
     brands: [],
-    coverImage: placeholder("Mármol", "material-marmol"),
-    gallery: [placeholder("Ambiente con mármol", "material-marmol-1")],
+    coverImage: real("Mármol", "marmol"),
+    gallery: [real("Mármol — detalle de veta", "marmol", "Mármol negro con veta dorada — detalle")],
     catalogIds: [],
     featured: true,
     seo: {
@@ -153,8 +159,8 @@ export const materials: Material[] = [
     finishes: ["Pulido", "Mate"],
     colors: ["Blancos", "Grises", "Negros", "Aspecto mármol"],
     brands: ["Cambria"],
-    coverImage: placeholder("Cuarzo", "material-cuarzo"),
-    gallery: [placeholder("Ambiente con cuarzo", "material-cuarzo-1")],
+    coverImage: real("Cuarzo", "cuarzo"),
+    gallery: [real("Cuarzo — detalle de superficie", "cuarzo", "Cuarzo gris de grano uniforme — detalle")],
     catalogIds: [],
     featured: true,
     seo: {
@@ -301,8 +307,8 @@ export const materials: Material[] = [
     finishes: ["Honed (mate)", "Cepillado", "Poro abierto", "Resinado"],
     colors: ["Beige", "Crema", "Nuez", "Plata"],
     brands: [],
-    coverImage: placeholder("Travertino", "material-travertino"),
-    gallery: [placeholder("Ambiente con travertino", "material-travertino-1")],
+    coverImage: real("Travertino", "travertino"),
+    gallery: [real("Travertino — detalle de veta", "travertino", "Travertino beige con vetas horizontales — detalle")],
     catalogIds: [],
     featured: false,
     seo: {
@@ -339,8 +345,8 @@ export const materials: Material[] = [
     finishes: ["Pulido", "Mate"],
     colors: ["Blancos", "Grises", "Negros", "Aspecto mármol"],
     brands: ["Cambria"],
-    coverImage: placeholder("Cambria", "material-cambria"),
-    gallery: [placeholder("Ambiente con superficie Cambria", "material-cambria-1")],
+    coverImage: real("Cambria", "cambria"),
+    gallery: [real("Cambria — detalle de veta", "cambria", "Cuarzo Cambria blanco con vetas — detalle")],
     catalogIds: [],
     featured: true,
     seo: {
