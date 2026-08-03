@@ -85,8 +85,8 @@ export const materials: Material[] = [
     finishes: ["Pulido", "Flameado", "Leather"],
     colors: ["Negros", "Grises", "Blancos", "Tonos tierra"],
     brands: [],
-    coverImage: placeholder("Granito", "material-granito"),
-    gallery: [placeholder("Ambiente con granito", "material-granito-1")],
+    coverImage: real("Granito", "granito"),
+    gallery: [real("Granito — detalle de superficie", "granito", "Granito blanco y gris jaspeado — detalle")],
     catalogIds: [],
     featured: true,
     seo: {
@@ -122,8 +122,8 @@ export const materials: Material[] = [
     finishes: ["Pulido", "Honed (mate)"],
     colors: ["Blancos", "Grises", "Negros", "Tonos crema"],
     brands: [],
-    coverImage: real("Mármol", "marmol"),
-    gallery: [real("Mármol — detalle de veta", "marmol", "Mármol negro con veta dorada — detalle")],
+    coverImage: placeholder("Mármol", "material-marmol"),
+    gallery: [placeholder("Ambiente con mármol", "material-marmol-1")],
     catalogIds: [],
     featured: true,
     seo: {
@@ -196,8 +196,8 @@ export const materials: Material[] = [
     finishes: ["Natural", "Pulido", "Texturizado"],
     colors: ["Aspecto piedra", "Aspecto cemento", "Aspecto madera", "Colores sólidos"],
     brands: ["ABK"],
-    coverImage: placeholder("Porcelánico", "material-porcelanico"),
-    gallery: [placeholder("Ambiente con porcelánico", "material-porcelanico-1")],
+    coverImage: real("Porcelánico", "porcelanico"),
+    gallery: [real("Porcelánico — detalle de veta", "porcelanico", "Porcelánico negro con veta dorada — detalle")],
     catalogIds: [],
     featured: true,
     seo: {
