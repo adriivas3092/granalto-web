@@ -99,7 +99,7 @@ export const collections: Collection[] = [
     },
     gallery: [
       {
-        src: "/images/photos/coleccion-hogar-1.jpg",
+        src: "/images/photos/coleccion-hogar-barra.jpg",
         alt: "Barra exterior con sobre y salpicadero en piedra negra veteada, fregadero y grifería negra",
       },
     ],
