@@ -94,17 +94,13 @@ export const collections: Collection[] = [
     description:
       "Más allá de la cocina y el baño, la piedra y las superficies técnicas transforman todo el hogar: chimeneas revestidas, mesas y barras fabricadas a la medida, paredes y pisos de gran formato, escaleras y piezas personalizadas. Diseñamos junto a arquitectos, diseñadores y propietarios para que cada espacio tenga identidad propia.",
     coverImage: {
-      src: "/images/placeholders/coleccion-hogar.svg",
-      alt: "Sala con pared revestida en piedra — imagen pendiente de reemplazo",
+      src: "/images/photos/coleccion-hogar.jpg",
+      alt: "Mueble con sobre en mármol negro y panel de listones, junto a área social",
     },
     gallery: [
       {
-        src: "/images/placeholders/coleccion-hogar-1.svg",
-        alt: "Chimenea revestida en mármol — imagen pendiente de reemplazo",
-      },
-      {
-        src: "/images/placeholders/coleccion-hogar-2.svg",
-        alt: "Mesa de comedor en piedra natural — imagen pendiente de reemplazo",
+        src: "/images/photos/coleccion-hogar-1.jpg",
+        alt: "Repisa de ventana en piedra beige con mobiliario de madera clara",
       },
     ],
     subcategories: [
