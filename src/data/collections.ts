@@ -100,7 +100,7 @@ export const collections: Collection[] = [
     gallery: [
       {
         src: "/images/photos/coleccion-hogar-1.jpg",
-        alt: "Repisa de ventana en piedra beige con mobiliario de madera clara",
+        alt: "Barra exterior con sobre y salpicadero en piedra negra veteada, fregadero y grifería negra",
       },
     ],
     subcategories: [
