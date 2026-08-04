@@ -94,13 +94,13 @@ export const collections: Collection[] = [
     description:
       "Más allá de la cocina y el baño, la piedra y las superficies técnicas transforman todo el hogar: chimeneas revestidas, mesas y barras fabricadas a la medida, paredes y pisos de gran formato, escaleras y piezas personalizadas. Diseñamos junto a arquitectos, diseñadores y propietarios para que cada espacio tenga identidad propia.",
     coverImage: {
-      src: "/images/photos/coleccion-hogar.jpg",
-      alt: "Mueble con sobre en mármol negro y panel de listones, junto a área social",
+      src: "/images/photos/coleccion-hogar-barra.jpg",
+      alt: "Barra exterior con sobre y salpicadero en piedra negra veteada, fregadero y grifería negra",
     },
     gallery: [
       {
-        src: "/images/photos/coleccion-hogar-barra.jpg",
-        alt: "Barra exterior con sobre y salpicadero en piedra negra veteada, fregadero y grifería negra",
+        src: "/images/photos/coleccion-hogar.jpg",
+        alt: "Mueble con sobre en mármol negro y panel de listones, junto a área social",
       },
     ],
     subcategories: [
