@@ -15,6 +15,57 @@ export const blogCategories = [
 
 export const blogPosts: BlogPost[] = [
   {
+    id: "post-granito-en-costa-rica",
+    slug: "granito-en-costa-rica-elegancia-natural-y-resistencia",
+    title: "Granito en Costa Rica: elegancia natural y resistencia para tu cocina",
+    excerpt:
+      "Durabilidad, belleza natural y bajo mantenimiento: por qué el granito sigue siendo una de las mejores opciones para sobres de cocina, islas y baños.",
+    content: `El granito ha sido durante décadas uno de los materiales más valorados para sobres de cocina, y no es casualidad. En Costa Rica, cada vez más hogares apuestan por su durabilidad, belleza natural y fácil mantenimiento. En Granalto, somos especialistas en la venta de granito para cocina, con soluciones a la medida de cada proyecto.
+
+## Ventajas del granito
+
+- Alta resistencia al calor, golpes y rayones.
+- Vetas únicas: cada plancha es diferente y exclusiva.
+- Bajo mantenimiento.
+
+## Aplicaciones recomendadas
+
+- Sobres de cocina
+- Islas centrales
+- Sobres de baño
+
+Elegir granito en Costa Rica para tu cocina no es solo una decisión estética, es una inversión en calidad de vida, durabilidad y valor para tu hogar. En Granalto, combinamos experiencia, materiales premium y pasión por el diseño para que cada cocina que entregamos sea única y funcional.
+
+## ¿Listo para transformar tu cocina con granito?
+
+Contactanos hoy y recibí una asesoría sin compromiso. También podés visitar nuestra galería de proyectos para inspirarte.
+
+## Nuestros showrooms
+
+**Escazú** — Guachipelín de Escazú, diagonal a Distrito Cuatro.
+Lunes a viernes: 8:00 a.m. a 5:00 p.m. · Sábados: 9:00 a.m. a 2:00 p.m.
+
+**Heredia** — Lagunilla de Heredia, Bodegas Lagunilla #2.
+Lunes a viernes: 8:00 a.m. a 5:00 p.m. · Sábados: 8:00 a.m. a 1:00 p.m.
+
+**Guanacaste** — Liberia, Parque Industrial Solarium, bodega 9.
+Lunes a viernes: 8:30 a.m. a 5:30 p.m. · Sábados: 8:00 a.m. a 1:00 p.m.`,
+    category: "Materiales",
+    author: "Equipo Granalto",
+    publishedAt: "2026-08-05",
+    readingTime: 4,
+    coverImage: {
+      src: "/images/blog/granito-en-costa-rica.webp",
+      alt: "Cocina con sobre y revestimiento en granito terrazzo verde y grifería dorada",
+    },
+    featured: false,
+    seo: {
+      title: "Granito en Costa Rica: elegancia natural y resistencia para tu cocina",
+      description:
+        "Ventajas del granito para sobres de cocina, islas y baños: resistencia al calor, vetas únicas y bajo mantenimiento. Venta e instalación a la medida en Granalto Costa Rica.",
+    },
+  },
+  {
     id: "post-sobres-de-cocina-granalto",
     slug: "la-solucion-de-granalto-en-sobres-de-cocina",
     title: "La solución de Granalto en sobres de cocina",
