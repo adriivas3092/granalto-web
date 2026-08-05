@@ -20,6 +20,32 @@ export const projectCategories = [
 
 export const projects: Project[] = [
   {
+    id: "proj-calacatta-grey",
+    slug: "calacatta-grey",
+    title: "Calacatta Grey",
+    category: "cocina",
+    materials: ["porcelanico"],
+    partner: "Vital Design",
+    credits: [
+      { label: "Diseño", value: "Vital Design" },
+      { label: "Instalación de sobres", value: "Granalto" },
+      { label: "Material del sobre", value: "Aria White" },
+    ],
+    description: "",
+    coverImage: {
+      src: "/images/proyectos/calacatta-grey-1.jpg",
+      alt: "Cocina con mobiliario azul e isla con sobre en Aria White",
+    },
+    gallery: [
+      { src: "/images/proyectos/calacatta-grey-1.jpg", alt: "Cocina con mobiliario azul e isla con sobre en Aria White" },
+      { src: "/images/proyectos/calacatta-grey-2.jpg", alt: "Isla central con sobre en Aria White y bancos de madera" },
+      { src: "/images/proyectos/calacatta-grey-3.jpg", alt: "Vista frontal de la cocina con isla en Aria White" },
+      { src: "/images/proyectos/calacatta-grey-4.jpg", alt: "Detalle de los sobres en L en Aria White sobre mobiliario azul" },
+      { src: "/images/proyectos/calacatta-grey-5.jpg", alt: "Detalle del canto del sobre en Aria White en la isla" },
+    ],
+    featured: true,
+  },
+  {
     id: "proj-cocina-cuarcita",
     slug: "cocina-isla-cuarcita",
     title: "Cocina con isla en cuarcita",
@@ -81,4 +107,13 @@ export function getProjectsByMaterial(materialSlug: string): Project[] {
 
 export function getProjectsByCategory(category: Project["category"]): Project[] {
   return projects.filter((p) => p.category === category);
+}
+
+/** Proyectos con galería para mostrar como ficha (miniaturas + créditos). */
+export function getShowcaseProjects(category?: Project["category"]): Project[] {
+  return projects.filter(
+    (p) =>
+      p.gallery.length > 0 &&
+      (category ? p.category === category : true),
+  );
 }

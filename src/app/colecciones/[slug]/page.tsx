@@ -6,6 +6,7 @@ import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { ImageGallery } from "@/components/galleries/ImageGallery";
 import { MaterialCard } from "@/components/cards/MaterialCard";
 import { ProjectCard } from "@/components/cards/ProjectCard";
+import { ProjectShowcase } from "@/components/sections/ProjectShowcase";
 import { getCollections, getCollectionBySlug } from "@/data/collections";
 import { getFeaturedMaterials } from "@/data/materials";
 import { getProjectsByCategory } from "@/data/projects";
@@ -34,6 +35,8 @@ export default async function CollectionPage({ params }: { params: Promise<Param
   const projects = ["cocina", "bano", "hogar"].includes(slug)
     ? getProjectsByCategory(slug as Project["category"])
     : [];
+  const showcaseProjects = projects.filter((p) => p.gallery.length > 0);
+  const cardProjects = projects.filter((p) => p.gallery.length === 0);
   const materials = getFeaturedMaterials().slice(0, 5);
 
   return (
@@ -98,11 +101,22 @@ export default async function CollectionPage({ params }: { params: Promise<Param
             eyebrow="Proyectos"
             title="Proyectos relacionados"
           />
-          <div className="grid gap-8 md:grid-cols-3">
-            {projects.map((project) => (
-              <ProjectCard key={project.id} project={project} />
-            ))}
-          </div>
+
+          {showcaseProjects.length > 0 && (
+            <div className="mt-4">
+              {showcaseProjects.map((project) => (
+                <ProjectShowcase key={project.id} project={project} />
+              ))}
+            </div>
+          )}
+
+          {cardProjects.length > 0 && (
+            <div className="mt-12 grid gap-8 md:grid-cols-3">
+              {cardProjects.map((project) => (
+                <ProjectCard key={project.id} project={project} />
+              ))}
+            </div>
+          )}
         </section>
       )}
 

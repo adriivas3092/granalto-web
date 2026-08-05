@@ -138,6 +138,10 @@ export type Project = {
   materials: string[];
   brand?: string;
   description: string;
+  /** Aliado con quien se realizó el proyecto (p. ej. estudio de diseño). */
+  partner?: string;
+  /** Créditos del proyecto: diseño, instalación, material del sobre, etc. */
+  credits?: { label: string; value: string }[];
   coverImage: Media;
   gallery: Media[];
   featured: boolean;
