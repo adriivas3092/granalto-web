@@ -15,6 +15,45 @@ export const blogCategories = [
 
 export const blogPosts: BlogPost[] = [
   {
+    id: "post-sobres-de-cocina-granalto",
+    slug: "la-solucion-de-granalto-en-sobres-de-cocina",
+    title: "La solución de Granalto en sobres de cocina",
+    excerpt:
+      "Variedad de materiales para cada proyecto: fabricación e instalación de sobres de cocina en granito, mármol, cuarzo, cuarcita y porcelánico, con asesoría de principio a fin.",
+    content: `## Variedad de materiales para cada proyecto
+
+En Granalto, transformamos la piedra natural en piezas funcionales y elegantes que dan vida a los espacios más importantes de tu hogar o proyecto: la cocina.
+
+Con más de 15 años de experiencia en el sector, nos especializamos en la fabricación e instalación de sobres de cocina en granito, mármol, cuarzo, cuarcita y porcelánicos, materiales seleccionados por su resistencia, estética y adaptabilidad al clima y estilo de vida costarricense.
+
+Ya sea que estés construyendo la casa de tus sueños, remodelando tu apartamento o desarrollando un proyecto inmobiliario, en Granalto trabajamos uno a uno contigo para ofrecer soluciones a la medida. También colaboramos con estudios de arquitectura, constructoras y diseñadores que buscan calidad y cumplimiento en cada etapa del proyecto.
+
+## ¿Qué nos diferencia?
+
+- Asesoría personalizada desde el primer contacto
+- Selección cuidadosa de materiales premium
+- Corte y acabado de alta precisión
+- Instalación profesional con atención al detalle
+
+Convertí tu cocina en un espacio donde la funcionalidad y la belleza conviven todos los días. Con Granalto, cada sobre es una pieza única que refleja tu estilo.
+
+Solicitá tu cotización o agenda una visita personalizada.`,
+    category: "Materiales",
+    author: "Equipo Granalto",
+    publishedAt: "2026-08-05",
+    readingTime: 4,
+    coverImage: {
+      src: "/images/blog/sobres-de-cocina-granalto.jpg",
+      alt: "Bodega de Granalto con láminas de mármol, cuarcita, cuarzo y porcelánico en exhibición",
+    },
+    featured: false,
+    seo: {
+      title: "La solución de Granalto en sobres de cocina",
+      description:
+        "Fabricación e instalación de sobres de cocina en granito, mármol, cuarzo, cuarcita y porcelánico. Más de 15 años de experiencia, asesoría personalizada e instalación profesional en Costa Rica.",
+    },
+  },
+  {
     id: "post-como-elegir-material-ideal",
     slug: "como-elegir-el-material-ideal",
     title: "¿Cómo elegir el material ideal?",
