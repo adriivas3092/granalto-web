@@ -20,6 +20,30 @@ export const projectCategories = [
 
 export const projects: Project[] = [
   {
+    id: "proj-superficie-solida-bano",
+    slug: "superficie-solida-bano",
+    title: "Superficie Sólida",
+    category: "bano",
+    materials: ["superficie-solida"],
+    partner: "Vital Design",
+    credits: [
+      { label: "Diseño", value: "Vital Design" },
+      { label: "Instalación de sobres", value: "Granalto" },
+      { label: "Material del sobre", value: "Superficie sólida" },
+    ],
+    description: "",
+    coverImage: {
+      src: "/images/proyectos/superficie-solida-bano-1.jpg",
+      alt: "Baño con sobre en superficie sólida negra sobre mueble de madera y pared verde tropical",
+    },
+    gallery: [
+      { src: "/images/proyectos/superficie-solida-bano-1.jpg", alt: "Baño con sobre en superficie sólida negra, mueble de madera y papel tapiz tropical" },
+      { src: "/images/proyectos/superficie-solida-bano-2.jpg", alt: "Detalle del mueble de madera con sobre en superficie sólida negra y espejo redondo" },
+      { src: "/images/proyectos/superficie-solida-bano-3.jpg", alt: "Vista del baño con sobre en superficie sólida negra, ducha y revestimiento hexagonal" },
+    ],
+    featured: true,
+  },
+  {
     id: "proj-volakas",
     slug: "volakas",
     title: "Volakas",
