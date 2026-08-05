@@ -20,6 +20,32 @@ export const projectCategories = [
 
 export const projects: Project[] = [
   {
+    id: "proj-volakas",
+    slug: "volakas",
+    title: "Volakas",
+    category: "bano",
+    materials: ["marmol"],
+    partner: "Vital Design",
+    credits: [
+      { label: "Diseño", value: "Vital Design" },
+      { label: "Instalación de sobres de baño", value: "Granalto" },
+      { label: "Material del sobre", value: "Mármol Volakas" },
+    ],
+    description: "",
+    coverImage: {
+      src: "/images/proyectos/volakas-1.jpg",
+      alt: "Baño con sobre de lavamanos en mármol Volakas y mueble de madera",
+    },
+    gallery: [
+      { src: "/images/proyectos/volakas-1.jpg", alt: "Detalle del sobre de lavamanos en mármol Volakas con cuadro de coral" },
+      { src: "/images/proyectos/volakas-2.jpg", alt: "Lavamanos con sobre en mármol Volakas y botiquín de madera con espejo" },
+      { src: "/images/proyectos/volakas-3.jpg", alt: "Baño con doble lavamanos y sobre en mármol Volakas" },
+      { src: "/images/proyectos/volakas-4.jpg", alt: "Mueble de baño en madera con sobre en mármol Volakas y doble lavamanos" },
+      { src: "/images/proyectos/volakas-5.jpg", alt: "Vista del sobre en mármol Volakas sobre mueble de madera con doble lavamanos" },
+    ],
+    featured: true,
+  },
+  {
     id: "proj-calacatta-gold",
     slug: "calacatta-gold",
     title: "Calacatta Gold",
