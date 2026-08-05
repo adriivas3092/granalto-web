@@ -93,7 +93,7 @@ export function Footer() {
                   className="transition-colors hover:text-white"
                   external
                 >
-                  {siteConfig.contact.whatsapp} (WhatsApp)
+                  {siteConfig.contact.whatsapp}
                 </TrackedContactLink>
               </li>
               <li>
