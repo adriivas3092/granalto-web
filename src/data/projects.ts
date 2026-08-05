@@ -20,6 +20,31 @@ export const projectCategories = [
 
 export const projects: Project[] = [
   {
+    id: "proj-porcelanico-bottega-acero",
+    slug: "porcelanico-bottega-acero",
+    title: "Porcelánico",
+    category: "cocina",
+    materials: ["porcelanico"],
+    partner: "The Kitchen",
+    credits: [
+      { label: "Diseño", value: "The Kitchen" },
+      { label: "Instalación de sobres", value: "Granalto" },
+      { label: "Material del sobre", value: "Porcelánico Bottega Acero" },
+    ],
+    description: "",
+    coverImage: {
+      src: "/images/proyectos/porcelanico-bottega-1.jpg",
+      alt: "Cocina en negro mate con sobres en porcelánico Bottega Acero",
+    },
+    gallery: [
+      { src: "/images/proyectos/porcelanico-bottega-1.jpg", alt: "Cocina en negro mate con sobres en porcelánico Bottega Acero y salpicadero de madera" },
+      { src: "/images/proyectos/porcelanico-bottega-2.jpg", alt: "Isla central con sobre en porcelánico Bottega Acero y bancos negros" },
+      { src: "/images/proyectos/porcelanico-bottega-3.jpg", alt: "Vista general de la cocina en negro con isla en porcelánico Bottega Acero" },
+      { src: "/images/proyectos/porcelanico-bottega-4.jpg", alt: "Detalle de los sobres en porcelánico Bottega Acero con mobiliario negro" },
+    ],
+    featured: true,
+  },
+  {
     id: "proj-calacatta-grey",
     slug: "calacatta-grey",
     title: "Calacatta Grey",
