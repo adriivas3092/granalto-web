@@ -20,6 +20,32 @@ export const projectCategories = [
 
 export const projects: Project[] = [
   {
+    id: "proj-calacatta-gold",
+    slug: "calacatta-gold",
+    title: "Calacatta Gold",
+    category: "cocina",
+    materials: ["porcelanico"],
+    partner: "Vital Design",
+    credits: [
+      { label: "Diseño", value: "Vital Design" },
+      { label: "Instalación de sobres", value: "Granalto" },
+      { label: "Material del sobre", value: "Porcelánico Calacatta Gold" },
+    ],
+    description: "",
+    coverImage: {
+      src: "/images/proyectos/calacatta-gold-1.jpg",
+      alt: "Cocina de madera con isla y salpicadero en porcelánico Calacatta Gold",
+    },
+    gallery: [
+      { src: "/images/proyectos/calacatta-gold-1.jpg", alt: "Cocina de madera con barra e isla en porcelánico Calacatta Gold" },
+      { src: "/images/proyectos/calacatta-gold-2.jpg", alt: "Área de bar con sobre en Calacatta Gold y panel de vinos en madera" },
+      { src: "/images/proyectos/calacatta-gold-3.jpg", alt: "Detalle del salpicadero en porcelánico Calacatta Gold sobre mueble de madera" },
+      { src: "/images/proyectos/calacatta-gold-4.jpg", alt: "Bar húmedo con sobre y salpicadero en Calacatta Gold y mobiliario gris" },
+      { src: "/images/proyectos/calacatta-gold-5.jpg", alt: "Isla con barra de madera y sobre en porcelánico Calacatta Gold" },
+    ],
+    featured: true,
+  },
+  {
     id: "proj-porcelanico-bottega-acero",
     slug: "porcelanico-bottega-acero",
     title: "Porcelánico",
