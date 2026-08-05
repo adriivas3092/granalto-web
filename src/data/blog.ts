@@ -1,10 +1,7 @@
 import type { BlogPost } from "@/types";
 
 /**
- * Artículos del blog.
- * CONTENIDO DE DEMOSTRACIÓN: estos artículos son provisionales y están
- * basados en temas reales del blog actual de granaltocr.net; requieren
- * revisión editorial de Granalto antes de producción (ver CONTENT_TODO.md).
+ * Artículos del blog (contenido real de Granalto).
  */
 export const blogCategories = [
   "Materiales",
@@ -18,115 +15,56 @@ export const blogCategories = [
 
 export const blogPosts: BlogPost[] = [
   {
-    id: "post-granito-cocina",
-    slug: "granito-elegancia-natural-para-tu-cocina",
-    title: "Granito: elegancia natural y resistencia para su cocina",
+    id: "post-como-elegir-material-ideal",
+    slug: "como-elegir-el-material-ideal",
+    title: "¿Cómo elegir el material ideal?",
     excerpt:
-      "Por qué el granito sigue siendo una de las opciones más confiables para sobres de cocina: durabilidad, belleza natural y mantenimiento sencillo.",
-    content: `El granito ha sido valorado durante décadas como material para sobres de cocina, y cada vez más hogares en Costa Rica lo eligen por su durabilidad, su belleza natural y su facilidad de mantenimiento.
+      "Una guía práctica para encontrar el material perfecto según el uso del espacio, la estética, el mantenimiento y el presupuesto de tu proyecto.",
+    content: `En Granalto, sabemos que la decisión no es sencilla, por eso te compartimos una guía práctica para que encuentres el material perfecto según tus necesidades y estilo.
 
-## Un material que trabaja tanto como usted
+## 1. Define el uso del espacio
 
-El granito es una roca ígnea de gran dureza. Resiste el uso diario de una cocina activa: cortes accidentales, ollas calientes y limpieza constante. A diferencia de otros materiales, envejece con dignidad.
+El primer paso es considerar el propósito de la superficie:
 
-## Cada lámina es única
+- **Cocinas:** prioriza materiales resistentes a las manchas y al calor, como la piedra sinterizada.
+- **Exteriores:** asegúrate de elegir un material duradero frente a las inclemencias climáticas, como la piedra natural.
 
-Al ser piedra natural, no existen dos láminas de granito iguales. Recomendamos visitar nuestro showroom para seleccionar personalmente la lámina de su proyecto y apreciar su tonalidad y granulometría reales.
+## 2. Evalúa la estética
 
-## Mantenimiento sencillo
+El diseño de tu espacio define mucho del impacto visual.
 
-Con un sellado periódico y limpieza con productos neutros, un sobre de granito conserva su apariencia por décadas. Nuestro equipo le indica el plan de cuidado adecuado según el granito elegido.
+- **Tendencias modernas:** materiales como el Calacatta Gold o el Ivory imitan acabados naturales con un toque de sofisticación.
+- **Estilos únicos:** mármoles como Gucci Red o Green Jade son perfectos para crear un ambiente exclusivo.
 
-## Asesoría de principio a fin
+## 3. Mantenimiento
 
-En Granalto acompañamos cada proyecto desde la selección de la lámina hasta la plantilla, el corte de precisión y la instalación final.`,
-    category: "Materiales",
+La facilidad de limpieza y el cuidado son factores clave.
+
+- Para un bajo mantenimiento, las piedras sinterizadas o porcelánicos son ideales.
+- Si prefieres algo más natural, los selladores pueden proteger el granito o el mármol.
+
+## 4. Presupuesto
+
+Define cuánto estás dispuesto a invertir. Materiales como el granito o el cuarzo ofrecen una excelente relación calidad-precio, mientras que opciones más exclusivas como la cuarcita tienen un costo mayor, pero añaden lujo y valor a tu espacio.
+
+## ¿Por qué elegir Granalto?
+
+En Granalto contamos con una amplia variedad de materiales como cuarzos, granitos, cuarcitas, mármoles y piedras sinterizadas. Te ayudamos a elegir el material ideal para que cada proyecto sea una obra de arte funcional.
+
+¿Listo para transformar tu espacio? Contáctanos y hagamos realidad tu visión.`,
+    category: "Guías",
     author: "Equipo Granalto",
-    publishedAt: "2026-05-12",
+    publishedAt: "2026-08-05",
     readingTime: 4,
     coverImage: {
-      src: "/images/placeholders/blog-granito.svg",
-      alt: "Sobre de cocina en granito — imagen pendiente de reemplazo",
+      src: "/images/blog/como-elegir-material-ideal.jpg",
+      alt: "Lavamanos esculpido en mármol con vetas doradas y grifería en acabado dorado",
     },
     featured: true,
     seo: {
-      title: "Granito: elegancia natural y resistencia para su cocina",
+      title: "¿Cómo elegir el material ideal? | Guía de Granalto",
       description:
-        "Ventajas del granito para sobres de cocina: durabilidad, belleza natural y mantenimiento sencillo. Guía de Granalto Costa Rica.",
-    },
-  },
-  {
-    id: "post-piedra-sinterizada",
-    slug: "piedra-sinterizada-diseno-de-alta-gama",
-    title: "Piedra sinterizada: diseño de alta gama y resistencia extrema",
-    excerpt:
-      "Qué es la piedra sinterizada, cómo se fabrica y por qué se ha convertido en una de las superficies técnicas más avanzadas para cocinas.",
-    content: `La piedra sinterizada es un material ultracompacto fabricado mediante un proceso tecnológico que somete minerales naturales a presiones y temperaturas extremadamente altas, replicando en horas lo que la naturaleza tarda milenios en formar.
-
-## Resistencia extrema
-
-El resultado es una superficie prácticamente no porosa, resistente al rayado, al calor directo, a los rayos UV y a las manchas. Es apta tanto para interiores como para exteriores.
-
-## Diseño sin límites
-
-La tecnología de impresión permite reproducir mármoles, piedras y cementos con gran fidelidad, en formatos grandes y espesores variados, incluyendo aplicaciones como encimeras con zonas de cocción integradas.
-
-## ¿Para quién es ideal?
-
-Para quienes buscan la estética de la piedra natural con el máximo desempeño técnico: cocinas de uso intensivo, exteriores, fachadas y proyectos comerciales.
-
-Consulte con nuestro equipo la disponibilidad de formatos y acabados para su proyecto.`,
-    category: "Materiales",
-    author: "Equipo Granalto",
-    publishedAt: "2026-04-20",
-    readingTime: 5,
-    coverImage: {
-      src: "/images/placeholders/blog-sinterizada.svg",
-      alt: "Cocina con superficie de piedra sinterizada — imagen pendiente de reemplazo",
-    },
-    featured: false,
-    seo: {
-      title: "Piedra sinterizada: diseño de alta gama y resistencia extrema",
-      description:
-        "Qué es la piedra sinterizada, sus ventajas y aplicaciones en cocinas y exteriores. Guía de Granalto Costa Rica.",
-    },
-  },
-  {
-    id: "post-cuidado-piedra-natural",
-    slug: "como-cuidar-superficies-de-piedra-natural",
-    title: "Cómo cuidar sus superficies de piedra natural",
-    excerpt:
-      "Recomendaciones prácticas de limpieza, sellado y uso diario para que sus sobres y revestimientos de piedra natural luzcan como el primer día.",
-    content: `La piedra natural es una inversión que puede durar generaciones. Estos cuidados básicos ayudan a conservar su belleza.
-
-## Limpieza diaria
-
-Utilice agua, jabón neutro y un paño suave. Evite limpiadores ácidos (vinagre, limón, desincrustantes) y abrasivos, especialmente en mármol y travertino.
-
-## Sellado periódico
-
-Las piedras naturales son porosas en distintos grados. Un sellador de calidad, aplicado con la frecuencia adecuada al material y al uso, protege contra manchas y humedad. Productos especializados como los de la línea Tenax están diseñados para este fin.
-
-## Uso diario inteligente
-
-Aunque muchas piedras resisten el calor, recomendamos usar salvamanteles y tablas de cortar. Limpie los derrames de vino, café o cítricos cuanto antes.
-
-## ¿Dudas sobre su material?
-
-Cada piedra tiene necesidades distintas. Escríbanos y le indicamos el plan de cuidado específico para su superficie.`,
-    category: "Mantenimiento",
-    author: "Equipo Granalto",
-    publishedAt: "2026-03-15",
-    readingTime: 4,
-    coverImage: {
-      src: "/images/placeholders/blog-mantenimiento.svg",
-      alt: "Limpieza de una superficie de piedra natural — imagen pendiente de reemplazo",
-    },
-    featured: false,
-    seo: {
-      title: "Cómo cuidar sus superficies de piedra natural",
-      description:
-        "Guía práctica de limpieza, sellado y uso diario de sobres y revestimientos de piedra natural. Recomendaciones de Granalto Costa Rica.",
+        "Guía práctica para elegir el material perfecto según el uso del espacio, la estética, el mantenimiento y el presupuesto. Cuarzos, granitos, cuarcitas, mármoles y piedras sinterizadas en Granalto Costa Rica.",
     },
   },
 ];
