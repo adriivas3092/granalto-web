@@ -90,8 +90,8 @@ Lunes a viernes: 8:30 a.m. a 5:30 p.m. · Sábados: 8:00 a.m. a 1:00 p.m.`,
     publishedAt: "2026-08-05",
     readingTime: 4,
     coverImage: {
-      src: "/images/blog/granito-en-costa-rica.webp",
-      alt: "Cocina con sobre y revestimiento en granito terrazzo verde y grifería dorada",
+      src: "/images/blog/granito-en-costa-rica-2.webp",
+      alt: "Cocina con sobre y salpicadero en granito negro de vetas blancas y grifería negra",
     },
     featured: false,
     seo: {
