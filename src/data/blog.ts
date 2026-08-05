@@ -15,6 +15,41 @@ export const blogCategories = [
 
 export const blogPosts: BlogPost[] = [
   {
+    id: "post-cuarcita-lujo-y-durabilidad",
+    slug: "cuarcita-la-opcion-perfecta-para-cocinas",
+    title: "Cuarcita: la opción perfecta para cocinas que combinan lujo y durabilidad",
+    excerpt:
+      "La estética del mármol con una resistencia muy superior: por qué la cuarcita es ideal para cocinas modernas, funcionales y de alto uso.",
+    content: `La cuarcita es una piedra natural que ha ganado terreno por su estética parecida al mármol, pero con una resistencia muy superior. Es ideal para quienes desean una cocina moderna, funcional y que se mantenga impecable con el paso del tiempo.
+
+## Beneficios de la cuarcita
+
+- Tolerancia extrema al calor y a los rayones.
+- Apariencia elegante y sofisticada.
+- Excelente para áreas de alto uso, como cocinas familiares.
+- Diseños exclusivos.
+
+## ¿Por qué elegirla?
+
+Si te gusta el aspecto del mármol pero necesitas la durabilidad del granito, la cuarcita ofrece el equilibrio perfecto. En Granalto, seleccionamos cuidadosamente las mejores planchas y garantizamos un trabajo de instalación de alta precisión.
+
+Elegir cuarcita es apostar por la combinación de lujo y resistencia. Consúltanos para conocer nuestras opciones disponibles en Costa Rica.`,
+    category: "Materiales",
+    author: "Equipo Granalto",
+    publishedAt: "2026-08-05",
+    readingTime: 3,
+    coverImage: {
+      src: "/images/blog/cuarcita-lujo-y-durabilidad.jpg",
+      alt: "Cocina moderna con sobre e isla en cuarcita de vetas doradas y frente de listones de madera",
+    },
+    featured: false,
+    seo: {
+      title: "Cuarcita: la opción perfecta para cocinas que combinan lujo y durabilidad",
+      description:
+        "La cuarcita une la estética del mármol con la resistencia del granito: tolerancia al calor y rayones, diseños exclusivos e instalación de precisión en Granalto Costa Rica.",
+    },
+  },
+  {
     id: "post-granito-en-costa-rica",
     slug: "granito-en-costa-rica-elegancia-natural-y-resistencia",
     title: "Granito en Costa Rica: elegancia natural y resistencia para tu cocina",
