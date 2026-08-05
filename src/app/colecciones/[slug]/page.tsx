@@ -58,22 +58,6 @@ export default async function CollectionPage({ params }: { params: Promise<Param
             {collection.description}
           </p>
         </div>
-
-        <div className="mt-12">
-          <h2 className="mb-6 font-serif text-2xl text-ink">
-            Soluciones de la colección
-          </h2>
-          <ul className="flex flex-wrap gap-2">
-            {collection.subcategories.map((sub) => (
-              <li
-                key={sub}
-                className="rounded-sm border border-stone-beige bg-white px-4 py-2 text-sm text-charcoal"
-              >
-                {sub}
-              </li>
-            ))}
-          </ul>
-        </div>
       </section>
 
       {showcaseProjects.length > 0 && (
