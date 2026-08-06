@@ -20,6 +20,26 @@ export const projectCategories = [
 
 export const projects: Project[] = [
   {
+    id: "proj-hogar-materiales-varios",
+    slug: "hogar-materiales-varios",
+    title: "Materiales varios",
+    category: "hogar",
+    materials: [],
+    partner: "Vital Design y otros",
+    description: "",
+    coverImage: {
+      src: "/images/proyectos/hogar-materiales-varios-1.jpg",
+      alt: "Cocina exterior con parrilla, sobre en piedra y muebles de madera",
+    },
+    gallery: [
+      { src: "/images/proyectos/hogar-materiales-varios-1.jpg", alt: "Cocina exterior con parrilla y sobre en piedra sobre mueble de madera" },
+      { src: "/images/proyectos/hogar-materiales-varios-2.jpg", alt: "Tocador con espejo iluminado y sobre en piedra clara" },
+      { src: "/images/proyectos/hogar-materiales-varios-3.jpg", alt: "Repisa flotante para TV en terrazo oscuro con detalles dorados" },
+      { src: "/images/proyectos/hogar-materiales-varios-4.jpg", alt: "Vestidor de madera con isla central y sobre en piedra clara" },
+    ],
+    featured: true,
+  },
+  {
     id: "proj-superficie-solida-bano",
     slug: "superficie-solida-bano",
     title: "Superficie Sólida",
