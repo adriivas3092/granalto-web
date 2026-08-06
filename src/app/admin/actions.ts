@@ -122,6 +122,30 @@ export async function bulkAvailability(formData: FormData) {
   redirect(categorySlug ? `/admin?categoria=${categorySlug}` : "/admin");
 }
 
+/** Borra en bloque los productos seleccionados (por id). */
+export async function bulkDeleteProducts(ids: string[]) {
+  await requireAdmin();
+  const clean = ids.filter(Boolean);
+  if (clean.length === 0) return;
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.from("products").delete().in("id", clean);
+  if (error) throw new Error(error.message);
+  revalidatePath("/admin");
+  revalidatePath("/tienda");
+}
+
+/** Activa/desactiva en bloque los productos seleccionados (por id). */
+export async function bulkSetAvailabilityForIds(ids: string[], available: boolean) {
+  await requireAdmin();
+  const clean = ids.filter(Boolean);
+  if (clean.length === 0) return;
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.from("products").update({ available }).in("id", clean);
+  if (error) throw new Error(error.message);
+  revalidatePath("/admin");
+  revalidatePath("/tienda");
+}
+
 export async function updateOrderStatus(id: string, formData: FormData) {
   const status = (formData.get("status") as string) || "pendiente";
   const supabase = await createSupabaseServerClient();
