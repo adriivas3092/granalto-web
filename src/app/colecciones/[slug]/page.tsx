@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { CTASection } from "@/components/sections/CTASection";
-import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { ProjectShowcase } from "@/components/sections/ProjectShowcase";
 import { getCollections, getCollectionBySlug } from "@/data/collections";
@@ -62,15 +61,9 @@ export default async function CollectionPage({ params }: { params: Promise<Param
 
       {showcaseProjects.length > 0 && (
         <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-24 lg:px-8">
-          <SectionHeading
-            eyebrow="Proyectos"
-            title="Proyectos relacionados"
-          />
-          <div className="mt-4">
-            {showcaseProjects.map((project) => (
-              <ProjectShowcase key={project.id} project={project} />
-            ))}
-          </div>
+          {showcaseProjects.map((project) => (
+            <ProjectShowcase key={project.id} project={project} />
+          ))}
         </section>
       )}
 
