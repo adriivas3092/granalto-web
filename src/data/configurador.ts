@@ -1,0 +1,151 @@
+/**
+ * Configuración del cotizador de sobres estandarizados (Documento 4).
+ *
+ * Reglas de negocio (RN-01..RN-12): catálogo aprobado, espesor automático por
+ * material, una sola moldura, salpicadero opcional, U sin cotización automática,
+ * paralela = 2 sobres, personalizado deriva a asesor, plazo editable.
+ *
+ * NOTA DE PRECIOS: los precios por m² y por metro lineal son PARÁMETROS
+ * editables por Granalto. Mientras estén en 0, el cotizador calcula áreas y
+ * metros pero muestra "Precio a confirmar" (no inventa montos). Al cargar los
+ * precios reales aquí, el cálculo se activa automáticamente.
+ */
+
+export const IVA_RATE = 0.13;
+
+/** Plazo estándar de producción (RN-08). Editable por Granalto. */
+export const PLAZO_DIAS_HABILES = 10;
+
+/** Precio por metro lineal de moldura básica (CRC). 0 = a confirmar. */
+export const PRECIO_MOLDURA_ML = 0;
+
+/** Límites de medidas en mm (sujeto a validación de Producción). */
+export const MEDIDAS_LIMITES = {
+  largoMin: 100,
+  largoMax: 6000,
+  profMin: 100,
+  profMax: 1200,
+};
+
+/** Salpicadero: alturas en cm. */
+export const SALPICADERO = {
+  estandarCm: 10,
+  customMinCm: 5,
+  customMaxCm: 30,
+};
+
+export type TramoDef = { key: string; label: string };
+
+export type Geometria = {
+  id: string;
+  nombre: string;
+  descripcion: string;
+  tramos: TramoDef[];
+  /** true = genera precio automático; false = deriva a asesor. */
+  autoPrecio: boolean;
+  nota?: string;
+};
+
+/** Pantalla 1 — Tipo de proyecto (geometría). RN-05 excluye la U del catálogo. */
+export const GEOMETRIAS: Geometria[] = [
+  {
+    id: "recto",
+    nombre: "Sobre recto",
+    descripcion: "Un tramo con largo y profundidad.",
+    tramos: [{ key: "principal", label: "Sobre" }],
+    autoPrecio: true,
+  },
+  {
+    id: "barra",
+    nombre: "Barra",
+    descripcion: "Un tramo con largo y profundidad. Puede llevar moldura y salpicadero.",
+    tramos: [{ key: "principal", label: "Barra" }],
+    autoPrecio: true,
+  },
+  {
+    id: "isla",
+    nombre: "Isla",
+    descripcion: "Pieza independiente con largo y profundidad, sin unión con otro tramo.",
+    tramos: [{ key: "principal", label: "Isla" }],
+    autoPrecio: true,
+  },
+  {
+    id: "l",
+    nombre: "Sobre en L",
+    descripcion: "Dos tramos relacionados y una unión.",
+    tramos: [
+      { key: "a", label: "Tramo A" },
+      { key: "b", label: "Tramo B" },
+    ],
+    autoPrecio: true,
+    nota: "Las medidas de la L quedan sujetas a validación técnica posterior.",
+  },
+  {
+    id: "paralela",
+    nombre: "Cocina paralela",
+    descripcion: "Dos tramos rectos dentro del mismo pedido. El total es la suma de ambos.",
+    tramos: [
+      { key: "a", label: "Sobre A" },
+      { key: "b", label: "Sobre B" },
+    ],
+    autoPrecio: true,
+  },
+  {
+    id: "personalizado",
+    nombre: "Proyecto personalizado",
+    descripcion: "¿Otra forma o un proyecto especial? Un asesor lo cotiza con vos.",
+    tramos: [],
+    autoPrecio: false,
+    nota: "Los proyectos personalizados se atienden con un asesor; no generan precio automático.",
+  },
+];
+
+export function getGeometria(id: string | null): Geometria | undefined {
+  return GEOMETRIAS.find((g) => g.id === id);
+}
+
+export type Color = { id: string; nombre: string; swatch: string };
+
+export type MaterialCat = {
+  id: string;
+  nombre: string;
+  espesorMm: number;
+  /** Precio por m² en CRC. 0 = a confirmar. */
+  precioM2: number;
+  colores: Color[];
+};
+
+/** Pantalla 2 — Material y color (RN-01, RN-02). Espesor automático. */
+export const MATERIALES: MaterialCat[] = [
+  {
+    id: "cuarzo",
+    nombre: "Cuarzo chino",
+    espesorMm: 15,
+    precioM2: 0,
+    colores: [
+      { id: "blanco-alpino", nombre: "Blanco Alpino", swatch: "#f1efe9" },
+      { id: "gris-vulcano", nombre: "Gris Vulcano", swatch: "#6f7276" },
+      { id: "london-grey", nombre: "London Grey", swatch: "#b7b6b1" },
+      { id: "negro", nombre: "Negro", swatch: "#1d1d1d" },
+      { id: "blanco-star", nombre: "Blanco Star", swatch: "#e9e6df" },
+    ],
+  },
+  {
+    id: "porcelanico",
+    nombre: "Porcelánico",
+    espesorMm: 12,
+    precioM2: 0,
+    colores: [
+      { id: "calacatta-gold", nombre: "Calacatta Gold", swatch: "#ece6da" },
+      { id: "calacatta-grey", nombre: "Calacatta Grey", swatch: "#e8e6e2" },
+      { id: "pireney-grey", nombre: "Pireney Grey", swatch: "#9a9b9d" },
+      { id: "blanco", nombre: "Blanco", swatch: "#f4f3f0" },
+      { id: "negro", nombre: "Negro", swatch: "#201f1d" },
+      { id: "triani-beige", nombre: "Triani Beige", swatch: "#cdbfa8" },
+    ],
+  },
+];
+
+export function getMaterial(id: string | null): MaterialCat | undefined {
+  return MATERIALES.find((m) => m.id === id);
+}
