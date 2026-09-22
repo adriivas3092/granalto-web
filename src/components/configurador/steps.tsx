@@ -16,7 +16,7 @@ import {
   getMaterial,
 } from "@/data/configurador";
 import { calcularPrecio } from "@/lib/configurador/pricing";
-import { useConfigurador, PASOS } from "@/store/configuradorStore";
+import { useConfigurador, PASOS, MM_POR_UNIDAD, type Unidad } from "@/store/configuradorStore";
 
 const card =
   "group relative flex w-full flex-col rounded-sm border p-4 text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2";
@@ -147,38 +147,61 @@ export function StepMaterial() {
 }
 
 /* ── Paso 3 — Medidas ──────────────────────────────────────── */
-function CampoMm({
+/** Convierte mm a texto en la unidad elegida (sin ceros sobrantes). */
+function mmAUnidadStr(mm: number, unidad: Unidad): string {
+  if (!mm || mm <= 0) return "";
+  const val = mm / MM_POR_UNIDAD[unidad];
+  return String(parseFloat(val.toFixed(3)));
+}
+
+/** Campo de medida en la unidad elegida; guarda internamente en mm. */
+function CampoMedida({
   label,
-  value,
-  max,
-  onChange,
+  mmValue,
+  maxMm,
+  unidad,
+  onChangeMm,
 }: {
   label: string;
-  value: number;
-  max: number;
-  onChange: (n: number) => void;
+  mmValue: number;
+  maxMm: number;
+  unidad: Unidad;
+  onChangeMm: (mm: number) => void;
 }) {
-  const excede = value > max;
-  const vacio = value <= 0;
+  const [draft, setDraft] = useState(() => mmAUnidadStr(mmValue, unidad));
+  const factor = MM_POR_UNIDAD[unidad];
+  const excede = mmValue > maxMm;
+  const vacio = mmValue <= 0;
+  const maxUnidad = parseFloat((maxMm / factor).toFixed(3));
+  const step = unidad === "mm" ? 1 : unidad === "cm" ? 0.1 : 0.001;
+
   return (
     <label className="block">
       <span className="mb-1 block text-xs text-charcoal/80">{label}</span>
       <div className="relative">
         <input
           type="number"
-          inputMode="numeric"
-          min={1}
-          value={value || ""}
-          onChange={(e) => onChange(Math.max(0, Math.round(Number(e.target.value) || 0)))}
+          inputMode="decimal"
+          min={0}
+          step={step}
+          value={draft}
+          onChange={(e) => {
+            const raw = e.target.value;
+            setDraft(raw);
+            const num = parseFloat(raw.replace(",", "."));
+            onChangeMm(Number.isFinite(num) && num > 0 ? Math.round(num * factor) : 0);
+          }}
           placeholder="0"
           className={cn(
             "w-full rounded-sm border bg-white px-3 py-2.5 pr-12 text-ink outline-none focus:border-ink",
             excede ? "border-[#b8863b]" : "border-stone-beige",
           )}
         />
-        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-mineral">mm</span>
+        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-mineral">{unidad}</span>
       </div>
-      <span className="mt-1 block text-xs text-mineral">Máx. estándar {(max / 1000).toFixed(2).replace(".", ",")} m</span>
+      <span className="mt-1 block text-xs text-mineral">
+        Máx. estándar {String(maxUnidad).replace(".", ",")} {unidad}
+      </span>
       {excede && <span className="mt-0.5 block text-xs text-[#b8863b]">Supera el máximo estándar</span>}
       {vacio && <span className="mt-0.5 block text-xs text-mineral">Requerido</span>}
     </label>
@@ -192,6 +215,8 @@ export function StepMedidas() {
   const setDerivar = useConfigurador((s) => s.setDerivar);
   const setPaso = useConfigurador((s) => s.setPaso);
   const yaDerivado = useConfigurador((st) => st.derivar);
+  const unidad = useConfigurador((st) => st.unidad);
+  const setUnidad = useConfigurador((st) => st.setUnidad);
   const geo = getGeometria(geometriaId);
   const L = MEDIDAS_LIMITES;
 
@@ -215,9 +240,33 @@ export function StepMedidas() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const unidades: Unidad[] = ["mm", "cm", "m"];
+
   return (
     <div>
-      <StepTitle n={3} title="Medidas" subtitle="Ingresá largo y profundidad de cada tramo, en milímetros." />
+      <StepTitle n={3} title="Medidas" subtitle="Ingresá largo y profundidad de cada tramo." />
+
+      {/* Selector de unidad */}
+      <div className="mb-6 flex items-center gap-3">
+        <span className="text-sm text-charcoal/80">Unidad:</span>
+        <div className="inline-flex overflow-hidden rounded-sm border border-stone-beige">
+          {unidades.map((u) => (
+            <button
+              key={u}
+              type="button"
+              onClick={() => setUnidad(u)}
+              aria-pressed={unidad === u}
+              className={cn(
+                "min-h-[38px] px-4 py-1.5 text-sm transition-colors",
+                unidad === u ? "bg-ink text-ivory" : "bg-white text-charcoal hover:bg-stone-beige/50",
+              )}
+            >
+              {u}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="grid gap-6 lg:grid-cols-2">
         {geo.tramos.map((t) => (
           <div key={t.key} className="rounded-sm border border-stone-beige bg-white p-5">
@@ -228,8 +277,8 @@ export function StepMedidas() {
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <CampoMm label="Largo" value={medidas[t.key]?.largo ?? 0} max={L.largoMaxMm} onChange={(n) => setMedida(t.key, "largo", n)} />
-              <CampoMm label="Profundidad" value={medidas[t.key]?.prof ?? 0} max={L.profMaxMm} onChange={(n) => setMedida(t.key, "prof", n)} />
+              <CampoMedida key={`${unidad}-${t.key}-largo`} label="Largo" mmValue={medidas[t.key]?.largo ?? 0} maxMm={L.largoMaxMm} unidad={unidad} onChangeMm={(n) => setMedida(t.key, "largo", n)} />
+              <CampoMedida key={`${unidad}-${t.key}-prof`} label="Profundidad" mmValue={medidas[t.key]?.prof ?? 0} maxMm={L.profMaxMm} unidad={unidad} onChangeMm={(n) => setMedida(t.key, "prof", n)} />
             </div>
           </div>
         ))}
@@ -375,8 +424,10 @@ export function StepResumen() {
   const price = calcularPrecio(s);
   const setPaso = s.setPaso;
 
+  const uf = MM_POR_UNIDAD[s.unidad];
+  const enUnidad = (mm: number) => String(parseFloat(((mm ?? 0) / uf).toFixed(3))).replace(".", ",");
   const medidasTxt = geo?.tramos
-    .map((t) => `${t.label}: ${s.medidas[t.key]?.largo ?? 0}×${s.medidas[t.key]?.prof ?? 0} mm`)
+    .map((t) => `${t.label}: ${enUnidad(s.medidas[t.key]?.largo ?? 0)}×${enUnidad(s.medidas[t.key]?.prof ?? 0)} ${s.unidad}`)
     .join(" · ");
   const salpTxt =
     s.salpicaderoTipo === "no" ? "Sin salpicadero" : s.salpicaderoTipo === "10" ? "10 cm" : `${s.salpicaderoAlturaCm} cm`;

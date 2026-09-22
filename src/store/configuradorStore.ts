@@ -4,6 +4,11 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Medida, SalpicaderoTipo } from "@/lib/configurador/pricing";
 
+/** Unidad de medida para ingresar dimensiones (se guarda internamente en mm). */
+export type Unidad = "mm" | "cm" | "m";
+/** Milímetros por unidad. */
+export const MM_POR_UNIDAD: Record<Unidad, number> = { mm: 1, cm: 10, m: 1000 };
+
 /** Pasos del cotizador (Documento 4, sección 2). */
 export const PASOS = [
   { key: "tipo", label: "Tipo de proyecto" },
@@ -45,6 +50,7 @@ type State = {
   materialId: string | null;
   colorId: string | null;
   medidas: Record<string, Medida>;
+  unidad: Unidad;
   moldura: boolean | null;
   salpicaderoTipo: SalpicaderoTipo;
   salpicaderoAlturaCm: number;
@@ -60,6 +66,7 @@ type State = {
   setMaterial: (id: string) => void;
   setColor: (id: string) => void;
   setMedida: (tramo: string, campo: keyof Medida, valor: number) => void;
+  setUnidad: (u: Unidad) => void;
   setMoldura: (v: boolean) => void;
   setSalpicadero: (tipo: SalpicaderoTipo, alturaCm?: number) => void;
   setDerivar: (v: boolean) => void;
@@ -74,6 +81,7 @@ const initial = {
   materialId: null,
   colorId: null,
   medidas: {} as Record<string, Medida>,
+  unidad: "mm" as Unidad,
   moldura: null,
   salpicaderoTipo: "no" as SalpicaderoTipo,
   salpicaderoAlturaCm: 0,
@@ -108,6 +116,7 @@ export const useConfigurador = create<State>()(
           },
         })),
 
+      setUnidad: (u) => set({ unidad: u }),
       setMoldura: (v) => set({ moldura: v }),
       setDerivar: (v) => set({ derivar: v }),
       setSalpicadero: (tipo, alturaCm) =>
@@ -130,6 +139,7 @@ export const useConfigurador = create<State>()(
         materialId: s.materialId,
         colorId: s.colorId,
         medidas: s.medidas,
+        unidad: s.unidad,
         moldura: s.moldura,
         salpicaderoTipo: s.salpicaderoTipo,
         salpicaderoAlturaCm: s.salpicaderoAlturaCm,
