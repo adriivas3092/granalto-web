@@ -13,6 +13,11 @@
 
 export const IVA_RATE = 0.13;
 
+/** Unidad de medida para ingresar dimensiones (internamente todo se guarda en mm). */
+export type Unidad = "mm" | "cm" | "m";
+/** Milímetros por unidad. */
+export const MM_POR_UNIDAD: Record<Unidad, number> = { mm: 1, cm: 10, m: 1000 };
+
 /** Plazo estándar de producción (RN-08). Editable por Granalto. */
 export const PLAZO_DIAS_HABILES = 10;
 

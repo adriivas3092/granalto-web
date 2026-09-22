@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { rateLimit, clientIp } from "@/lib/api/rate-limit";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
+import { buildFicha } from "@/lib/configurador/ficha";
+import { enviarNotificaciones } from "@/lib/configurador/email";
 
 /**
  * POST /api/configurador — registra una configuración de sobre (Documento 4).
@@ -23,6 +25,8 @@ const bodySchema = z.object({
   moldura: z.boolean().nullable().optional(),
   salpicaderoTipo: z.enum(["no", "10", "custom"]).optional(),
   salpicaderoAlturaCm: z.coerce.number().nonnegative().optional(),
+  unidad: z.enum(["mm", "cm", "m"]).optional(),
+  derivar: z.boolean().optional(),
   personalizado: z.boolean().optional(),
   area: z.coerce.number().nonnegative().optional(),
   cliente: z.object({
@@ -65,6 +69,34 @@ export async function POST(req: Request) {
   }
 
   const folio = generarFolio();
+  const d = parsed.data;
+
+  // Ficha técnica: respaldo del cliente y paquete para los equipos internos.
+  const { secciones, esPersonalizado, entregaDomicilio } = buildFicha({
+    geometriaId: d.geometriaId,
+    materialId: d.materialId ?? null,
+    colorId: d.colorId ?? null,
+    medidas: d.medidas ?? {},
+    moldura: d.moldura ?? null,
+    salpicaderoTipo: d.salpicaderoTipo ?? "no",
+    salpicaderoAlturaCm: d.salpicaderoAlturaCm ?? 0,
+    derivar: d.derivar,
+    unidad: d.unidad ?? "mm",
+    cliente: d.cliente,
+    folio,
+    fecha: new Date().toLocaleString("es-CR"),
+  });
+
+  // Notificaciones: Dibujo (siempre) + Logística en copia si hay entrega a
+  // domicilio + confirmación al cliente. Nunca bloquea la respuesta.
+  const notif = await enviarNotificaciones({
+    folio,
+    secciones,
+    esPersonalizado,
+    entregaDomicilio,
+    clienteCorreo: d.cliente.correo,
+    clienteNombre: d.cliente.nombre,
+  });
 
   // Persistencia opcional (no bloquea la confirmación al cliente).
   try {
@@ -72,7 +104,8 @@ export async function POST(req: Request) {
     if (supabase) {
       await supabase.from("configuraciones").insert({
         folio,
-        payload: parsed.data,
+        payload: d,
+        notificacion: notif,
         created_at: new Date().toISOString(),
       });
     }

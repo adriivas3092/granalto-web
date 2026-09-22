@@ -3,11 +3,10 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Medida, SalpicaderoTipo } from "@/lib/configurador/pricing";
+import { MM_POR_UNIDAD, type Unidad } from "@/data/configurador";
 
-/** Unidad de medida para ingresar dimensiones (se guarda internamente en mm). */
-export type Unidad = "mm" | "cm" | "m";
-/** Milímetros por unidad. */
-export const MM_POR_UNIDAD: Record<Unidad, number> = { mm: 1, cm: 10, m: 1000 };
+export { MM_POR_UNIDAD };
+export type { Unidad };
 
 /** Pasos del cotizador (Documento 4, sección 2). */
 export const PASOS = [

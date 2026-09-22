@@ -516,6 +516,8 @@ export function StepDatos() {
           moldura: s.moldura,
           salpicaderoTipo: s.salpicaderoTipo,
           salpicaderoAlturaCm: s.salpicaderoAlturaCm,
+          unidad: s.unidad,
+          derivar: s.derivar,
           personalizado: esPersonalizado,
           area: price.areaTotal,
           cliente: c,
