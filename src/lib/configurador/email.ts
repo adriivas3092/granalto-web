@@ -14,11 +14,11 @@ import type { FichaSeccion } from "@/lib/configurador/ficha";
  * lanza: un fallo de correo no debe romper el registro del pedido.
  */
 
-const FROM = process.env.CONFIGURADOR_FROM || "Granalto <pedidos@granalto.net>";
-const DIBUJO = process.env.DIBUJO_EMAIL || "dibujo@granalto.net";
-const LOGISTICA = process.env.LOGISTICA_EMAIL || "logistica@granalto.net";
-const CONTABILIDAD = process.env.CONTABILIDAD_EMAIL || "contabilidad@granalto.net";
-const VENTAS = process.env.VENTAS_EMAIL || "info@granalto.net";
+const FROM = process.env.CONFIGURADOR_FROM || "Granalto <pedidos@granaltocr.net>";
+const DIBUJO = process.env.DIBUJO_EMAIL || "dibujo@granaltocr.net";
+const LOGISTICA = process.env.LOGISTICA_EMAIL || "logistica@granaltocr.net";
+const CONTABILIDAD = process.env.CONTABILIDAD_EMAIL || "contabilidad@granaltocr.net";
+const VENTAS = process.env.VENTAS_EMAIL || "info@granaltocr.net";
 
 function esc(s: string): string {
   return s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c] as string);

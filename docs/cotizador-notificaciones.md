@@ -22,11 +22,11 @@ El envío es por **Resend** (HTTP, sin dependencias). Si no está configurado, c
 | Variable | Descripción | Valor por defecto |
 |---|---|---|
 | `RESEND_API_KEY` | API key de Resend. Sin esto no se envían correos. | — |
-| `CONFIGURADOR_FROM` | Remitente verificado en Resend. | `Granalto <pedidos@granalto.net>` |
-| `DIBUJO_EMAIL` | Correo del equipo de Dibujo (destinatario principal). | `dibujo@granalto.net` |
-| `LOGISTICA_EMAIL` | Correo de Logística (copia si hay entrega a domicilio). | `logistica@granalto.net` |
-| `CONTABILIDAD_EMAIL` | Correo de Contabilidad (siempre en copia). | `contabilidad@granalto.net` |
-| `VENTAS_EMAIL` | Copia general de cada solicitud. | `info@granalto.net` |
+| `CONFIGURADOR_FROM` | Remitente verificado en Resend. | `Granalto <pedidos@granaltocr.net>` |
+| `DIBUJO_EMAIL` | Correo del equipo de Dibujo (destinatario principal). | `dibujo@granaltocr.net` |
+| `LOGISTICA_EMAIL` | Correo de Logística (copia si hay entrega a domicilio). | `logistica@granaltocr.net` |
+| `CONTABILIDAD_EMAIL` | Correo de Contabilidad (siempre en copia). | `contabilidad@granaltocr.net` |
+| `VENTAS_EMAIL` | Copia general de cada solicitud. | `info@granaltocr.net` |
 | `CONFIGURADOR_WEBHOOK_URL` | Respaldo si no se usa Resend (Zapier/Make/API propia). | — |
 
 ## Pasos para activarlo
