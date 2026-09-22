@@ -32,7 +32,7 @@ export default function CotizarExitoPage() {
   const geo = getGeometria(s.geometriaId);
   const material = getMaterial(s.materialId);
   const price = calcularPrecio(s);
-  const esPersonalizado = geo?.autoPrecio === false;
+  const esPersonalizado = geo?.autoPrecio === false || s.derivar;
   const wa = getWhatsAppUrl(`Hola, envié la solicitud ${folio} desde el cotizador. Quisiera continuar.`);
 
   return (

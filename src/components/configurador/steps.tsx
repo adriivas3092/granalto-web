@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check, Pencil, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -147,27 +147,19 @@ export function StepMaterial() {
 }
 
 /* ── Paso 3 — Medidas ──────────────────────────────────────── */
-function medidaError(v: number, min: number, max: number): string | null {
-  if (!v) return "Requerido";
-  if (v < min) return `Mín. ${min} mm`;
-  if (v > max) return `Máx. ${max} mm`;
-  return null;
-}
-
 function CampoMm({
   label,
   value,
-  min,
   max,
   onChange,
 }: {
   label: string;
   value: number;
-  min: number;
   max: number;
   onChange: (n: number) => void;
 }) {
-  const err = value ? medidaError(value, min, max) : null;
+  const excede = value > max;
+  const vacio = value <= 0;
   return (
     <label className="block">
       <span className="mb-1 block text-xs text-charcoal/80">{label}</span>
@@ -175,19 +167,20 @@ function CampoMm({
         <input
           type="number"
           inputMode="numeric"
-          min={min}
-          max={max}
+          min={1}
           value={value || ""}
           onChange={(e) => onChange(Math.max(0, Math.round(Number(e.target.value) || 0)))}
           placeholder="0"
           className={cn(
             "w-full rounded-sm border bg-white px-3 py-2.5 pr-12 text-ink outline-none focus:border-ink",
-            err ? "border-[#a03826]" : "border-stone-beige",
+            excede ? "border-[#b8863b]" : "border-stone-beige",
           )}
         />
         <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-mineral">mm</span>
       </div>
-      {err && <span className="mt-1 block text-xs text-[#a03826]">{err}</span>}
+      <span className="mt-1 block text-xs text-mineral">Máx. estándar {(max / 1000).toFixed(2).replace(".", ",")} m</span>
+      {excede && <span className="mt-0.5 block text-xs text-[#b8863b]">Supera el máximo estándar</span>}
+      {vacio && <span className="mt-0.5 block text-xs text-mineral">Requerido</span>}
     </label>
   );
 }
@@ -196,9 +189,32 @@ export function StepMedidas() {
   const geometriaId = useConfigurador((s) => s.geometriaId);
   const medidas = useConfigurador((s) => s.medidas);
   const setMedida = useConfigurador((s) => s.setMedida);
+  const setDerivar = useConfigurador((s) => s.setDerivar);
+  const setPaso = useConfigurador((s) => s.setPaso);
+  const yaDerivado = useConfigurador((st) => st.derivar);
   const geo = getGeometria(geometriaId);
-  if (!geo) return null;
   const L = MEDIDAS_LIMITES;
+
+  const excedeAlguno =
+    !!geo &&
+    geo.tramos.some((t) => {
+      const m = medidas[t.key];
+      return m && (m.largo > L.largoMaxMm || m.prof > L.profMaxMm);
+    });
+
+  // Si el usuario corrige y ninguna medida excede, volvemos al flujo normal.
+  useEffect(() => {
+    if (yaDerivado && !excedeAlguno) setDerivar(false);
+  }, [yaDerivado, excedeAlguno, setDerivar]);
+
+  if (!geo) return null;
+
+  const derivar = () => {
+    setDerivar(true);
+    setPaso(6); // salta a datos / contacto
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
     <div>
       <StepTitle n={3} title="Medidas" subtitle="Ingresá largo y profundidad de cada tramo, en milímetros." />
@@ -212,12 +228,29 @@ export function StepMedidas() {
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <CampoMm label="Largo" value={medidas[t.key]?.largo ?? 0} min={L.largoMin} max={L.largoMax} onChange={(n) => setMedida(t.key, "largo", n)} />
-              <CampoMm label="Profundidad" value={medidas[t.key]?.prof ?? 0} min={L.profMin} max={L.profMax} onChange={(n) => setMedida(t.key, "prof", n)} />
+              <CampoMm label="Largo" value={medidas[t.key]?.largo ?? 0} max={L.largoMaxMm} onChange={(n) => setMedida(t.key, "largo", n)} />
+              <CampoMm label="Profundidad" value={medidas[t.key]?.prof ?? 0} max={L.profMaxMm} onChange={(n) => setMedida(t.key, "prof", n)} />
             </div>
           </div>
         ))}
       </div>
+
+      {excedeAlguno && (
+        <div className="mt-6 rounded-sm border border-[#b8863b]/50 bg-[#b8863b]/10 p-4">
+          <p className="text-sm text-ink">
+            Alguna medida supera el máximo estándar (<strong>3,10 m de largo</strong> o <strong>1,40 m de ancho/profundidad</strong>).
+            Estas piezas se cotizan de forma personalizada con un asesor.
+          </p>
+          <button
+            type="button"
+            onClick={derivar}
+            className="mt-3 inline-flex min-h-[44px] items-center gap-2 rounded-sm bg-ink px-5 py-2.5 text-sm font-medium text-ivory hover:bg-charcoal"
+          >
+            Continuar con cotización personalizada
+          </button>
+        </div>
+      )}
+
       <p className="mt-4 text-xs text-mineral">
         Las medidas son referenciales y quedan sujetas a validación técnica. {geo.nota ?? ""}
       </p>
@@ -402,7 +435,7 @@ export function StepDatos() {
   const router = useRouter();
   const s = useConfigurador();
   const geo = getGeometria(s.geometriaId);
-  const esPersonalizado = geo?.autoPrecio === false;
+  const esPersonalizado = geo?.autoPrecio === false || s.derivar;
   const c = s.cliente;
   const setCliente = s.setCliente;
   const setFolio = s.setFolio;

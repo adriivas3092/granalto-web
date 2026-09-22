@@ -39,13 +39,17 @@ export function Configurador() {
   useEffect(() => setMounted(true), []);
 
   const geo = getGeometria(s.geometriaId);
-  const esPersonalizado = geo?.autoPrecio === false;
+  const geoPersonalizado = geo?.autoPrecio === false;
 
-  // Pasos visibles: personalizado salta directo a datos.
-  const visibles = useMemo(
-    () => (esPersonalizado ? [0, TOTAL_PASOS - 1] : [...Array(TOTAL_PASOS).keys()]),
-    [esPersonalizado],
-  );
+  // Pasos visibles:
+  //  - geometría personalizada → tipo + datos.
+  //  - derivado por medidas fuera de rango → tipo, material, medidas + datos.
+  //  - normal → todos.
+  const visibles = useMemo(() => {
+    if (geoPersonalizado) return [0, TOTAL_PASOS - 1];
+    if (s.derivar) return [0, 1, 2, TOTAL_PASOS - 1];
+    return [...Array(TOTAL_PASOS).keys()];
+  }, [geoPersonalizado, s.derivar]);
 
   if (!mounted) return <div className="min-h-[60svh]" />;
 
@@ -150,7 +154,7 @@ function LiveSummary() {
   const material = getMaterial(s.materialId);
   const color = material?.colores.find((c) => c.id === s.colorId);
   const price = calcularPrecio(s);
-  const esPersonalizado = geo?.autoPrecio === false;
+  const esPersonalizado = geo?.autoPrecio === false || s.derivar;
 
   return (
     <div className="rounded-sm border border-stone-beige bg-white p-5">
@@ -221,14 +225,17 @@ function validar(paso: number, s: ReturnType<typeof useConfigurador.getState>): 
       const geo = getGeometria(s.geometriaId);
       if (!geo || geo.tramos.length === 0) return false;
       const L = MEDIDAS_LIMITES;
+      // Válido para continuar automáticamente: todas las piezas positivas y
+      // dentro del máximo estándar. Si alguna excede, no avanza por aquí: se
+      // ofrece derivar a cotización personalizada en el propio paso.
       return geo.tramos.every((t) => {
         const m = s.medidas[t.key];
         return (
           m &&
-          m.largo >= L.largoMin &&
-          m.largo <= L.largoMax &&
-          m.prof >= L.profMin &&
-          m.prof <= L.profMax
+          m.largo > 0 &&
+          m.prof > 0 &&
+          m.largo <= L.largoMaxMm &&
+          m.prof <= L.profMaxMm
         );
       });
     }

@@ -19,13 +19,21 @@ export const PLAZO_DIAS_HABILES = 10;
 /** Precio por metro lineal de moldura básica (CRC). 0 = a confirmar. */
 export const PRECIO_MOLDURA_ML = 0;
 
-/** Límites de medidas en mm (sujeto a validación de Producción). */
+/**
+ * Límites de medidas por pieza estándar, en mm (RN-13).
+ * Máximo 3,10 m de largo y 1,40 m de ancho/profundidad. Lo que exceda cualquiera
+ * de estos límites se deriva a cotización personalizada. No hay mínimo de piezas
+ * por pedido (RN-14); solo se exigen números positivos.
+ */
 export const MEDIDAS_LIMITES = {
-  largoMin: 100,
-  largoMax: 6000,
-  profMin: 100,
-  profMax: 1200,
+  largoMaxMm: 3100,
+  profMaxMm: 1400,
 };
+
+/** true si la medida de una pieza supera el máximo estándar (deriva a personalizado). */
+export function medidaExcedeMaximo(largoMm: number, profMm: number): boolean {
+  return largoMm > MEDIDAS_LIMITES.largoMaxMm || profMm > MEDIDAS_LIMITES.profMaxMm;
+}
 
 /** Salpicadero: alturas en cm. */
 export const SALPICADERO = {

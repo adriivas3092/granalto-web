@@ -48,6 +48,8 @@ type State = {
   moldura: boolean | null;
   salpicaderoTipo: SalpicaderoTipo;
   salpicaderoAlturaCm: number;
+  /** true cuando el proyecto se deriva a cotización personalizada (p. ej. medidas fuera de rango). */
+  derivar: boolean;
   cliente: Cliente;
   folio: string | null;
 
@@ -60,6 +62,7 @@ type State = {
   setMedida: (tramo: string, campo: keyof Medida, valor: number) => void;
   setMoldura: (v: boolean) => void;
   setSalpicadero: (tipo: SalpicaderoTipo, alturaCm?: number) => void;
+  setDerivar: (v: boolean) => void;
   setCliente: (patch: Partial<Cliente>) => void;
   setFolio: (f: string) => void;
   reset: () => void;
@@ -74,6 +77,7 @@ const initial = {
   moldura: null,
   salpicaderoTipo: "no" as SalpicaderoTipo,
   salpicaderoAlturaCm: 0,
+  derivar: false,
   cliente: clienteVacio,
   folio: null,
 };
@@ -88,7 +92,7 @@ export const useConfigurador = create<State>()(
       prev: () => set((s) => ({ paso: Math.max(0, s.paso - 1) })),
 
       setGeometria: (id) =>
-        set((s) => (s.geometriaId === id ? s : { geometriaId: id, medidas: {} })),
+        set((s) => (s.geometriaId === id ? s : { geometriaId: id, medidas: {}, derivar: false })),
       setMaterial: (id) =>
         set((s) => (s.materialId === id ? s : { materialId: id, colorId: null })),
       setColor: (id) => set({ colorId: id }),
@@ -105,6 +109,7 @@ export const useConfigurador = create<State>()(
         })),
 
       setMoldura: (v) => set({ moldura: v }),
+      setDerivar: (v) => set({ derivar: v }),
       setSalpicadero: (tipo, alturaCm) =>
         set({
           salpicaderoTipo: tipo,
@@ -128,6 +133,7 @@ export const useConfigurador = create<State>()(
         moldura: s.moldura,
         salpicaderoTipo: s.salpicaderoTipo,
         salpicaderoAlturaCm: s.salpicaderoAlturaCm,
+        derivar: s.derivar,
       }),
     },
   ),
