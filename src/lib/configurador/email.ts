@@ -17,6 +17,7 @@ import type { FichaSeccion } from "@/lib/configurador/ficha";
 const FROM = process.env.CONFIGURADOR_FROM || "Granalto <pedidos@granalto.net>";
 const DIBUJO = process.env.DIBUJO_EMAIL || "dibujo@granalto.net";
 const LOGISTICA = process.env.LOGISTICA_EMAIL || "logistica@granalto.net";
+const CONTABILIDAD = process.env.CONTABILIDAD_EMAIL || "contabilidad@granalto.net";
 const VENTAS = process.env.VENTAS_EMAIL || "info@granalto.net";
 
 function esc(s: string): string {
@@ -94,8 +95,8 @@ export async function enviarNotificaciones(params: {
   const tipo = params.esPersonalizado ? "Cotización personalizada" : "Pedido";
   const asuntoInterno = `${tipo} ${params.folio}${params.entregaDomicilio ? " · Entrega a domicilio" : " · Retiro"}`;
 
-  // Copia a Logística solo si hay que gestionar entrega.
-  const cc = [VENTAS, ...(params.entregaDomicilio ? [LOGISTICA] : [])];
+  // Copia siempre a Ventas y Contabilidad; Logística solo si hay que gestionar entrega.
+  const cc = [VENTAS, CONTABILIDAD, ...(params.entregaDomicilio ? [LOGISTICA] : [])];
 
   let interno = false;
   let cliente = false;

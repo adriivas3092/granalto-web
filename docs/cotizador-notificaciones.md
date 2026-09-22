@@ -8,6 +8,7 @@ Al enviar una solicitud desde `/cotizar`, el sistema:
 3. Envía correos:
    - **Dibujo** (siempre): valida disponibilidad de material y medidas, y lleva el control.
    - **Logística** (en copia): solo cuando la modalidad es **entrega a domicilio**.
+   - **Contabilidad** (en copia): siempre.
    - **Ventas / info** (en copia): siempre.
    - **Cliente**: confirmación con la ficha como respaldo.
 4. Muestra al cliente el resumen completo en pantalla (imprimible / PDF) como respaldo.
@@ -24,6 +25,7 @@ El envío es por **Resend** (HTTP, sin dependencias). Si no está configurado, c
 | `CONFIGURADOR_FROM` | Remitente verificado en Resend. | `Granalto <pedidos@granalto.net>` |
 | `DIBUJO_EMAIL` | Correo del equipo de Dibujo (destinatario principal). | `dibujo@granalto.net` |
 | `LOGISTICA_EMAIL` | Correo de Logística (copia si hay entrega a domicilio). | `logistica@granalto.net` |
+| `CONTABILIDAD_EMAIL` | Correo de Contabilidad (siempre en copia). | `contabilidad@granalto.net` |
 | `VENTAS_EMAIL` | Copia general de cada solicitud. | `info@granalto.net` |
 | `CONFIGURADOR_WEBHOOK_URL` | Respaldo si no se usa Resend (Zapier/Make/API propia). | — |
 
