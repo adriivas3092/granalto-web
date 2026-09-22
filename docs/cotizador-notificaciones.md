@@ -31,7 +31,7 @@ El envío es por **Resend** (HTTP, sin dependencias). Si no está configurado, c
 
 ## Pasos para activarlo
 
-1. Crear una cuenta en Resend y **verificar el dominio** `granalto.net` (registros SPF/DKIM).
+1. Crear una cuenta en Resend y **verificar el dominio** `granaltocr.net` (registros SPF/DKIM).
 2. Crear una API key y guardarla en Vercel como `RESEND_API_KEY`.
 3. Definir `CONFIGURADOR_FROM` con un remitente del dominio verificado.
 4. Ajustar `DIBUJO_EMAIL`, `LOGISTICA_EMAIL` y `VENTAS_EMAIL` con los correos reales.
