@@ -6,9 +6,9 @@ Al enviar una solicitud desde `/cotizar`, el sistema:
 2. Arma la **ficha técnica** completa del pedido (proyecto, material, color, espesor,
    medidas por tramo, moldura, salpicadero, área, precio/plazo, entrega y cliente).
 3. Envía correos:
-   - **Dibujo** (siempre): valida disponibilidad de material y medidas, y lleva el control.
+   - **Dibujo** (siempre): valida **medidas** y lleva el control.
+   - **Contabilidad** (en copia, siempre): valida **disponibilidad de material** y **facturación**.
    - **Logística** (en copia): solo cuando la modalidad es **entrega a domicilio**.
-   - **Contabilidad** (en copia): siempre.
    - **Ventas / info** (en copia): siempre.
    - **Cliente**: confirmación con la ficha como respaldo.
 4. Muestra al cliente el resumen completo en pantalla (imprimible / PDF) como respaldo.

@@ -109,7 +109,7 @@ export async function enviarNotificaciones(params: {
     subject: `Granalto · ${asuntoInterno}`,
     html: fichaHtml(
       params.secciones,
-      `Nueva solicitud desde el cotizador. Dibujo: validar disponibilidad de material y medidas.${
+      `Nueva solicitud desde el cotizador. Contabilidad: validar disponibilidad de material y facturación. Dibujo: validar medidas y llevar el control.${
         params.entregaDomicilio ? " Logística en copia para gestionar la entrega." : ""
       }`,
     ),
