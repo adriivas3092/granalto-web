@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { FileText } from "lucide-react";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { requireAdmin } from "@/lib/supabase/admin-guard";
@@ -5,7 +6,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getGeometria, getMaterial } from "@/data/configurador";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Admin | Solicitudes", robots: { index: false } };
+export const metadata = { title: "Admin | Pedidos de sobres", robots: { index: false } };
 
 type Cliente = {
   nombre?: string;
@@ -56,8 +57,10 @@ export default async function AdminSolicitudesPage() {
   return (
     <AdminShell>
       <div>
-        <h1 className="font-sans text-2xl font-bold text-ink">Solicitudes del cotizador</h1>
-        <p className="text-sm text-charcoal/70">{rows.length} solicitud(es)</p>
+        <h1 className="font-sans text-2xl font-bold text-ink">Pedidos de sobres</h1>
+        <p className="text-sm text-charcoal/70">
+          Solicitudes recibidas desde el cotizador · {rows.length} en total
+        </p>
       </div>
 
       {error && (
@@ -91,7 +94,11 @@ export default async function AdminSolicitudesPage() {
               const cli = p.cliente ?? {};
               return (
                 <tr key={r.id} className="border-b border-stone-beige/60 last:border-0 hover:bg-ivory/60 align-top">
-                  <td className="px-4 py-3 font-mono text-ink">{r.folio}</td>
+                  <td className="px-4 py-3">
+                    <Link href={`/admin/solicitudes/${r.id}`} className="font-mono text-ink hover:underline">
+                      {r.folio}
+                    </Link>
+                  </td>
                   <td className="px-4 py-3 text-charcoal">{fmtDate(r.created_at)}</td>
                   <td className="px-4 py-3">
                     <span

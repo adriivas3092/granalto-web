@@ -15,7 +15,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
             <nav className="flex items-center gap-4 text-sm">
               <Link href="/admin" className="text-charcoal hover:text-ink">Productos</Link>
               <Link href="/admin/pedidos" className="text-charcoal hover:text-ink">Pedidos</Link>
-              <Link href="/admin/solicitudes" className="text-charcoal hover:text-ink">Solicitudes</Link>
+              <Link href="/admin/solicitudes" className="text-charcoal hover:text-ink">Pedidos de sobres</Link>
               <Link href="/admin/clientes" className="text-charcoal hover:text-ink">Clientes</Link>
               <Link href="/tienda" className="text-mineral hover:text-ink">Ver tienda ↗</Link>
             </nav>
