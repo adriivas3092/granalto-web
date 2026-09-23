@@ -154,6 +154,7 @@ export async function bulkSetAvailabilityForIds(ids: string[], available: boolea
 }
 
 export async function updateOrderStatus(id: string, formData: FormData) {
+  await requireAdmin();
   const status = (formData.get("status") as string) || "pendiente";
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.from("orders").update({ status }).eq("id", id);
@@ -161,6 +162,58 @@ export async function updateOrderStatus(id: string, formData: FormData) {
   revalidatePath("/admin/pedidos");
   revalidatePath(`/admin/pedidos/${id}`);
   redirect(`/admin/pedidos/${id}`);
+}
+
+/** Modificar los datos de un pedido (cliente, contacto, dirección, notas). */
+export async function updateOrderDetails(id: string, formData: FormData) {
+  await requireAdmin();
+  const str = (k: string) => ((formData.get(k) as string) || "").trim();
+  const patch = {
+    customer_name: str("customer_name"),
+    customer_email: str("customer_email"),
+    customer_phone: str("customer_phone") || null,
+    shipping_address: str("shipping_address") || null,
+    notes: str("notes") || null,
+  };
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.from("orders").update(patch).eq("id", id);
+  if (error) throw new Error(error.message);
+  revalidatePath("/admin/pedidos");
+  revalidatePath(`/admin/pedidos/${id}`);
+  redirect(`/admin/pedidos/${id}`);
+}
+
+/** Eliminar un pedido (los ítems se borran en cascada). */
+export async function deleteOrder(id: string) {
+  await requireAdmin();
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.from("orders").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+  revalidatePath("/admin/pedidos");
+  redirect("/admin/pedidos");
+}
+
+/** Actualizar una solicitud del cotizador (estado y notas internas). */
+export async function updateSolicitud(id: string, formData: FormData) {
+  await requireAdmin();
+  const estado = ((formData.get("estado") as string) || "nuevo").trim();
+  const notas = ((formData.get("notas") as string) || "").trim() || null;
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.from("configuraciones").update({ estado, notas }).eq("id", id);
+  if (error) throw new Error(error.message);
+  revalidatePath("/admin/solicitudes");
+  revalidatePath(`/admin/solicitudes/${id}`);
+  redirect(`/admin/solicitudes/${id}`);
+}
+
+/** Eliminar una solicitud del cotizador. */
+export async function deleteSolicitud(id: string) {
+  await requireAdmin();
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.from("configuraciones").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+  revalidatePath("/admin/solicitudes");
+  redirect("/admin/solicitudes");
 }
 
 export async function signOut() {

@@ -4,7 +4,8 @@ import { AdminShell } from "@/components/admin/AdminShell";
 import { getOrderById } from "@/lib/store/admin";
 import { formatPrice } from "@/lib/store/format";
 import { OrderStatusBadge } from "@/components/store/OrderStatusBadge";
-import { updateOrderStatus } from "@/app/admin/actions";
+import { updateOrderStatus, updateOrderDetails, deleteOrder } from "@/app/admin/actions";
+import { DeleteWithConfirm } from "@/components/admin/DeleteWithConfirm";
 import { requireAdmin } from "@/lib/supabase/admin-guard";
 import { ORDER_STATUS_LABELS, type OrderStatus } from "@/types/store";
 
@@ -24,7 +25,11 @@ export default async function AdminOrderDetail({ params }: { params: Promise<{ i
   if (!order) notFound();
 
   const action = updateOrderStatus.bind(null, id);
+  const editAction = updateOrderDetails.bind(null, id);
+  const del = deleteOrder.bind(null, id);
   const statuses = Object.keys(ORDER_STATUS_LABELS) as OrderStatus[];
+  const inputCls =
+    "w-full rounded-sm border border-stone-beige bg-white px-3 py-2 text-sm text-ink focus:border-ink focus:outline-none";
 
   return (
     <AdminShell>
@@ -92,23 +97,48 @@ export default async function AdminOrderDetail({ params }: { params: Promise<{ i
             </form>
           </div>
 
-          <div className="rounded-sm border border-stone-beige bg-white p-5 text-sm">
-            <h2 className="mb-2 font-sans font-bold text-ink">Cliente</h2>
-            <p className="text-charcoal">{order.customer_name}</p>
-            <p className="text-charcoal">{order.customer_email}</p>
-            {order.customer_phone && <p className="text-charcoal">{order.customer_phone}</p>}
-            {order.shipping_address && (
-              <>
-                <h3 className="mb-1 mt-3 font-medium text-ink">Dirección</h3>
-                <p className="text-charcoal">{order.shipping_address}</p>
-              </>
-            )}
-            {order.notes && (
-              <>
-                <h3 className="mb-1 mt-3 font-medium text-ink">Notas</h3>
-                <p className="text-charcoal">{order.notes}</p>
-              </>
-            )}
+          <div className="rounded-sm border border-stone-beige bg-white p-5">
+            <h2 className="mb-3 font-sans font-bold text-ink">Modificar pedido</h2>
+            <form action={editAction} className="space-y-3 text-sm">
+              <label className="block">
+                <span className="mb-1 block text-xs text-charcoal/80">Nombre</span>
+                <input name="customer_name" defaultValue={order.customer_name ?? ""} className={inputCls} />
+              </label>
+              <label className="block">
+                <span className="mb-1 block text-xs text-charcoal/80">Correo</span>
+                <input name="customer_email" defaultValue={order.customer_email ?? ""} className={inputCls} />
+              </label>
+              <label className="block">
+                <span className="mb-1 block text-xs text-charcoal/80">Teléfono</span>
+                <input name="customer_phone" defaultValue={order.customer_phone ?? ""} className={inputCls} />
+              </label>
+              <label className="block">
+                <span className="mb-1 block text-xs text-charcoal/80">Dirección</span>
+                <textarea name="shipping_address" defaultValue={order.shipping_address ?? ""} rows={2} className={inputCls} />
+              </label>
+              <label className="block">
+                <span className="mb-1 block text-xs text-charcoal/80">Notas</span>
+                <textarea name="notes" defaultValue={order.notes ?? ""} rows={2} className={inputCls} />
+              </label>
+              <button
+                type="submit"
+                className="inline-flex min-h-[44px] w-full items-center justify-center rounded-sm border border-ink px-5 py-2.5 text-sm font-medium text-ink hover:bg-ink hover:text-ivory"
+              >
+                Guardar cambios
+              </button>
+            </form>
+          </div>
+
+          <div className="rounded-sm border border-stone-beige bg-white p-5">
+            <h2 className="mb-3 font-sans font-bold text-ink">Eliminar pedido</h2>
+            <p className="mb-3 text-xs text-charcoal/70">
+              Se elimina el pedido y su detalle de forma permanente.
+            </p>
+            <DeleteWithConfirm
+              action={del}
+              label="Eliminar pedido"
+              confirmText={`¿Eliminar el pedido #${order.id.slice(0, 8).toUpperCase()}? Esta acción no se puede deshacer.`}
+            />
           </div>
         </div>
       </div>
