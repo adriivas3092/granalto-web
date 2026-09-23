@@ -45,6 +45,63 @@ export type CustomerSummary = {
   last_order: string;
 };
 
+export type SalesStats = {
+  revenue: number;
+  currency: string;
+  orders: number;
+  avgTicket: number;
+  last30Orders: number;
+  last30Revenue: number;
+  unitsSold: number;
+  byStatus: Record<string, number>;
+  topProducts: { name: string; qty: number; total: number }[];
+};
+
+/** Estadísticas de ventas para el panel (pedidos de la tienda). */
+export async function getSalesStats(): Promise<SalesStats> {
+  const supabase = await createSupabaseServerClient();
+  const orders = await getAllOrders();
+
+  const paid = orders.filter((o) => o.status !== "cancelado");
+  const revenue = paid.reduce((a, o) => a + (o.total ?? 0), 0);
+  const currency = orders[0]?.currency ?? "CRC";
+  const avgTicket = paid.length ? Math.round(revenue / paid.length) : 0;
+
+  const since = Date.now() - 30 * 24 * 60 * 60 * 1000;
+  const last30 = paid.filter((o) => new Date(o.created_at).getTime() >= since);
+  const last30Revenue = last30.reduce((a, o) => a + (o.total ?? 0), 0);
+
+  const byStatus: Record<string, number> = {};
+  for (const o of orders) byStatus[o.status] = (byStatus[o.status] ?? 0) + 1;
+
+  // Productos más vendidos (desde order_items).
+  const { data: items } = await supabase
+    .from("order_items")
+    .select("product_name, quantity, line_total");
+  const agg = new Map<string, { name: string; qty: number; total: number }>();
+  let unitsSold = 0;
+  for (const it of (items as { product_name: string; quantity: number; line_total: number }[]) ?? []) {
+    unitsSold += it.quantity ?? 0;
+    const cur = agg.get(it.product_name) ?? { name: it.product_name, qty: 0, total: 0 };
+    cur.qty += it.quantity ?? 0;
+    cur.total += it.line_total ?? 0;
+    agg.set(it.product_name, cur);
+  }
+  const topProducts = [...agg.values()].sort((a, b) => b.qty - a.qty).slice(0, 5);
+
+  return {
+    revenue,
+    currency,
+    orders: orders.length,
+    avgTicket,
+    last30Orders: last30.length,
+    last30Revenue,
+    unitsSold,
+    byStatus,
+    topProducts,
+  };
+}
+
 /** Resumen de clientes que han comprado (agrupado desde pedidos). */
 export async function getCustomers(): Promise<CustomerSummary[]> {
   const orders = await getAllOrders();

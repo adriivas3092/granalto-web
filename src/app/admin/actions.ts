@@ -62,8 +62,9 @@ export async function createProduct(formData: FormData) {
   const { error } = await supabase.from("products").insert(input);
   if (error) throw new Error(error.message);
   revalidatePath("/admin");
+  revalidatePath("/admin/productos");
   revalidatePath("/tienda");
-  redirect("/admin");
+  redirect("/admin/productos");
 }
 
 export async function updateProduct(id: string, formData: FormData) {
@@ -72,9 +73,10 @@ export async function updateProduct(id: string, formData: FormData) {
   const { error } = await supabase.from("products").update(input).eq("id", id);
   if (error) throw new Error(error.message);
   revalidatePath("/admin");
+  revalidatePath("/admin/productos");
   revalidatePath("/tienda");
   revalidatePath(`/tienda/${input.slug}`);
-  redirect("/admin");
+  redirect("/admin/productos");
 }
 
 export async function deleteProduct(id: string) {
@@ -82,6 +84,7 @@ export async function deleteProduct(id: string) {
   const { error } = await supabase.from("products").delete().eq("id", id);
   if (error) throw new Error(error.message);
   revalidatePath("/admin");
+  revalidatePath("/admin/productos");
   revalidatePath("/tienda");
 }
 
@@ -92,6 +95,7 @@ export async function toggleAvailability(id: string, next: boolean) {
   const { error } = await supabase.from("products").update({ available: next }).eq("id", id);
   if (error) throw new Error(error.message);
   revalidatePath("/admin");
+  revalidatePath("/admin/productos");
   revalidatePath("/tienda");
 }
 
@@ -118,8 +122,9 @@ export async function bulkAvailability(formData: FormData) {
   if (error) throw new Error(error.message);
 
   revalidatePath("/admin");
+  revalidatePath("/admin/productos");
   revalidatePath("/tienda");
-  redirect(categorySlug ? `/admin?categoria=${categorySlug}` : "/admin");
+  redirect(categorySlug ? `/admin/productos?categoria=${categorySlug}` : "/admin/productos");
 }
 
 /** Borra en bloque los productos seleccionados (por id). */
@@ -131,6 +136,7 @@ export async function bulkDeleteProducts(ids: string[]) {
   const { error } = await supabase.from("products").delete().in("id", clean);
   if (error) throw new Error(error.message);
   revalidatePath("/admin");
+  revalidatePath("/admin/productos");
   revalidatePath("/tienda");
 }
 
@@ -143,6 +149,7 @@ export async function bulkSetAvailabilityForIds(ids: string[], available: boolea
   const { error } = await supabase.from("products").update({ available }).in("id", clean);
   if (error) throw new Error(error.message);
   revalidatePath("/admin");
+  revalidatePath("/admin/productos");
   revalidatePath("/tienda");
 }
 

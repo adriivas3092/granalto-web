@@ -24,7 +24,7 @@ export default async function EditProductPage({
 
   return (
     <AdminShell>
-      <Link href="/admin" className="text-sm text-mineral hover:text-ink">
+      <Link href="/admin/productos" className="text-sm text-mineral hover:text-ink">
         ← Volver
       </Link>
       <h1 className="mb-6 mt-2 font-sans text-2xl font-bold text-ink">Editar producto</h1>
