@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { LogOut } from "lucide-react";
 import { signOut } from "@/app/admin/actions";
 import { AdminNav } from "@/components/admin/AdminNav";
+import { AdminBack } from "@/components/admin/AdminBack";
 
 /** Marco del panel de administración (barra superior + contenido). */
 export function AdminShell({ children }: { children: ReactNode }) {
@@ -35,7 +36,10 @@ export function AdminShell({ children }: { children: ReactNode }) {
           </div>
         </div>
       </header>
-      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">{children}</main>
+      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+        <AdminBack />
+        {children}
+      </main>
     </div>
   );
 }
