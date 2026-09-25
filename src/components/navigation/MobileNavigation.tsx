@@ -78,35 +78,35 @@ export function MobileNavigation({ isTransparent }: { isTransparent: boolean }) 
             </button>
           </div>
 
-          <nav aria-label="Navegación móvil" className="flex-1 overflow-y-auto px-6 py-8">
-            <ul className="space-y-1">
+          <nav aria-label="Navegación móvil" className="flex-1 overflow-y-auto px-5 py-3 sm:px-6">
+            <ul className="divide-y divide-stone-beige/70">
               <li>
                 <Link
                   href="/"
                   onClick={() => setOpen(false)}
-                  className="block py-3 font-serif text-2xl text-ink"
+                  className="block py-2.5 text-[15px] font-medium text-ink hover:text-mineral"
                 >
                   Inicio
                 </Link>
               </li>
               {mainNavigation.map((item) => (
-                <li key={item.href}>
+                <li key={item.href} className="py-0.5">
                   <Link
                     href={item.href}
                     onClick={() => setOpen(false)}
-                    className="block py-3 font-serif text-2xl text-ink"
+                    className="block py-2.5 text-[15px] font-medium text-ink hover:text-mineral"
                     aria-current={pathname === item.href ? "page" : undefined}
                   >
                     {item.label}
                   </Link>
                   {item.children && (
-                    <ul className="mb-2 ml-4 space-y-1 border-l border-stone-beige pl-4">
+                    <ul className="mb-1.5 ml-3 flex flex-wrap gap-x-4 gap-y-1 border-l border-stone-beige pl-3">
                       {item.children.map((child) => (
                         <li key={child.href}>
                           <Link
                             href={child.href}
                             onClick={() => setOpen(false)}
-                            className="block py-2 text-base text-charcoal hover:text-ink"
+                            className="block py-1 text-sm text-charcoal hover:text-ink"
                           >
                             {child.label}
                           </Link>
@@ -120,7 +120,7 @@ export function MobileNavigation({ isTransparent }: { isTransparent: boolean }) 
                 <Link
                   href="/ubicaciones"
                   onClick={() => setOpen(false)}
-                  className="block py-3 font-serif text-2xl text-ink"
+                  className="block py-2.5 text-[15px] font-medium text-ink hover:text-mineral"
                 >
                   Ubicaciones
                 </Link>
@@ -129,7 +129,7 @@ export function MobileNavigation({ isTransparent }: { isTransparent: boolean }) 
                 <Link
                   href="/cuenta"
                   onClick={() => setOpen(false)}
-                  className="block py-3 font-serif text-2xl text-ink"
+                  className="block py-2.5 text-[15px] font-medium text-ink hover:text-mineral"
                 >
                   Mi cuenta
                 </Link>
@@ -137,14 +137,14 @@ export function MobileNavigation({ isTransparent }: { isTransparent: boolean }) 
             </ul>
           </nav>
 
-          <div className="space-y-3 border-t border-stone-beige px-6 py-6">
+          <div className="space-y-2.5 border-t border-stone-beige px-5 py-4 sm:px-6">
             <Link
               href="/contacto"
               onClick={() => {
                 trackEvent({ name: "cta_advisory_click", params: { source: "mobile-menu" } });
                 setOpen(false);
               }}
-              className="block rounded-sm bg-ink px-6 py-3.5 text-center text-sm font-medium tracking-wide text-ivory"
+              className="block rounded-sm bg-ink px-6 py-3 text-center text-sm font-medium tracking-wide text-ivory"
             >
               Solicitar asesoría
             </Link>
@@ -153,7 +153,7 @@ export function MobileNavigation({ isTransparent }: { isTransparent: boolean }) 
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => trackEvent({ name: "whatsapp_click", params: { source: "mobile-menu" } })}
-              className="flex items-center justify-center gap-2 rounded-sm border border-ink px-6 py-3.5 text-sm font-medium tracking-wide text-ink"
+              className="flex items-center justify-center gap-2 rounded-sm border border-ink px-6 py-3 text-sm font-medium tracking-wide text-ink"
             >
               <MessageCircle aria-hidden="true" className="h-4 w-4" />
               Escribir por WhatsApp
