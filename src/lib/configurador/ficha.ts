@@ -116,7 +116,7 @@ export function buildFicha(input: FichaInput): {
   } else if (price.tienePrecio) {
     precio.push({ label: "Subtotal", value: fmtCRC(price.subtotal) });
     precio.push({ label: "IVA (13%)", value: fmtCRC(price.iva) });
-    precio.push({ label: "Total estimado", value: fmtCRC(price.total) });
+    precio.push({ label: "Costo final", value: fmtCRC(price.total) });
   } else {
     precio.push({ label: "Precio", value: "A confirmar" });
   }

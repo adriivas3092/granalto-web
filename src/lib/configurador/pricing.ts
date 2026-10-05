@@ -29,6 +29,12 @@ export type PriceResult = {
   molduraMl: number;
   /** true si hay precios cargados para calcular montos. */
   tienePrecio: boolean;
+  /** Precio por m² del material (0 si no está cargado). */
+  precioM2: number;
+  /** Costo del material (área total × precio/m²). */
+  materialCost: number;
+  /** Costo de la moldura (ml × precio/ml). */
+  molduraCost: number;
   subtotal: number;
   iva: number;
   total: number;
@@ -82,8 +88,12 @@ export function calcularPrecio(input: ConfigInput): PriceResult {
   const tienePrecio = autoPrecio && precioM2 > 0;
 
   let subtotal = 0;
+  let materialCost = 0;
+  let molduraCost = 0;
   if (tienePrecio) {
-    subtotal = areaTotal * precioM2 + molduraMl * PRECIO_MOLDURA_ML;
+    materialCost = areaTotal * precioM2;
+    molduraCost = molduraMl * PRECIO_MOLDURA_ML;
+    subtotal = materialCost + molduraCost;
   }
   const iva = tienePrecio ? subtotal * IVA_RATE : 0;
   const total = subtotal + iva;
@@ -94,6 +104,9 @@ export function calcularPrecio(input: ConfigInput): PriceResult {
     areaTotal: round2(areaTotal),
     molduraMl: round2(molduraMl),
     tienePrecio,
+    precioM2,
+    materialCost: Math.round(materialCost),
+    molduraCost: Math.round(molduraCost),
     subtotal: Math.round(subtotal),
     iva: Math.round(iva),
     total: Math.round(total),

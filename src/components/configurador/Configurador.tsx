@@ -188,13 +188,15 @@ function LiveSummary() {
           <p className="text-sm text-charcoal/80">Proyecto personalizado — te cotiza un asesor.</p>
         ) : price.tienePrecio ? (
           <div className="flex items-center justify-between">
-            <span className="text-sm text-mineral">Total estimado</span>
+            <span className="text-sm text-mineral">Costo final</span>
             <span className="text-lg font-bold text-ink">{formatPrice(price.total, price.moneda)}</span>
           </div>
         ) : (
           <p className="text-sm text-ink">
-            <span className="font-medium">Precio a confirmar</span>
-            <span className="mt-1 block text-xs text-charcoal/70">Un asesor confirma el monto final.</span>
+            <span className="font-medium">Calculando…</span>
+            <span className="mt-1 block text-xs text-charcoal/70">
+              {price.areaTotal > 0 ? `${price.areaTotal.toFixed(2)} m² · ` : ""}precios por material en preparación.
+            </span>
           </p>
         )}
         <p className="mt-3 text-[11px] leading-relaxed text-mineral">

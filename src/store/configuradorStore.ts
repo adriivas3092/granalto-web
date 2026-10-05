@@ -80,7 +80,7 @@ const initial = {
   materialId: null,
   colorId: null,
   medidas: {} as Record<string, Medida>,
-  unidad: "mm" as Unidad,
+  unidad: "m" as Unidad,
   moldura: null,
   salpicaderoTipo: "no" as SalpicaderoTipo,
   salpicaderoAlturaCm: 0,

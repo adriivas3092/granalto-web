@@ -220,6 +220,11 @@ export function StepMedidas() {
   const geo = getGeometria(geometriaId);
   const L = MEDIDAS_LIMITES;
 
+  // Los sobres se miden siempre en metros.
+  useEffect(() => {
+    if (unidad !== "m") setUnidad("m");
+  }, [unidad, setUnidad]);
+
   const excedeAlguno =
     !!geo &&
     geo.tramos.some((t) => {
@@ -240,32 +245,9 @@ export function StepMedidas() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const unidades: Unidad[] = ["mm", "cm", "m"];
-
   return (
     <div>
-      <StepTitle n={3} title="Medidas" subtitle="Ingresá largo y profundidad de cada tramo." />
-
-      {/* Selector de unidad */}
-      <div className="mb-6 flex items-center gap-3">
-        <span className="text-sm text-charcoal/80">Unidad:</span>
-        <div className="inline-flex overflow-hidden rounded-sm border border-stone-beige">
-          {unidades.map((u) => (
-            <button
-              key={u}
-              type="button"
-              onClick={() => setUnidad(u)}
-              aria-pressed={unidad === u}
-              className={cn(
-                "min-h-[38px] px-4 py-1.5 text-sm transition-colors",
-                unidad === u ? "bg-ink text-ivory" : "bg-white text-charcoal hover:bg-stone-beige/50",
-              )}
-            >
-              {u}
-            </button>
-          ))}
-        </div>
-      </div>
+      <StepTitle n={3} title="Medidas" subtitle="Ingresá el largo y el ancho de cada tramo, en metros." />
 
       <div className="grid gap-6 lg:grid-cols-2">
         {geo.tramos.map((t) => (
@@ -277,8 +259,8 @@ export function StepMedidas() {
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <CampoMedida key={`${unidad}-${t.key}-largo`} label="Largo" mmValue={medidas[t.key]?.largo ?? 0} maxMm={L.largoMaxMm} unidad={unidad} onChangeMm={(n) => setMedida(t.key, "largo", n)} />
-              <CampoMedida key={`${unidad}-${t.key}-prof`} label="Profundidad" mmValue={medidas[t.key]?.prof ?? 0} maxMm={L.profMaxMm} unidad={unidad} onChangeMm={(n) => setMedida(t.key, "prof", n)} />
+              <CampoMedida key={`${t.key}-largo`} label="Largo" mmValue={medidas[t.key]?.largo ?? 0} maxMm={L.largoMaxMm} unidad={unidad} onChangeMm={(n) => setMedida(t.key, "largo", n)} />
+              <CampoMedida key={`${t.key}-ancho`} label="Ancho" mmValue={medidas[t.key]?.prof ?? 0} maxMm={L.profMaxMm} unidad={unidad} onChangeMm={(n) => setMedida(t.key, "prof", n)} />
             </div>
           </div>
         ))}
@@ -287,7 +269,7 @@ export function StepMedidas() {
       {excedeAlguno && (
         <div className="mt-6 rounded-sm border border-[#b8863b]/50 bg-[#b8863b]/10 p-4">
           <p className="text-sm text-ink">
-            Alguna medida supera el máximo estándar (<strong>3,10 m de largo</strong> o <strong>1,40 m de ancho/profundidad</strong>).
+            Alguna medida supera el máximo estándar (<strong>3,10 m de largo</strong> o <strong>1,40 m de ancho</strong>).
             Estas piezas se cotizan de forma personalizada con un asesor.
           </p>
           <button
@@ -434,7 +416,7 @@ export function StepResumen() {
 
   return (
     <div>
-      <StepTitle n={6} title="Resumen y precio" subtitle="Revisá tu configuración antes de continuar. Podés editar cualquier sección." />
+      <StepTitle n={6} title="Resumen y precio" subtitle="Este es el costo final de tu sobre. Podés editar cualquier sección y el precio se recalcula al instante." />
       <div className="rounded-sm border border-stone-beige bg-white p-5">
         <ResumenFila label="Tipo de proyecto" value={geo?.nombre ?? "—"} onEdit={() => setPaso(0)} />
         <ResumenFila label="Material" value={material ? `${material.nombre} · ${material.espesorMm} mm` : "—"} onEdit={() => setPaso(1)} />
@@ -449,7 +431,18 @@ export function StepResumen() {
       <div className="mt-5 rounded-sm border border-ink bg-ivory/60 p-5">
         {price.tienePrecio ? (
           <>
+            <p className="mb-3 text-xs uppercase tracking-[0.14em] text-mineral">Cálculo del precio</p>
             <div className="flex items-center justify-between text-sm text-charcoal">
+              <span>Material ({price.areaTotal.toFixed(2)} m² × {formatPrice(price.precioM2, price.moneda)}/m²)</span>
+              <span>{formatPrice(price.materialCost, price.moneda)}</span>
+            </div>
+            {price.molduraCost > 0 && (
+              <div className="mt-1 flex items-center justify-between text-sm text-charcoal">
+                <span>Moldura ({price.molduraMl.toFixed(2)} m)</span>
+                <span>{formatPrice(price.molduraCost, price.moneda)}</span>
+              </div>
+            )}
+            <div className="mt-1 flex items-center justify-between text-sm text-charcoal">
               <span>Subtotal</span>
               <span>{formatPrice(price.subtotal, price.moneda)}</span>
             </div>
@@ -457,16 +450,17 @@ export function StepResumen() {
               <span>IVA (13%)</span>
               <span>{formatPrice(price.iva, price.moneda)}</span>
             </div>
-            <div className="mt-2 flex items-center justify-between border-t border-stone-beige pt-2 text-lg font-bold text-ink">
-              <span>Total estimado</span>
-              <span>{formatPrice(price.total, price.moneda)}</span>
+            <div className="mt-2 flex items-center justify-between border-t border-stone-beige pt-2">
+              <span className="font-serif text-lg text-ink">Costo final de tu sobre</span>
+              <span className="font-serif text-2xl font-bold text-ink">{formatPrice(price.total, price.moneda)}</span>
             </div>
           </>
         ) : (
           <div className="text-sm text-ink">
-            <p className="font-medium">Precio a confirmar</p>
+            <p className="font-medium">Precio en preparación</p>
             <p className="mt-1 text-charcoal/80">
-              Calculamos tu área ({price.areaTotal.toFixed(2)} m²) y un asesor te confirma el precio final según material y acabados.
+              Tu sobre mide <strong>{price.areaTotal.toFixed(2)} m²</strong>. Estamos terminando de cargar los
+              precios por material para mostrarte el costo final al instante.
             </p>
           </div>
         )}
