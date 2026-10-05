@@ -149,7 +149,7 @@ export function precioM2Color(material: MaterialCat | undefined, color: Color | 
 export const MATERIALES: MaterialCat[] = [
   {
     id: "cuarzo",
-    nombre: "Cuarzo chino",
+    nombre: "Cuarzo",
     espesorMm: 15,
     precioM2: 85,
     colores: [

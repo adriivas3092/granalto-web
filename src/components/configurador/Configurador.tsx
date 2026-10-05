@@ -278,7 +278,7 @@ function validar(paso: number, s: ReturnType<typeof useConfigurador.getState>): 
 function ConfiguradorIntro({ onStart }: { onStart: () => void }) {
   const pasos = [
     { icon: Ruler, title: "Elegí la forma", desc: "Sobre recto, barra, isla, L o cocina paralela." },
-    { icon: Palette, title: "Material y color", desc: "Cuarzo chino o porcelánico, con su espesor y color." },
+    { icon: Palette, title: "Material y color", desc: "Cuarzo o porcelánico, con su espesor y color." },
     { icon: Calculator, title: "Medidas y acabados", desc: "Largo y ancho, moldura y salpicadero." },
     { icon: Clock, title: "Precio y plazo al instante", desc: "Ves el costo final y el tiempo de entrega." },
   ];
