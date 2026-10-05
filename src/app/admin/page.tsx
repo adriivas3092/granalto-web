@@ -13,44 +13,63 @@ import {
 import { AdminShell } from "@/components/admin/AdminShell";
 import { requireAdmin } from "@/lib/supabase/admin-guard";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { getAllProducts, getAllOrders, getCustomers, getSalesStats } from "@/lib/store/admin";
 import { formatPrice } from "@/lib/store/format";
-import { ORDER_STATUS_LABELS, type OrderStatus } from "@/types/store";
+import { ORDER_STATUS_LABELS, type OrderStatus, type Order } from "@/types/store";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Admin | Inicio", robots: { index: false } };
 
 export default async function AdminInicioPage() {
   await requireAdmin();
+  const supabase = await createSupabaseServerClient();
 
-  const [products, orders, customers, sales] = await Promise.all([
-    getAllProducts(),
-    getAllOrders(),
-    getCustomers(),
-    getSalesStats(),
+  // Una sola tanda de consultas en paralelo (evita timeouts).
+  const [productsRes, ordersRes, itemsRes, solicitudesRes] = await Promise.all([
+    supabase.from("products").select("id, available"),
+    supabase.from("orders").select("*").order("created_at", { ascending: false }),
+    supabase.from("order_items").select("product_name, quantity, line_total"),
+    supabase.from("configuraciones").select("id", { count: "exact", head: true }),
   ]);
+
+  const products = (productsRes.data ?? []) as { id: string; available: boolean }[];
+  const orders = (ordersRes.data ?? []) as Order[];
+  const items = (itemsRes.data ?? []) as { product_name: string; quantity: number; line_total: number }[];
+  const solicitudes = solicitudesRes.count ?? 0;
 
   const visibles = products.filter((p) => p.available).length;
   const ocultos = products.length - visibles;
   const pedidosPendientes = orders.filter((o) => o.status === "pendiente").length;
 
-  // Solicitudes del cotizador (puede no existir la tabla todavía).
-  let solicitudes = 0;
-  try {
-    const supabase = await createSupabaseServerClient();
-    const { count } = await supabase
-      .from("configuraciones")
-      .select("id", { count: "exact", head: true });
-    solicitudes = count ?? 0;
-  } catch {
-    solicitudes = 0;
+  // Clientes únicos (desde pedidos).
+  const customersCount = new Set(orders.map((o) => o.customer_id)).size;
+
+  // Estadísticas de ventas (en memoria).
+  const paid = orders.filter((o) => o.status !== "cancelado");
+  const revenue = paid.reduce((a, o) => a + (o.total ?? 0), 0);
+  const currency = orders[0]?.currency ?? "CRC";
+  const avgTicket = paid.length ? Math.round(revenue / paid.length) : 0;
+  const since = Date.now() - 30 * 24 * 60 * 60 * 1000;
+  const last30 = paid.filter((o) => new Date(o.created_at).getTime() >= since);
+  const last30Revenue = last30.reduce((a, o) => a + (o.total ?? 0), 0);
+  const byStatus: Record<string, number> = {};
+  for (const o of orders) byStatus[o.status] = (byStatus[o.status] ?? 0) + 1;
+  let unitsSold = 0;
+  const agg = new Map<string, { name: string; qty: number; total: number }>();
+  for (const it of items) {
+    unitsSold += it.quantity ?? 0;
+    const cur = agg.get(it.product_name) ?? { name: it.product_name, qty: 0, total: 0 };
+    cur.qty += it.quantity ?? 0;
+    cur.total += it.line_total ?? 0;
+    agg.set(it.product_name, cur);
   }
+  const topProducts = [...agg.values()].sort((a, b) => b.qty - a.qty).slice(0, 5);
+  const sales = { revenue, currency, avgTicket, last30Orders: last30.length, last30Revenue, unitsSold, byStatus, topProducts };
 
   const stats = [
     { label: "Productos", value: products.length, hint: `${visibles} visibles · ${ocultos} ocultos`, icon: Package },
     { label: "Pedidos", value: orders.length, hint: `${pedidosPendientes} pendientes`, icon: ShoppingBag },
     { label: "Pedidos de sobres", value: solicitudes, hint: "desde el cotizador", icon: FileText },
-    { label: "Clientes", value: customers.length, hint: "con pedidos", icon: Users },
+    { label: "Clientes", value: customersCount, hint: "con pedidos", icon: Users },
   ];
 
   const secciones = [

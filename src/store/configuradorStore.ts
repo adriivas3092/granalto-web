@@ -44,6 +44,7 @@ const clienteVacio: Cliente = {
 };
 
 type State = {
+  iniciado: boolean;
   paso: number;
   geometriaId: string | null;
   materialId: string | null;
@@ -59,6 +60,7 @@ type State = {
   folio: string | null;
 
   setPaso: (n: number) => void;
+  setIniciado: (v: boolean) => void;
   next: () => void;
   prev: () => void;
   setGeometria: (id: string) => void;
@@ -75,6 +77,7 @@ type State = {
 };
 
 const initial = {
+  iniciado: false,
   paso: 0,
   geometriaId: null,
   materialId: null,
@@ -95,6 +98,7 @@ export const useConfigurador = create<State>()(
       ...initial,
 
       setPaso: (n) => set({ paso: Math.max(0, Math.min(TOTAL_PASOS - 1, n)) }),
+      setIniciado: (v) => set({ iniciado: v }),
       next: () => set((s) => ({ paso: Math.min(TOTAL_PASOS - 1, s.paso + 1) })),
       prev: () => set((s) => ({ paso: Math.max(0, s.paso - 1) })),
 
@@ -133,6 +137,7 @@ export const useConfigurador = create<State>()(
       name: "granalto-configurador",
       // No persistir PII (cliente) ni el folio; sí el avance de configuración.
       partialize: (s) => ({
+        iniciado: s.iniciado,
         paso: s.paso,
         geometriaId: s.geometriaId,
         materialId: s.materialId,

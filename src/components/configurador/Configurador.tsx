@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, ArrowRight, Check } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Ruler, Palette, Calculator, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatPrice } from "@/lib/store/format";
 import {
@@ -52,6 +52,11 @@ export function Configurador() {
   }, [geoPersonalizado, s.derivar]);
 
   if (!mounted) return <div className="min-h-[60svh]" />;
+
+  // Pantalla de introducción antes de empezar a cotizar.
+  if (!s.iniciado) {
+    return <ConfiguradorIntro onStart={() => s.setIniciado(true)} />;
+  }
 
   const paso = visibles.includes(s.paso) ? s.paso : 0;
   const idxVisible = visibles.indexOf(paso);
@@ -254,4 +259,56 @@ function validar(paso: number, s: ReturnType<typeof useConfigurador.getState>): 
     default:
       return true;
   }
+}
+
+/** Pantalla de introducción del cotizador. */
+function ConfiguradorIntro({ onStart }: { onStart: () => void }) {
+  const pasos = [
+    { icon: Ruler, title: "Elegí la forma", desc: "Sobre recto, barra, isla, L o cocina paralela." },
+    { icon: Palette, title: "Material y color", desc: "Cuarzo chino o porcelánico, con su espesor y color." },
+    { icon: Calculator, title: "Medidas y acabados", desc: "Largo y ancho, moldura y salpicadero." },
+    { icon: Clock, title: "Precio y plazo al instante", desc: "Ves el costo final y el tiempo de entrega." },
+  ];
+  return (
+    <div className="mx-auto max-w-3xl">
+      <div className="rounded-sm border border-stone-beige bg-white p-7 sm:p-10">
+        <p className="text-xs uppercase tracking-[0.2em] text-mineral">Cotizador de sobres</p>
+        <h2 className="mt-2 font-serif text-2xl text-ink md:text-3xl">
+          Calculá el precio de tu sobre en pocos pasos
+        </h2>
+        <p className="mt-3 max-w-xl text-sm leading-relaxed text-charcoal/80">
+          Te guiamos con opciones claras. En minutos obtenés el <strong className="text-ink">costo final</strong> de
+          tu sobre de cocina o baño, con el detalle de material, acabados y plazo de producción. Las medidas quedan
+          sujetas a validación técnica.
+        </p>
+
+        <ul className="mt-7 grid gap-4 sm:grid-cols-2">
+          {pasos.map((p, i) => (
+            <li key={p.title} className="flex items-start gap-3">
+              <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-sm bg-ivory text-ink">
+                <p.icon aria-hidden="true" className="h-5 w-5" />
+              </span>
+              <span>
+                <span className="flex items-center gap-2 font-medium text-ink">
+                  <span className="text-xs text-mineral">{i + 1}.</span> {p.title}
+                </span>
+                <span className="mt-0.5 block text-sm text-charcoal/70">{p.desc}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+
+        <div className="mt-8 flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={onStart}
+            className="inline-flex min-h-[48px] items-center gap-2 rounded-sm bg-ink px-7 py-3 text-sm font-medium text-ivory transition-colors hover:bg-charcoal"
+          >
+            Comenzar mi cotización <ArrowRight className="h-4 w-4" />
+          </button>
+          <span className="text-xs text-mineral">Toma unos 2–3 minutos.</span>
+        </div>
+      </div>
+    </div>
+  );
 }
