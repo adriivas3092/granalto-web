@@ -13,6 +13,9 @@
 
 export const IVA_RATE = 0.13;
 
+/** Moneda del cotizador. Los precios por material se cargan en esta moneda. */
+export const MONEDA = "USD";
+
 /** Unidad de medida para ingresar dimensiones (internamente todo se guarda en mm). */
 export type Unidad = "mm" | "cm" | "m";
 /** Milímetros por unidad. */
@@ -117,16 +120,30 @@ export function getGeometria(id: string | null): Geometria | undefined {
   return GEOMETRIAS.find((g) => g.id === id);
 }
 
-export type Color = { id: string; nombre: string; swatch: string };
+export type Color = {
+  id: string;
+  nombre: string;
+  swatch: string;
+  /** true = material sin disponibilidad (no cotiza; se consulta con asesor). */
+  agotado?: boolean;
+  /** Precio por m² específico del color (anula el del material). */
+  precioM2?: number;
+};
 
 export type MaterialCat = {
   id: string;
   nombre: string;
   espesorMm: number;
-  /** Precio por m² en CRC. 0 = a confirmar. */
+  /** Precio por m² en la moneda del cotizador (MONEDA). 0 = a confirmar. */
   precioM2: number;
   colores: Color[];
 };
+
+/** Precio por m² efectivo de un color (override del color o, si no, del material). */
+export function precioM2Color(material: MaterialCat | undefined, color: Color | undefined): number {
+  if (!material || !color || color.agotado) return 0;
+  return color.precioM2 ?? material.precioM2;
+}
 
 /** Pantalla 2 — Material y color (RN-01, RN-02). Espesor automático. */
 export const MATERIALES: MaterialCat[] = [
@@ -134,20 +151,20 @@ export const MATERIALES: MaterialCat[] = [
     id: "cuarzo",
     nombre: "Cuarzo chino",
     espesorMm: 15,
-    precioM2: 0,
+    precioM2: 85,
     colores: [
       { id: "blanco-alpino", nombre: "Blanco Alpino", swatch: "#f1efe9" },
-      { id: "gris-vulcano", nombre: "Gris Vulcano", swatch: "#6f7276" },
-      { id: "london-grey", nombre: "London Grey", swatch: "#b7b6b1" },
-      { id: "negro", nombre: "Negro", swatch: "#1d1d1d" },
-      { id: "blanco-star", nombre: "Blanco Star", swatch: "#e9e6df" },
+      { id: "gris-vulcano", nombre: "Gris Vulcano", swatch: "#6f7276", agotado: true },
+      { id: "london-grey", nombre: "London Grey", swatch: "#b7b6b1", agotado: true },
+      { id: "negro", nombre: "Negro", swatch: "#1d1d1d", agotado: true },
+      { id: "blanco-star", nombre: "Blanco Star", swatch: "#e9e6df", agotado: true },
     ],
   },
   {
     id: "porcelanico",
     nombre: "Porcelánico",
     espesorMm: 12,
-    precioM2: 0,
+    precioM2: 129,
     colores: [
       { id: "calacatta-gold", nombre: "Calacatta Gold", swatch: "#ece6da" },
       { id: "calacatta-grey", nombre: "Calacatta Grey", swatch: "#e8e6e2" },

@@ -197,6 +197,13 @@ function LiveSummary() {
       <div className="mt-4 border-t border-stone-beige pt-4">
         {esPersonalizado ? (
           <p className="text-sm text-charcoal/80">Proyecto personalizado — te cotiza un asesor.</p>
+        ) : price.agotado ? (
+          <p className="text-sm text-[#8a5f24]">
+            <span className="font-medium">Material agotado</span>
+            <span className="mt-1 block text-xs text-charcoal/70">
+              Sin disponibilidad. Consultá con un asesor por la disponibilidad.
+            </span>
+          </p>
         ) : price.tienePrecio ? (
           <div className="flex items-center justify-between">
             <span className="text-sm text-mineral">Costo final</span>

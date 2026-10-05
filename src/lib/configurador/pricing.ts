@@ -1,8 +1,10 @@
 import {
   IVA_RATE,
+  MONEDA,
   PRECIO_MOLDURA_ML,
   getGeometria,
   getMaterial,
+  precioM2Color,
 } from "@/data/configurador";
 
 export type Medida = { largo: number; prof: number }; // en mm
@@ -29,6 +31,8 @@ export type PriceResult = {
   molduraMl: number;
   /** true si hay precios cargados para calcular montos. */
   tienePrecio: boolean;
+  /** true si el color elegido está agotado (sin disponibilidad). */
+  agotado: boolean;
   /** Precio por m² del material (0 si no está cargado). */
   precioM2: number;
   /** Costo del material (área total × precio/m²). */
@@ -83,9 +87,11 @@ export function calcularPrecio(input: ConfigInput): PriceResult {
   const areaTotal = areaTramos + areaSalpicadero;
   const molduraMl = input.moldura ? frente : 0;
 
-  const precioM2 = material?.precioM2 ?? 0;
+  const color = material?.colores.find((c) => c.id === input.colorId);
+  const agotado = !!color?.agotado;
+  const precioM2 = precioM2Color(material, color);
   const autoPrecio = geo?.autoPrecio ?? false;
-  const tienePrecio = autoPrecio && precioM2 > 0;
+  const tienePrecio = autoPrecio && !agotado && precioM2 > 0;
 
   let subtotal = 0;
   let materialCost = 0;
@@ -104,13 +110,14 @@ export function calcularPrecio(input: ConfigInput): PriceResult {
     areaTotal: round2(areaTotal),
     molduraMl: round2(molduraMl),
     tienePrecio,
+    agotado,
     precioM2,
-    materialCost: Math.round(materialCost),
-    molduraCost: Math.round(molduraCost),
-    subtotal: Math.round(subtotal),
-    iva: Math.round(iva),
-    total: Math.round(total),
-    moneda: "CRC",
+    materialCost: round2(materialCost),
+    molduraCost: round2(molduraCost),
+    subtotal: round2(subtotal),
+    iva: round2(iva),
+    total: round2(total),
+    moneda: MONEDA,
   };
 }
 

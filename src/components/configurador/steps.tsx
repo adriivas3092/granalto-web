@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Pencil, Loader2 } from "lucide-react";
+import { Check, Pencil, Loader2, AlertTriangle, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatPrice } from "@/lib/store/format";
+import { getWhatsAppUrl } from "@/config/site";
 import { GeoDiagram } from "@/components/configurador/GeoDiagram";
 import {
   GEOMETRIAS,
@@ -76,6 +77,30 @@ export function StepTipo() {
   );
 }
 
+/** Aviso de material sin disponibilidad, con contacto directo a un asesor. */
+function DisclaimerAgotado({ nombre }: { nombre?: string }) {
+  const msg = `Hola, me interesa el acabado${nombre ? ` ${nombre}` : ""} que aparece agotado en el cotizador. ¿Me ayudan a consultar disponibilidad?`;
+  return (
+    <div className="mt-6 rounded-sm border border-[#b8863b]/50 bg-[#b8863b]/10 p-4">
+      <p className="flex items-start gap-2 text-sm text-ink">
+        <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[#b8863b]" aria-hidden="true" />
+        <span>
+          <strong>{nombre ?? "Este acabado"} está agotado.</strong> Por el momento no hay disponibilidad de
+          este material. Podés consultar con un asesor si habrá reposición o ver otras opciones disponibles.
+        </span>
+      </p>
+      <a
+        href={getWhatsAppUrl(msg)}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-3 inline-flex min-h-[44px] items-center gap-2 rounded-sm bg-ink px-5 py-2.5 text-sm font-medium text-ivory hover:bg-charcoal"
+      >
+        <MessageCircle className="h-4 w-4" /> Consultar disponibilidad con un asesor
+      </a>
+    </div>
+  );
+}
+
 /* ── Paso 2 — Material y color ─────────────────────────────── */
 export function StepMaterial() {
   const materialId = useConfigurador((s) => s.materialId);
@@ -83,6 +108,7 @@ export function StepMaterial() {
   const setMaterial = useConfigurador((s) => s.setMaterial);
   const setColor = useConfigurador((s) => s.setColor);
   const material = getMaterial(materialId);
+  const colorSel = material?.colores.find((c) => c.id === colorId);
   return (
     <div>
       <StepTitle n={2} title="Material y color" subtitle="El espesor se asigna solo según el material que elijas." />
@@ -131,15 +157,32 @@ export function StepMaterial() {
                   className={cn(
                     "flex items-center gap-3 rounded-sm border p-3 text-left transition-colors",
                     on ? cardOn : cardOff,
+                    c.agotado && !on && "opacity-70",
                   )}
                 >
-                  <span className="h-9 w-9 shrink-0 rounded-full border border-stone-beige" style={{ background: c.swatch }} />
-                  <span className="text-sm text-ink">{c.nombre}</span>
+                  <span
+                    className="relative h-9 w-9 shrink-0 rounded-full border border-stone-beige"
+                    style={{ background: c.swatch }}
+                  >
+                    {c.agotado && (
+                      <span className="absolute inset-0 rounded-full ring-1 ring-inset ring-[#b8863b]/60" />
+                    )}
+                  </span>
+                  <span className="flex flex-col">
+                    <span className="text-sm text-ink">{c.nombre}</span>
+                    {c.agotado && (
+                      <span className="mt-0.5 inline-block w-fit rounded-sm bg-[#b8863b]/15 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[#8a5f24]">
+                        Agotado
+                      </span>
+                    )}
+                  </span>
                   {on && <Check className="ml-auto h-4 w-4 text-ink" />}
                 </button>
               );
             })}
           </div>
+
+          {colorSel?.agotado && <DisclaimerAgotado nombre={colorSel.nombre} />}
         </div>
       )}
     </div>
@@ -455,6 +498,26 @@ export function StepResumen() {
               <span className="font-serif text-2xl font-bold text-ink">{formatPrice(price.total, price.moneda)}</span>
             </div>
           </>
+        ) : price.agotado ? (
+          <div className="text-sm text-ink">
+            <p className="flex items-center gap-2 font-medium">
+              <AlertTriangle className="h-4 w-4 text-[#b8863b]" aria-hidden="true" /> Material sin disponibilidad
+            </p>
+            <p className="mt-1 text-charcoal/80">
+              El acabado <strong>{color?.nombre}</strong> está agotado, por lo que no podemos calcular el precio
+              automáticamente. Consultá con un asesor la disponibilidad o elegí otro acabado.
+            </p>
+            <a
+              href={getWhatsAppUrl(
+                `Hola, me interesa el acabado ${color?.nombre ?? ""} que aparece agotado en el cotizador. ¿Me ayudan a consultar disponibilidad?`,
+              )}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-3 inline-flex min-h-[44px] items-center gap-2 rounded-sm bg-ink px-5 py-2.5 text-sm font-medium text-ivory hover:bg-charcoal"
+            >
+              <MessageCircle className="h-4 w-4" /> Consultar disponibilidad con un asesor
+            </a>
+          </div>
         ) : (
           <div className="text-sm text-ink">
             <p className="font-medium">Precio en preparación</p>

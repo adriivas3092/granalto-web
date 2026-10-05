@@ -113,6 +113,9 @@ export function buildFicha(input: FichaInput): {
   const precio: FichaFila[] = [];
   if (esPersonalizado) {
     precio.push({ label: "Precio", value: "A confirmar por un asesor" });
+  } else if (price.agotado) {
+    precio.push({ label: "Disponibilidad", value: "Material agotado — validar con asesor" });
+    precio.push({ label: "Precio", value: "A confirmar (según disponibilidad)" });
   } else if (price.tienePrecio) {
     precio.push({ label: "Subtotal", value: fmtCRC(price.subtotal) });
     precio.push({ label: "IVA (13%)", value: fmtCRC(price.iva) });
