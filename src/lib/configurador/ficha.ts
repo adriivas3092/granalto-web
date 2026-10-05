@@ -6,6 +6,7 @@ import {
   type Unidad,
 } from "@/data/configurador";
 import { calcularPrecio, type ConfigInput } from "@/lib/configurador/pricing";
+import { formatPrice } from "@/lib/store/format";
 
 export type FichaCliente = {
   nombre: string;
@@ -28,14 +29,6 @@ export type FichaInput = ConfigInput & {
 
 export type FichaFila = { label: string; value: string };
 export type FichaSeccion = { titulo: string; filas: FichaFila[] };
-
-function fmtCRC(n: number): string {
-  return new Intl.NumberFormat("es-CR", {
-    style: "currency",
-    currency: "CRC",
-    maximumFractionDigits: 0,
-  }).format(n);
-}
 
 function enUnidad(mm: number, u: Unidad): string {
   const v = (mm ?? 0) / MM_POR_UNIDAD[u];
@@ -117,9 +110,9 @@ export function buildFicha(input: FichaInput): {
     precio.push({ label: "Disponibilidad", value: "Material agotado — validar con asesor" });
     precio.push({ label: "Precio", value: "A confirmar (según disponibilidad)" });
   } else if (price.tienePrecio) {
-    precio.push({ label: "Subtotal", value: fmtCRC(price.subtotal) });
-    precio.push({ label: "IVA (13%)", value: fmtCRC(price.iva) });
-    precio.push({ label: "Costo final", value: fmtCRC(price.total) });
+    precio.push({ label: "Subtotal", value: formatPrice(price.subtotal, price.moneda) });
+    precio.push({ label: "IVA (13%)", value: formatPrice(price.iva, price.moneda) });
+    precio.push({ label: "Costo final", value: formatPrice(price.total, price.moneda) });
   } else {
     precio.push({ label: "Precio", value: "A confirmar" });
   }
