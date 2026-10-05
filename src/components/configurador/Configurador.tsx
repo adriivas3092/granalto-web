@@ -36,7 +36,13 @@ const stepComponents = [
 export function Configurador() {
   const [mounted, setMounted] = useState(false);
   const s = useConfigurador();
-  useEffect(() => setMounted(true), []);
+  // Mostrar siempre la introducción al abrir el cotizador. La configuración en
+  // curso (tipo, material, medidas…) se conserva, así que al pulsar "Comenzar"
+  // el cliente vuelve al paso donde estaba.
+  useEffect(() => {
+    useConfigurador.getState().setIniciado(false);
+    setMounted(true);
+  }, []);
 
   const geo = getGeometria(s.geometriaId);
   const geoPersonalizado = geo?.autoPrecio === false;

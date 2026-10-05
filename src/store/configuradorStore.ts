@@ -135,9 +135,9 @@ export const useConfigurador = create<State>()(
     }),
     {
       name: "granalto-configurador",
-      // No persistir PII (cliente) ni el folio; sí el avance de configuración.
+      // No persistir PII (cliente), el folio ni el flag de inicio (la intro se
+      // muestra siempre al abrir el cotizador); sí el avance de configuración.
       partialize: (s) => ({
-        iniciado: s.iniciado,
         paso: s.paso,
         geometriaId: s.geometriaId,
         materialId: s.materialId,
