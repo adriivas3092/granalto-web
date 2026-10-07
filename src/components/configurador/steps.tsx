@@ -17,8 +17,10 @@ import {
   ACABADOS,
   L_UNIONES,
   MOLDURA_GROSOR_ESTANDAR_CM,
+  MOLDURAS_PERFILES,
   getGeometria,
   getMaterial,
+  getMolduraPerfil,
   type Color,
 } from "@/data/configurador";
 import { calcularPrecio } from "@/lib/configurador/pricing";
@@ -599,6 +601,9 @@ function MolduraDiagram({ conMoldura, className }: { conMoldura: boolean; classN
 export function StepMoldura() {
   const moldura = useConfigurador((s) => s.moldura);
   const setMoldura = useConfigurador((s) => s.setMoldura);
+  const perfilId = useConfigurador((s) => s.molduraPerfil);
+  const setPerfil = useConfigurador((s) => s.setMolduraPerfil);
+  const perfil = getMolduraPerfil(perfilId);
   const opciones = [
     { v: false, t: "Sin moldura", d: "Canto recto estándar, línea limpia y minimalista." },
     {
@@ -629,6 +634,47 @@ export function StepMoldura() {
           );
         })}
       </div>
+
+      {/* Selección del diseño de moldura */}
+      {moldura === true && (
+        <div className="mt-8">
+          <h3 className="mb-1 text-sm font-medium text-ink">Diseño de la moldura</h3>
+          <p className="mb-3 text-xs text-charcoal/70">Elegí el perfil del canto. Todos con corte a 45° y {MOLDURA_GROSOR_ESTANDAR_CM} cm de grosor.</p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <label className="block">
+              <span className="mb-1 block text-xs text-charcoal/80">Perfil de moldura</span>
+              <select
+                value={perfilId ?? ""}
+                onChange={(e) => setPerfil(Number(e.target.value))}
+                className="w-full rounded-sm border border-stone-beige bg-white px-3 py-2.5 text-ink outline-none focus:border-ink"
+              >
+                <option value="" disabled>
+                  Seleccioná un diseño…
+                </option>
+                {MOLDURAS_PERFILES.map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.nombre}
+                  </option>
+                ))}
+              </select>
+              {!perfilId && <span className="mt-1 block text-xs text-mineral">Elegí un diseño para continuar.</span>}
+            </label>
+
+            {/* Vista del perfil elegido */}
+            <div className="flex min-h-[112px] items-center justify-center rounded-sm border border-stone-beige bg-ivory/50 p-4">
+              {perfil ? (
+                <figure className="w-full text-center">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={perfil.imagen} alt={perfil.nombre} className="mx-auto max-h-24 w-auto object-contain" />
+                  <figcaption className="mt-2 text-xs text-charcoal/70">{perfil.nombre} · corte a 45°</figcaption>
+                </figure>
+              ) : (
+                <span className="text-xs text-mineral">Elegí un diseño para previsualizarlo.</span>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Consulta por molduras de mayor grosor */}
       {moldura === true && (
@@ -759,7 +805,17 @@ export function StepResumen() {
         <ResumenFila label="Medidas" value={medidasTxt || "—"} onEdit={() => setPaso(2)} />
         <ResumenFila
           label="Moldura"
-          value={s.moldura ? `Con moldura${s.molduraGrosorCm ? ` · ${s.molduraGrosorCm} cm` : ""}` : "Sin moldura"}
+          value={
+            s.moldura
+              ? [
+                  "Con moldura",
+                  getMolduraPerfil(s.molduraPerfil)?.nombre,
+                  s.molduraGrosorCm ? `${s.molduraGrosorCm} cm` : null,
+                ]
+                  .filter(Boolean)
+                  .join(" · ")
+              : "Sin moldura"
+          }
           onEdit={() => setPaso(3)}
         />
         <ResumenFila label="Salpicadero" value={salpTxt} onEdit={() => setPaso(4)} />
@@ -875,6 +931,7 @@ export function StepDatos() {
           acabado: s.acabado,
           moldura: s.moldura,
           molduraGrosorCm: s.molduraGrosorCm,
+          molduraPerfil: s.molduraPerfil,
           salpicaderoTipo: s.salpicaderoTipo,
           salpicaderoAlturaCm: s.salpicaderoAlturaCm,
           lUnion: s.lUnion,

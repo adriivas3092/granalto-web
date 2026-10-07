@@ -4,6 +4,7 @@ import {
   NOTA_CONTRASOBRE,
   getGeometria,
   getMaterial,
+  getMolduraPerfil,
   type Unidad,
 } from "@/data/configurador";
 import { calcularPrecio, type ConfigInput } from "@/lib/configurador/pricing";
@@ -23,8 +24,10 @@ export type FichaInput = ConfigInput & {
   unidad: Unidad;
   /** Acabado de superficie. */
   acabado?: "brillo" | "mate" | null;
-  /** Grosor de la moldura en cm (2 o 4). */
+  /** Grosor de la moldura en cm. */
   molduraGrosorCm?: number | null;
+  /** Perfil de moldura elegido (1..12). */
+  molduraPerfil?: number | null;
   /** Esquina de la unión del sobre en L. */
   lUnion?: "izquierda" | "derecha" | null;
   /** true cuando el proyecto se derivó a cotización personalizada. */
@@ -101,11 +104,14 @@ export function buildFicha(input: FichaInput): {
   const acabados: FichaFila[] = [
     {
       label: "Moldura",
-      value: input.moldura
-        ? `Con moldura${input.molduraGrosorCm ? ` (${input.molduraGrosorCm} cm)` : ""}`
-        : "Sin moldura",
+      value: input.moldura ? "Con moldura (corte a 45°)" : "Sin moldura",
     },
   ];
+  if (input.moldura) {
+    const perfil = getMolduraPerfil(input.molduraPerfil);
+    if (perfil) acabados.push({ label: "Diseño de moldura", value: perfil.nombre });
+    if (input.molduraGrosorCm) acabados.push({ label: "Grosor de moldura", value: `${input.molduraGrosorCm} cm` });
+  }
   if (price.molduraMl > 0) acabados.push({ label: "Moldura (frente)", value: `${price.molduraMl.toFixed(2)} m` });
   const salpTxt =
     input.salpicaderoTipo === "no"

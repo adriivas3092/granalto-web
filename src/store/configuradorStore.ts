@@ -54,8 +54,10 @@ type State = {
   /** Acabado de superficie: brillo o mate (null = sin elegir). */
   acabado: "brillo" | "mate" | null;
   moldura: boolean | null;
-  /** Grosor de la moldura en cm (2 o 4) cuando lleva moldura. */
+  /** Grosor de la moldura en cm (estándar 3) cuando lleva moldura. */
   molduraGrosorCm: number | null;
+  /** Perfil de moldura elegido (1..12) cuando lleva moldura. */
+  molduraPerfil: number | null;
   salpicaderoTipo: SalpicaderoTipo;
   salpicaderoAlturaCm: number;
   /** Esquina de la unión del sobre en L. */
@@ -77,6 +79,7 @@ type State = {
   setAcabado: (a: "brillo" | "mate") => void;
   setMoldura: (v: boolean) => void;
   setMolduraGrosor: (cm: number) => void;
+  setMolduraPerfil: (id: number) => void;
   setLUnion: (u: "izquierda" | "derecha") => void;
   setSalpicadero: (tipo: SalpicaderoTipo, alturaCm?: number) => void;
   setDerivar: (v: boolean) => void;
@@ -96,6 +99,7 @@ const initial = {
   acabado: null as "brillo" | "mate" | null,
   moldura: null,
   molduraGrosorCm: null as number | null,
+  molduraPerfil: null as number | null,
   salpicaderoTipo: "no" as SalpicaderoTipo,
   salpicaderoAlturaCm: 0,
   lUnion: null as "izquierda" | "derecha" | null,
@@ -133,8 +137,9 @@ export const useConfigurador = create<State>()(
 
       setUnidad: (u) => set({ unidad: u }),
       setAcabado: (a) => set({ acabado: a }),
-      setMoldura: (v) => set({ moldura: v, molduraGrosorCm: v ? 3 : null }),
+      setMoldura: (v) => set((s) => ({ moldura: v, molduraGrosorCm: v ? 3 : null, molduraPerfil: v ? s.molduraPerfil : null })),
       setMolduraGrosor: (cm) => set({ molduraGrosorCm: cm }),
+      setMolduraPerfil: (id) => set({ molduraPerfil: id }),
       setLUnion: (u) => set({ lUnion: u }),
       setDerivar: (v) => set({ derivar: v }),
       setSalpicadero: (tipo, alturaCm) =>
@@ -162,6 +167,7 @@ export const useConfigurador = create<State>()(
         acabado: s.acabado,
         moldura: s.moldura,
         molduraGrosorCm: s.molduraGrosorCm,
+        molduraPerfil: s.molduraPerfil,
         salpicaderoTipo: s.salpicaderoTipo,
         salpicaderoAlturaCm: s.salpicaderoAlturaCm,
         lUnion: s.lUnion,

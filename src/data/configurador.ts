@@ -57,6 +57,18 @@ export const SALPICADERO = {
 /** Grosor estándar de la moldura (cm). Corte a 45°. Más grosor: consultar asesor. */
 export const MOLDURA_GROSOR_ESTANDAR_CM = 3;
 
+/** Catálogo de perfiles de moldura (Molduras Sobres Granalto). */
+export type MolduraPerfil = { id: number; nombre: string; imagen: string };
+export const MOLDURAS_PERFILES: MolduraPerfil[] = Array.from({ length: 12 }, (_, i) => ({
+  id: i + 1,
+  nombre: `Moldura ${i + 1}`,
+  imagen: `/materiales/molduras/moldura-${i + 1}.png`,
+}));
+
+export function getMolduraPerfil(id: number | null | undefined): MolduraPerfil | undefined {
+  return id == null ? undefined : MOLDURAS_PERFILES.find((m) => m.id === id);
+}
+
 /** Acabado de superficie. */
 export type Acabado = "brillo" | "mate";
 export const ACABADOS: { id: Acabado; nombre: string; desc: string }[] = [

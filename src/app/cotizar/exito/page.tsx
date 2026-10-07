@@ -40,6 +40,7 @@ export default function CotizarExitoPage() {
     acabado: s.acabado,
     moldura: s.moldura,
     molduraGrosorCm: s.molduraGrosorCm,
+    molduraPerfil: s.molduraPerfil,
     salpicaderoTipo: s.salpicaderoTipo,
     salpicaderoAlturaCm: s.salpicaderoAlturaCm,
     lUnion: s.lUnion,

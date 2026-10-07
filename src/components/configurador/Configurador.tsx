@@ -11,6 +11,7 @@ import {
   NOTA_CONTRASOBRE,
   getGeometria,
   getMaterial,
+  getMolduraPerfil,
 } from "@/data/configurador";
 import { calcularPrecio } from "@/lib/configurador/pricing";
 import { useConfigurador, PASOS, TOTAL_PASOS } from "@/store/configuradorStore";
@@ -187,7 +188,7 @@ function LiveSummary() {
                 s.moldura == null
                   ? undefined
                   : s.moldura
-                    ? `Con moldura${s.molduraGrosorCm ? ` · ${s.molduraGrosorCm} cm` : ""}`
+                    ? ["Con moldura", getMolduraPerfil(s.molduraPerfil)?.nombre].filter(Boolean).join(" · ")
                     : "Sin moldura"
               }
             />
@@ -278,8 +279,8 @@ function validar(paso: number, s: ReturnType<typeof useConfigurador.getState>): 
     }
     case 3:
       if (s.moldura === null) return false;
-      // Si lleva moldura, hay que elegir el grosor (2 o 4 cm).
-      if (s.moldura === true && !s.molduraGrosorCm) return false;
+      // Si lleva moldura, hay que elegir el diseño (perfil) de moldura.
+      if (s.moldura === true && !s.molduraPerfil) return false;
       return true;
     case 4:
       if (s.salpicaderoTipo === "custom") {
