@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { Check, Pencil, Loader2, AlertTriangle, MessageCircle, ZoomIn, X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -26,6 +27,19 @@ const card =
   "group relative flex w-full flex-col rounded-sm border p-4 text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2";
 const cardOn = "border-ink bg-ivory/70";
 const cardOff = "border-stone-beige bg-white hover:border-mineral";
+
+/** Visor 3D cargado solo en el cliente (Three.js no se renderiza en el servidor). */
+const SobreViewer3D = dynamic(
+  () => import("@/components/configurador/SobreViewer3D").then((m) => m.SobreViewer3D),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex h-[340px] w-full items-center justify-center rounded-sm border border-stone-beige bg-ivory/40 text-sm text-mineral">
+        Cargando vista 3D…
+      </div>
+    ),
+  },
+);
 
 function StepTitle({ n, title, subtitle }: { n: number; title: string; subtitle?: string }) {
   return (
@@ -817,6 +831,13 @@ export function StepResumen() {
   return (
     <div>
       <StepTitle n={6} title="Resumen y precio" subtitle="Este es el costo final de tu sobre. Podés editar cualquier sección y el precio se recalcula al instante." />
+
+      {/* Vista 3D del sobre */}
+      <div className="mb-6">
+        <h3 className="mb-2 text-sm font-medium text-ink">Vista 3D de tu sobre</h3>
+        <SobreViewer3D />
+      </div>
+
       <div className="rounded-sm border border-stone-beige bg-white p-5">
         <ResumenFila label="Tipo de proyecto" value={geo?.nombre ?? "—"} onEdit={() => setPaso(0)} />
         <ResumenFila label="Material" value={material ? `${material.nombre} · ${material.espesorMm} mm` : "—"} onEdit={() => setPaso(1)} />
