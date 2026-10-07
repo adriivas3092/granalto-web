@@ -133,7 +133,7 @@ export const useConfigurador = create<State>()(
 
       setUnidad: (u) => set({ unidad: u }),
       setAcabado: (a) => set({ acabado: a }),
-      setMoldura: (v) => set((s) => ({ moldura: v, molduraGrosorCm: v ? s.molduraGrosorCm : null })),
+      setMoldura: (v) => set({ moldura: v, molduraGrosorCm: v ? 3 : null }),
       setMolduraGrosor: (cm) => set({ molduraGrosorCm: cm }),
       setLUnion: (u) => set({ lUnion: u }),
       setDerivar: (v) => set({ derivar: v }),

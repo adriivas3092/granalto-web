@@ -54,9 +54,8 @@ export const SALPICADERO = {
   customMaxCm: 30,
 };
 
-/** Grosores de moldura disponibles (cm). RN: el cliente elige 2 o 4 cm. */
-export const MOLDURA_GROSORES_CM = [2, 4] as const;
-export type MolduraGrosorCm = (typeof MOLDURA_GROSORES_CM)[number];
+/** Grosor estándar de la moldura (cm). Corte a 45°. Más grosor: consultar asesor. */
+export const MOLDURA_GROSOR_ESTANDAR_CM = 3;
 
 /** Acabado de superficie. */
 export type Acabado = "brillo" | "mate";

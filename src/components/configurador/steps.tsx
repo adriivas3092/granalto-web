@@ -16,7 +16,7 @@ import {
   NOTA_CONTRASOBRE,
   ACABADOS,
   L_UNIONES,
-  MOLDURA_GROSORES_CM,
+  MOLDURA_GROSOR_ESTANDAR_CM,
   getGeometria,
   getMaterial,
   type Color,
@@ -561,15 +561,51 @@ export function StepMedidas() {
   );
 }
 
+/** Ilustración del canto: inglete a 45° (con moldura) o canto recto (sin moldura). */
+function MolduraDiagram({ conMoldura, className }: { conMoldura: boolean; className?: string }) {
+  return (
+    <svg viewBox="0 0 140 90" className={className} aria-hidden="true">
+      {conMoldura ? (
+        <>
+          {/* Perfil del sobre con moldura (contorno) */}
+          <polygon
+            points="16,28 124,28 124,70 108,70 108,40 16,40"
+            fill="rgba(38,58,44,0.06)"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinejoin="round"
+          />
+          {/* Junta del inglete a 45° en la esquina frontal */}
+          <line x1="124" y1="28" x2="108" y2="44" stroke="currentColor" strokeWidth="1.6" strokeDasharray="4 3" />
+          {/* Marca de ángulo */}
+          <path d="M124 40 A 12 12 0 0 0 116 32" fill="none" stroke="currentColor" strokeWidth="1.2" />
+          <text x="101" y="25" fontSize="11" fill="currentColor">45°</text>
+        </>
+      ) : (
+        /* Canto recto estándar */
+        <polygon
+          points="16,34 124,34 124,48 16,48"
+          fill="rgba(38,58,44,0.06)"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinejoin="round"
+        />
+      )}
+    </svg>
+  );
+}
+
 /* ── Paso 4 — Moldura ──────────────────────────────────────── */
 export function StepMoldura() {
   const moldura = useConfigurador((s) => s.moldura);
   const setMoldura = useConfigurador((s) => s.setMoldura);
-  const grosor = useConfigurador((s) => s.molduraGrosorCm);
-  const setGrosor = useConfigurador((s) => s.setMolduraGrosor);
   const opciones = [
-    { v: false, t: "Sin moldura", d: "Canto estándar, línea limpia y minimalista." },
-    { v: true, t: "Con moldura", d: "Borde con moldura para un acabado con más presencia." },
+    { v: false, t: "Sin moldura", d: "Canto recto estándar, línea limpia y minimalista." },
+    {
+      v: true,
+      t: `Con moldura (${MOLDURA_GROSOR_ESTANDAR_CM} cm)`,
+      d: `Canto reforzado con corte a 45° (inglete), de ${MOLDURA_GROSOR_ESTANDAR_CM} cm de grosor.`,
+    },
   ];
   return (
     <div>
@@ -584,11 +620,8 @@ export function StepMoldura() {
                   <Check className="h-3.5 w-3.5" />
                 </span>
               )}
-              <div className="mb-3 h-16 w-full">
-                <svg viewBox="0 0 120 50" className="h-full w-full text-ink/70" aria-hidden="true">
-                  <rect x="10" y="14" width="100" height="14" fill="rgba(38,58,44,0.06)" stroke="currentColor" strokeWidth="2" />
-                  {o.v && <rect x="10" y="28" width="100" height="6" fill="rgba(38,58,44,0.18)" stroke="currentColor" strokeWidth="1.5" />}
-                </svg>
+              <div className="mb-3 h-20 w-full text-ink/70">
+                <MolduraDiagram conMoldura={o.v} className="h-full w-full" />
               </div>
               <span className="font-medium text-ink">{o.t}</span>
               <span className="mt-1 text-xs text-charcoal/70">{o.d}</span>
@@ -597,42 +630,23 @@ export function StepMoldura() {
         })}
       </div>
 
-      {/* Grosor de la moldura (2 o 4 cm) */}
+      {/* Consulta por molduras de mayor grosor */}
       {moldura === true && (
-        <div className="mt-8">
-          <h3 className="mb-1 text-sm font-medium text-ink">Grosor de la moldura</h3>
-          <p className="mb-3 text-xs text-charcoal/70">Elegí el grosor del canto con moldura.</p>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {MOLDURA_GROSORES_CM.map((g) => {
-              const on = grosor === g;
-              return (
-                <button
-                  key={g}
-                  type="button"
-                  onClick={() => setGrosor(g)}
-                  aria-pressed={on}
-                  className={cn(card, on ? cardOn : cardOff)}
-                >
-                  {on && (
-                    <span className="absolute right-3 top-3 inline-flex h-6 w-6 items-center justify-center rounded-full bg-ink text-ivory">
-                      <Check className="h-3.5 w-3.5" />
-                    </span>
-                  )}
-                  <div className="mb-3 h-12 w-full">
-                    <svg viewBox="0 0 120 40" className="h-full w-full text-ink/70" aria-hidden="true">
-                      <rect x="10" y="10" width="100" height="10" fill="rgba(38,58,44,0.06)" stroke="currentColor" strokeWidth="2" />
-                      <rect x="10" y="20" width="100" height={g === 2 ? 5 : 10} fill="rgba(38,58,44,0.18)" stroke="currentColor" strokeWidth="1.5" />
-                    </svg>
-                  </div>
-                  <span className="font-medium text-ink">{g} cm</span>
-                  <span className="mt-1 text-xs text-charcoal/70">
-                    {g === 2 ? "Moldura discreta." : "Moldura más marcada."}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-          {!grosor && <p className="mt-2 text-xs text-mineral">Elegí el grosor para continuar.</p>}
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-sm border border-stone-beige bg-ivory/60 p-4">
+          <p className="text-xs leading-relaxed text-charcoal/85">
+            La moldura estándar es de <strong className="text-ink">{MOLDURA_GROSOR_ESTANDAR_CM} cm</strong> con corte a 45°.
+            ¿Necesitás una moldura de mayor grosor? Consultá con un asesor.
+          </p>
+          <a
+            href={getWhatsAppUrl(
+              `Hola, en el cotizador quisiera una moldura de mayor grosor que los ${MOLDURA_GROSOR_ESTANDAR_CM} cm estándar. ¿Me ayudan?`,
+            )}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex min-h-[40px] shrink-0 items-center gap-2 rounded-sm border border-ink bg-white px-4 py-2 text-sm font-medium text-ink hover:bg-ink hover:text-ivory"
+          >
+            <MessageCircle className="h-4 w-4" /> Consultar
+          </a>
         </div>
       )}
     </div>
