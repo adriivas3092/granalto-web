@@ -173,11 +173,11 @@ export const MATERIALES: MaterialCat[] = [
     espesorMm: 15,
     precioM2: 85,
     colores: [
-      { id: "blanco-alpino", nombre: "Blanco Alpino", swatch: "#f1efe9" },
-      { id: "gris-vulcano", nombre: "Gris Vulcano", swatch: "#6f7276", agotado: true },
+      { id: "blanco-alpino", nombre: "Blanco Alpino", swatch: "#f1efe9", imagen: "/materiales/cuarzo-blanco-alpino.webp" },
+      { id: "gris-vulcano", nombre: "Gris Vulcano", swatch: "#6f7276", imagen: "/materiales/cuarzo-gris-vulcano.webp", agotado: true },
       { id: "london-grey", nombre: "London Grey", swatch: "#b7b6b1", agotado: true },
-      { id: "negro", nombre: "Negro", swatch: "#1d1d1d", agotado: true },
-      { id: "blanco-star", nombre: "Blanco Star", swatch: "#e9e6df", agotado: true },
+      { id: "negro", nombre: "Negro", swatch: "#1d1d1d", imagen: "/materiales/cuarzo-negro.jpg", agotado: true },
+      { id: "blanco-star", nombre: "Blanco Star", swatch: "#e9e6df", imagen: "/materiales/cuarzo-blanco-star.jpg", agotado: true },
     ],
   },
   {
@@ -186,12 +186,12 @@ export const MATERIALES: MaterialCat[] = [
     espesorMm: 12,
     precioM2: 129,
     colores: [
-      { id: "calacatta-gold", nombre: "Calacatta Gold", swatch: "#ece6da" },
-      { id: "calacatta-grey", nombre: "Calacatta Grey", swatch: "#e8e6e2" },
-      { id: "pireney-grey", nombre: "Pireney Grey", swatch: "#9a9b9d" },
+      { id: "calacatta-gold", nombre: "Calacatta Gold", swatch: "#ece6da", imagen: "/materiales/porcelanico-calacatta-gold.webp" },
+      { id: "calacatta-grey", nombre: "Calacatta Grey", swatch: "#e8e6e2", imagen: "/materiales/porcelanico-calacatta-grey.webp" },
+      { id: "pireney-grey", nombre: "Pireney Grey", swatch: "#9a9b9d", imagen: "/materiales/porcelanico-pireney-grey.webp" },
       { id: "blanco", nombre: "Blanco", swatch: "#f4f3f0" },
-      { id: "negro", nombre: "Negro", swatch: "#201f1d" },
-      { id: "triani-beige", nombre: "Triani Beige", swatch: "#cdbfa8" },
+      { id: "negro", nombre: "Negro", swatch: "#201f1d", imagen: "/materiales/porcelanico-negro.png" },
+      { id: "triani-beige", nombre: "Triani Beige", swatch: "#cdbfa8", imagen: "/materiales/porcelanico-triani-beige.webp" },
     ],
   },
 ];
