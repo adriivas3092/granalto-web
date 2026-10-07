@@ -121,10 +121,10 @@ export const GEOMETRIAS: Geometria[] = [
   {
     id: "l",
     nombre: "Sobre en L",
-    descripcion: "Dos tramos relacionados y una unión.",
+    descripcion: "Parte larga (Tramo A) y parte corta (Tramo B), con un ancho común.",
     tramos: [
-      { key: "a", label: "Tramo A" },
-      { key: "b", label: "Tramo B" },
+      { key: "a", label: "Tramo A (parte larga)" },
+      { key: "b", label: "Tramo B (parte corta)" },
     ],
     autoPrecio: true,
     nota: "Las medidas de la L quedan sujetas a validación técnica posterior.",

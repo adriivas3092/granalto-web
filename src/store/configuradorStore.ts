@@ -62,6 +62,8 @@ type State = {
   salpicaderoAlturaCm: number;
   /** Esquina de la unión del sobre en L. */
   lUnion: "izquierda" | "derecha" | null;
+  /** Especificaciones libres del cliente (armado/orientación, detalles). */
+  notas: string;
   /** true cuando el proyecto se deriva a cotización personalizada (p. ej. medidas fuera de rango). */
   derivar: boolean;
   cliente: Cliente;
@@ -81,6 +83,7 @@ type State = {
   setMolduraGrosor: (cm: number) => void;
   setMolduraPerfil: (id: number) => void;
   setLUnion: (u: "izquierda" | "derecha") => void;
+  setNotas: (t: string) => void;
   setSalpicadero: (tipo: SalpicaderoTipo, alturaCm?: number) => void;
   setDerivar: (v: boolean) => void;
   setCliente: (patch: Partial<Cliente>) => void;
@@ -103,6 +106,7 @@ const initial = {
   salpicaderoTipo: "no" as SalpicaderoTipo,
   salpicaderoAlturaCm: 0,
   lUnion: null as "izquierda" | "derecha" | null,
+  notas: "",
   derivar: false,
   cliente: clienteVacio,
   folio: null,
@@ -141,6 +145,7 @@ export const useConfigurador = create<State>()(
       setMolduraGrosor: (cm) => set({ molduraGrosorCm: cm }),
       setMolduraPerfil: (id) => set({ molduraPerfil: id }),
       setLUnion: (u) => set({ lUnion: u }),
+      setNotas: (t) => set({ notas: t }),
       setDerivar: (v) => set({ derivar: v }),
       setSalpicadero: (tipo, alturaCm) =>
         set({
@@ -171,6 +176,7 @@ export const useConfigurador = create<State>()(
         salpicaderoTipo: s.salpicaderoTipo,
         salpicaderoAlturaCm: s.salpicaderoAlturaCm,
         lUnion: s.lUnion,
+        notas: s.notas,
         derivar: s.derivar,
       }),
     },

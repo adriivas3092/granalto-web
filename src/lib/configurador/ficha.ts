@@ -30,6 +30,8 @@ export type FichaInput = ConfigInput & {
   molduraPerfil?: number | null;
   /** Esquina de la unión del sobre en L. */
   lUnion?: "izquierda" | "derecha" | null;
+  /** Especificaciones libres del cliente. */
+  notas?: string | null;
   /** true cuando el proyecto se derivó a cotización personalizada. */
   derivar?: boolean;
   cliente?: FichaCliente;
@@ -123,6 +125,11 @@ export function buildFicha(input: FichaInput): {
   if (price.areaSalpicadero > 0)
     acabados.push({ label: "Área salpicadero", value: `${price.areaSalpicadero.toFixed(2)} m²` });
   if (!esPersonalizado) secciones.push({ titulo: "Acabados", filas: acabados });
+
+  // Especificaciones libres del cliente (armado / orientación).
+  if (input.notas && input.notas.trim()) {
+    secciones.push({ titulo: "Especificaciones del cliente", filas: [{ label: "Notas", value: input.notas.trim() }] });
+  }
 
   // Precio
   const precio: FichaFila[] = [];

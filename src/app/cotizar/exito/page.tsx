@@ -44,6 +44,7 @@ export default function CotizarExitoPage() {
     salpicaderoTipo: s.salpicaderoTipo,
     salpicaderoAlturaCm: s.salpicaderoAlturaCm,
     lUnion: s.lUnion,
+    notas: s.notas,
     derivar: s.derivar,
     unidad: s.unidad,
     cliente: tieneCliente ? s.cliente : undefined,

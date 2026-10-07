@@ -173,9 +173,6 @@ function LiveSummary() {
       <h3 className="text-sm font-medium text-ink">Tu configuración</h3>
       <dl className="mt-3 space-y-2 text-sm">
         <Row label="Proyecto" value={geo?.nombre} />
-        {geo?.id === "l" && (
-          <Row label="Unión" value={s.lUnion ? (s.lUnion === "izquierda" ? "Izquierda" : "Derecha") : undefined} />
-        )}
         {!esPersonalizado && (
           <>
             <Row label="Material" value={material ? `${material.nombre} · ${material.espesorMm} mm` : undefined} />
@@ -259,8 +256,6 @@ function validar(paso: number, s: ReturnType<typeof useConfigurador.getState>): 
     case 2: {
       const geo = getGeometria(s.geometriaId);
       if (!geo || geo.tramos.length === 0) return false;
-      // Para el sobre en L hay que elegir la esquina de la unión.
-      if (geo.id === "l" && !s.lUnion) return false;
       const L = MEDIDAS_LIMITES;
       // Válido para continuar automáticamente: todas las piezas positivas y
       // dentro del máximo estándar. Si alguna excede, no avanza por aquí: se

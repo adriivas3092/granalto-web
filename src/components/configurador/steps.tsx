@@ -15,7 +15,6 @@ import {
   PLAZO_DIAS_HABILES,
   NOTA_CONTRASOBRE,
   ACABADOS,
-  L_UNIONES,
   getGeometria,
   getMaterial,
   type Color,
@@ -360,25 +359,6 @@ function MaterialLightbox({
   );
 }
 
-/** Diagrama simple de la L en planta, según la esquina de la unión. */
-function LUnionDiagram({ lado, className }: { lado: "izquierda" | "derecha"; className?: string }) {
-  const pts =
-    lado === "izquierda"
-      ? "8,6 22,6 22,26 60,26 60,40 8,40"
-      : "60,6 46,6 46,26 8,26 8,40 60,40";
-  return (
-    <svg viewBox="0 0 68 46" className={className} aria-hidden="true">
-      <polygon
-        points={pts}
-        fill="rgba(38,58,44,0.08)"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
 /* ── Paso 3 — Medidas ──────────────────────────────────────── */
 /** Convierte mm a texto en la unidad elegida (sin ceros sobrantes). */
 function mmAUnidadStr(mm: number, unidad: Unidad): string {
@@ -450,8 +430,8 @@ export function StepMedidas() {
   const yaDerivado = useConfigurador((st) => st.derivar);
   const unidad = useConfigurador((st) => st.unidad);
   const setUnidad = useConfigurador((st) => st.setUnidad);
-  const lUnion = useConfigurador((st) => st.lUnion);
-  const setLUnion = useConfigurador((st) => st.setLUnion);
+  const notas = useConfigurador((st) => st.notas);
+  const setNotas = useConfigurador((st) => st.setNotas);
   const geo = getGeometria(geometriaId);
   const L = MEDIDAS_LIMITES;
   const esL = geo?.id === "l";
@@ -481,61 +461,60 @@ export function StepMedidas() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  // El ancho de la L es común a los dos tramos: al cambiarlo se aplica a ambos.
+  const setAnchoL = (n: number) => {
+    setMedida("a", "prof", n);
+    setMedida("b", "prof", n);
+  };
+
   return (
     <div>
-      <StepTitle n={3} title="Medidas" subtitle="Ingresá el largo y el ancho de cada tramo, en metros." />
+      <StepTitle n={3} title="Medidas" subtitle="Ingresá las medidas en metros." />
 
-      {/* Sobre en L: esquina de la unión */}
-      {esL && (
-        <div className="mb-6 rounded-sm border border-stone-beige bg-white p-5">
-          <h3 className="mb-1 font-medium text-ink">Esquina de la unión</h3>
-          <p className="mb-3 text-xs text-charcoal/70">
-            Indicá hacia qué lado se dobla la L (visto de frente). El tramo A es el principal y el B el que se une en la esquina.
-          </p>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {L_UNIONES.map((u) => {
-              const on = lUnion === u.id;
-              return (
-                <button
-                  key={u.id}
-                  type="button"
-                  onClick={() => setLUnion(u.id)}
-                  aria-pressed={on}
-                  className={cn(card, on ? cardOn : cardOff)}
-                >
-                  {on && (
-                    <span className="absolute right-3 top-3 inline-flex h-6 w-6 items-center justify-center rounded-full bg-ink text-ivory">
-                      <Check className="h-3.5 w-3.5" />
-                    </span>
-                  )}
-                  <div className="mb-2 h-14 w-full text-ink/70">
-                    <LUnionDiagram lado={u.id} className="h-full w-full" />
-                  </div>
-                  <span className="text-sm font-medium text-ink">{u.nombre}</span>
-                </button>
-              );
-            })}
+      {esL ? (
+        <>
+          <div className="mb-4 flex items-center gap-3">
+            <div className="h-12 w-16 text-ink/50">
+              <GeoDiagram id={geo.id} className="h-full w-full" />
+            </div>
+            <p className="text-sm text-charcoal/80">
+              El <strong>Tramo A</strong> es la parte larga y el <strong>Tramo B</strong> la parte corta. El ancho es
+              común a toda la L.
+            </p>
           </div>
-          {!lUnion && <p className="mt-2 text-xs text-mineral">Elegí la esquina de la unión para continuar.</p>}
-        </div>
-      )}
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        {geo.tramos.map((t) => (
-          <div key={t.key} className="rounded-sm border border-stone-beige bg-white p-5">
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="font-medium text-ink">{t.label}</h3>
-              <div className="h-10 w-16 text-ink/50">
-                <GeoDiagram id={geo.id} className="h-full w-full" />
+          <div className="grid gap-6 lg:grid-cols-3">
+            <div className="rounded-sm border border-stone-beige bg-white p-5">
+              <h3 className="mb-4 font-medium text-ink">Tramo A — parte larga</h3>
+              <CampoMedida label="Largo" mmValue={medidas.a?.largo ?? 0} maxMm={L.largoMaxMm} unidad={unidad} onChangeMm={(n) => setMedida("a", "largo", n)} />
+            </div>
+            <div className="rounded-sm border border-stone-beige bg-white p-5">
+              <h3 className="mb-4 font-medium text-ink">Tramo B — parte corta</h3>
+              <CampoMedida label="Largo" mmValue={medidas.b?.largo ?? 0} maxMm={L.largoMaxMm} unidad={unidad} onChangeMm={(n) => setMedida("b", "largo", n)} />
+            </div>
+            <div className="rounded-sm border border-stone-beige bg-white p-5">
+              <h3 className="mb-4 font-medium text-ink">Ancho (común)</h3>
+              <CampoMedida label="Ancho" mmValue={medidas.a?.prof ?? 0} maxMm={L.profMaxMm} unidad={unidad} onChangeMm={setAnchoL} />
+            </div>
+          </div>
+        </>
+      ) : (
+        <div className="grid gap-6 lg:grid-cols-2">
+          {geo.tramos.map((t) => (
+            <div key={t.key} className="rounded-sm border border-stone-beige bg-white p-5">
+              <div className="mb-4 flex items-center justify-between">
+                <h3 className="font-medium text-ink">{t.label}</h3>
+                <div className="h-10 w-16 text-ink/50">
+                  <GeoDiagram id={geo.id} className="h-full w-full" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <CampoMedida key={`${t.key}-largo`} label="Largo" mmValue={medidas[t.key]?.largo ?? 0} maxMm={L.largoMaxMm} unidad={unidad} onChangeMm={(n) => setMedida(t.key, "largo", n)} />
+                <CampoMedida key={`${t.key}-ancho`} label="Ancho" mmValue={medidas[t.key]?.prof ?? 0} maxMm={L.profMaxMm} unidad={unidad} onChangeMm={(n) => setMedida(t.key, "prof", n)} />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <CampoMedida key={`${t.key}-largo`} label="Largo" mmValue={medidas[t.key]?.largo ?? 0} maxMm={L.largoMaxMm} unidad={unidad} onChangeMm={(n) => setMedida(t.key, "largo", n)} />
-              <CampoMedida key={`${t.key}-ancho`} label="Ancho" mmValue={medidas[t.key]?.prof ?? 0} maxMm={L.profMaxMm} unidad={unidad} onChangeMm={(n) => setMedida(t.key, "prof", n)} />
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {excedeAlguno && (
         <div className="mt-6 rounded-sm border border-[#b8863b]/50 bg-[#b8863b]/10 p-4">
@@ -552,6 +531,26 @@ export function StepMedidas() {
           </button>
         </div>
       )}
+
+      {/* Especificaciones libres del cliente (armado / orientación) */}
+      <div className="mt-6">
+        <label className="block">
+          <span className="mb-1 block text-sm font-medium text-ink">Especificaciones (opcional)</span>
+          <span className="mb-2 block text-xs text-charcoal/70">
+            {esL
+              ? "Contanos cómo querés que quede armada y orientada la L (hacia qué lado va la parte corta, ubicación del fregadero o la cocina, etc.)."
+              : "¿Algún detalle que debamos tener en cuenta para armar y orientar bien tu sobre?"}
+          </span>
+          <textarea
+            value={notas}
+            onChange={(e) => setNotas(e.target.value)}
+            rows={3}
+            maxLength={600}
+            placeholder="Ej.: la parte corta va hacia la derecha; el fregadero queda sobre el tramo largo…"
+            className="w-full rounded-sm border border-stone-beige bg-white px-3 py-2.5 text-sm text-ink outline-none focus:border-ink"
+          />
+        </label>
+      </div>
 
       <p className="mt-4 text-xs text-mineral">
         Las medidas son referenciales y quedan sujetas a validación técnica. {geo.nota ?? ""}
@@ -780,13 +779,6 @@ export function StepResumen() {
       <StepTitle n={6} title="Resumen y precio" subtitle="Este es el costo final de tu sobre. Podés editar cualquier sección y el precio se recalcula al instante." />
       <div className="rounded-sm border border-stone-beige bg-white p-5">
         <ResumenFila label="Tipo de proyecto" value={geo?.nombre ?? "—"} onEdit={() => setPaso(0)} />
-        {geo?.id === "l" && (
-          <ResumenFila
-            label="Unión de la L"
-            value={s.lUnion ? (s.lUnion === "izquierda" ? "A la izquierda" : "A la derecha") : "—"}
-            onEdit={() => setPaso(2)}
-          />
-        )}
         <ResumenFila label="Material" value={material ? `${material.nombre} · ${material.espesorMm} mm` : "—"} onEdit={() => setPaso(1)} />
         <ResumenFila label="Color" value={color?.nombre ?? "—"} onEdit={() => setPaso(1)} />
         <ResumenFila label="Acabado" value={s.acabado ? (s.acabado === "brillo" ? "Brillo" : "Mate") : "—"} onEdit={() => setPaso(1)} />
@@ -797,6 +789,7 @@ export function StepResumen() {
           onEdit={() => setPaso(3)}
         />
         <ResumenFila label="Salpicadero" value={salpTxt} onEdit={() => setPaso(4)} />
+        {s.notas.trim() && <ResumenFila label="Especificaciones" value={s.notas.trim()} onEdit={() => setPaso(2)} />}
         <ResumenFila label="Área total" value={`${price.areaTotal.toFixed(2)} m²`} />
         {price.molduraMl > 0 && <ResumenFila label="Moldura (frente)" value={`${price.molduraMl.toFixed(2)} m`} />}
       </div>
@@ -913,6 +906,7 @@ export function StepDatos() {
           salpicaderoTipo: s.salpicaderoTipo,
           salpicaderoAlturaCm: s.salpicaderoAlturaCm,
           lUnion: s.lUnion,
+          notas: s.notas,
           unidad: s.unidad,
           derivar: s.derivar,
           personalizado: esPersonalizado,
