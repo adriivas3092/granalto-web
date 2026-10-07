@@ -16,11 +16,8 @@ import {
   NOTA_CONTRASOBRE,
   ACABADOS,
   L_UNIONES,
-  MOLDURA_GROSOR_ESTANDAR_CM,
-  MOLDURAS_PERFILES,
   getGeometria,
   getMaterial,
-  getMolduraPerfil,
   type Color,
 } from "@/data/configurador";
 import { calcularPrecio } from "@/lib/configurador/pricing";
@@ -563,35 +560,62 @@ export function StepMedidas() {
   );
 }
 
-/** Ilustración del canto: inglete a 45° (con moldura) o canto recto (sin moldura). */
-function MolduraDiagram({ conMoldura, className }: { conMoldura: boolean; className?: string }) {
+/**
+ * Ilustración del canto del sobre según el tipo de moldura:
+ *  - "no": canto recto, solo se pule (brilla) la orilla.
+ *  - "2" / "4": corte a 45° con bajante de 2 o 4 cm (se diferencia la altura).
+ */
+function MolduraDiagram({ tipo, className }: { tipo: "no" | "2" | "4"; className?: string }) {
+  const top = 24;
+  const under = 38; // cara inferior del sobre
+  const left = 16;
+  const right = 120;
+  const bfx = 102; // inicio del frente de la moldura
+  const bottom = tipo === "2" ? 56 : tipo === "4" ? 80 : under;
   return (
-    <svg viewBox="0 0 140 90" className={className} aria-hidden="true">
-      {conMoldura ? (
+    <svg viewBox="0 0 168 96" className={className} aria-hidden="true">
+      {tipo === "no" ? (
         <>
-          {/* Perfil del sobre con moldura (contorno) */}
+          {/* Sobre con canto recto */}
+          <rect
+            x={left}
+            y={top}
+            width={right - left}
+            height={under - top}
+            fill="rgba(38,58,44,0.06)"
+            stroke="currentColor"
+            strokeWidth="2"
+          />
+          {/* Orilla pulida (brillo) en el canto frontal */}
+          <line x1={right - 1.5} y1={top + 1} x2={right - 1.5} y2={under - 1} stroke="currentColor" strokeWidth="3" strokeOpacity="0.5" />
+          <path d="M126 23 l3 3 l-3 3 l-3 -3 z" fill="currentColor" opacity="0.6" />
+          <text x={right - 2} y={under + 15} fontSize="10" fill="currentColor" textAnchor="end">
+            orilla pulida
+          </text>
+        </>
+      ) : (
+        <>
+          {/* Perfil con moldura: bajante con corte a 45° */}
           <polygon
-            points="16,28 124,28 124,70 108,70 108,40 16,40"
+            points={`${left},${top} ${right},${top} ${right},${bottom} ${bfx},${bottom} ${bfx},${under} ${left},${under}`}
             fill="rgba(38,58,44,0.06)"
             stroke="currentColor"
             strokeWidth="2"
             strokeLinejoin="round"
           />
-          {/* Junta del inglete a 45° en la esquina frontal */}
-          <line x1="124" y1="28" x2="108" y2="44" stroke="currentColor" strokeWidth="1.6" strokeDasharray="4 3" />
-          {/* Marca de ángulo */}
-          <path d="M124 40 A 12 12 0 0 0 116 32" fill="none" stroke="currentColor" strokeWidth="1.2" />
-          <text x="101" y="25" fontSize="11" fill="currentColor">45°</text>
+          {/* Junta del inglete a 45° en la esquina frontal superior */}
+          <line x1={right} y1={top} x2={bfx} y2={top + (right - bfx)} stroke="currentColor" strokeWidth="1.5" strokeDasharray="4 3" />
+          <text x={left + 2} y={top - 6} fontSize="10" fill="currentColor">
+            45°
+          </text>
+          {/* Cota de la bajante */}
+          <line x1={right + 10} y1={top} x2={right + 10} y2={bottom} stroke="currentColor" strokeWidth="1" />
+          <line x1={right + 6} y1={top} x2={right + 14} y2={top} stroke="currentColor" strokeWidth="1" />
+          <line x1={right + 6} y1={bottom} x2={right + 14} y2={bottom} stroke="currentColor" strokeWidth="1" />
+          <text x={right + 18} y={(top + bottom) / 2 + 4} fontSize="12" fill="currentColor">
+            {tipo} cm
+          </text>
         </>
-      ) : (
-        /* Canto recto estándar */
-        <polygon
-          points="16,34 124,34 124,48 16,48"
-          fill="rgba(38,58,44,0.06)"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinejoin="round"
-        />
       )}
     </svg>
   );
@@ -600,101 +624,65 @@ function MolduraDiagram({ conMoldura, className }: { conMoldura: boolean; classN
 /* ── Paso 4 — Moldura ──────────────────────────────────────── */
 export function StepMoldura() {
   const moldura = useConfigurador((s) => s.moldura);
+  const grosor = useConfigurador((s) => s.molduraGrosorCm);
   const setMoldura = useConfigurador((s) => s.setMoldura);
-  const perfilId = useConfigurador((s) => s.molduraPerfil);
-  const setPerfil = useConfigurador((s) => s.setMolduraPerfil);
-  const perfil = getMolduraPerfil(perfilId);
+  const setGrosor = useConfigurador((s) => s.setMolduraGrosor);
+
   const opciones = [
-    { v: false, t: "Sin moldura", d: "Canto recto estándar, línea limpia y minimalista." },
     {
-      v: true,
-      t: `Con moldura (${MOLDURA_GROSOR_ESTANDAR_CM} cm)`,
-      d: `Canto reforzado con corte a 45° (inglete), de ${MOLDURA_GROSOR_ESTANDAR_CM} cm de grosor.`,
+      tipo: "no" as const,
+      t: "Sin moldura",
+      d: "Solo se pule (brilla) la orilla del sobre. Canto recto, línea limpia.",
+      sel: moldura === false,
+      aplicar: () => setMoldura(false),
+    },
+    {
+      tipo: "2" as const,
+      t: "Moldura de 2 cm",
+      d: "Corte a 45° con 2 cm de bajante. Versión más corta.",
+      sel: moldura === true && grosor === 2,
+      aplicar: () => {
+        setMoldura(true);
+        setGrosor(2);
+      },
+    },
+    {
+      tipo: "4" as const,
+      t: "Moldura de 4 cm",
+      d: "Corte a 45° con 4 cm de bajante. Más presencia.",
+      sel: moldura === true && grosor === 4,
+      aplicar: () => {
+        setMoldura(true);
+        setGrosor(4);
+      },
     },
   ];
+
   return (
     <div>
-      <StepTitle n={4} title="Moldura" subtitle="¿Querés un acabado de moldura en el borde del sobre?" />
-      <div className="grid gap-4 sm:grid-cols-2">
-        {opciones.map((o) => {
-          const on = moldura === o.v;
-          return (
-            <button key={String(o.v)} type="button" onClick={() => setMoldura(o.v)} aria-pressed={on} className={cn(card, on ? cardOn : cardOff)}>
-              {on && (
-                <span className="absolute right-3 top-3 inline-flex h-6 w-6 items-center justify-center rounded-full bg-ink text-ivory">
-                  <Check className="h-3.5 w-3.5" />
-                </span>
-              )}
-              <div className="mb-3 h-20 w-full text-ink/70">
-                <MolduraDiagram conMoldura={o.v} className="h-full w-full" />
-              </div>
-              <span className="font-medium text-ink">{o.t}</span>
-              <span className="mt-1 text-xs text-charcoal/70">{o.d}</span>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Selección del diseño de moldura */}
-      {moldura === true && (
-        <div className="mt-8">
-          <h3 className="mb-1 text-sm font-medium text-ink">Diseño de la moldura</h3>
-          <p className="mb-3 text-xs text-charcoal/70">Elegí el perfil del canto. Todos con corte a 45° y {MOLDURA_GROSOR_ESTANDAR_CM} cm de grosor.</p>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <label className="block">
-              <span className="mb-1 block text-xs text-charcoal/80">Perfil de moldura</span>
-              <select
-                value={perfilId ?? ""}
-                onChange={(e) => setPerfil(Number(e.target.value))}
-                className="w-full rounded-sm border border-stone-beige bg-white px-3 py-2.5 text-ink outline-none focus:border-ink"
-              >
-                <option value="" disabled>
-                  Seleccioná un diseño…
-                </option>
-                {MOLDURAS_PERFILES.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.nombre}
-                  </option>
-                ))}
-              </select>
-              {!perfilId && <span className="mt-1 block text-xs text-mineral">Elegí un diseño para continuar.</span>}
-            </label>
-
-            {/* Vista del perfil elegido */}
-            <div className="flex min-h-[112px] items-center justify-center rounded-sm border border-stone-beige bg-ivory/50 p-4">
-              {perfil ? (
-                <figure className="w-full text-center">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={perfil.imagen} alt={perfil.nombre} className="mx-auto max-h-24 w-auto object-contain" />
-                  <figcaption className="mt-2 text-xs text-charcoal/70">{perfil.nombre} · corte a 45°</figcaption>
-                </figure>
-              ) : (
-                <span className="text-xs text-mineral">Elegí un diseño para previsualizarlo.</span>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Consulta por molduras de mayor grosor */}
-      {moldura === true && (
-        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-sm border border-stone-beige bg-ivory/60 p-4">
-          <p className="text-xs leading-relaxed text-charcoal/85">
-            La moldura estándar es de <strong className="text-ink">{MOLDURA_GROSOR_ESTANDAR_CM} cm</strong> con corte a 45°.
-            ¿Necesitás una moldura de mayor grosor? Consultá con un asesor.
-          </p>
-          <a
-            href={getWhatsAppUrl(
-              `Hola, en el cotizador quisiera una moldura de mayor grosor que los ${MOLDURA_GROSOR_ESTANDAR_CM} cm estándar. ¿Me ayudan?`,
-            )}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex min-h-[40px] shrink-0 items-center gap-2 rounded-sm border border-ink bg-white px-4 py-2 text-sm font-medium text-ink hover:bg-ink hover:text-ivory"
+      <StepTitle n={4} title="Moldura" subtitle="¿Cómo querés el canto del sobre?" />
+      <div className="grid gap-4 sm:grid-cols-3">
+        {opciones.map((o) => (
+          <button
+            key={o.tipo}
+            type="button"
+            onClick={o.aplicar}
+            aria-pressed={o.sel}
+            className={cn(card, o.sel ? cardOn : cardOff)}
           >
-            <MessageCircle className="h-4 w-4" /> Consultar
-          </a>
-        </div>
-      )}
+            {o.sel && (
+              <span className="absolute right-3 top-3 inline-flex h-6 w-6 items-center justify-center rounded-full bg-ink text-ivory">
+                <Check className="h-3.5 w-3.5" />
+              </span>
+            )}
+            <div className="mb-3 h-24 w-full text-ink/70">
+              <MolduraDiagram tipo={o.tipo} className="h-full w-full" />
+            </div>
+            <span className="font-medium text-ink">{o.t}</span>
+            <span className="mt-1 text-xs text-charcoal/70">{o.d}</span>
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
@@ -805,17 +793,7 @@ export function StepResumen() {
         <ResumenFila label="Medidas" value={medidasTxt || "—"} onEdit={() => setPaso(2)} />
         <ResumenFila
           label="Moldura"
-          value={
-            s.moldura
-              ? [
-                  "Con moldura",
-                  getMolduraPerfil(s.molduraPerfil)?.nombre,
-                  s.molduraGrosorCm ? `${s.molduraGrosorCm} cm` : null,
-                ]
-                  .filter(Boolean)
-                  .join(" · ")
-              : "Sin moldura"
-          }
+          value={s.moldura ? `Con moldura · ${s.molduraGrosorCm ?? ""} cm`.trim() : "Sin moldura"}
           onEdit={() => setPaso(3)}
         />
         <ResumenFila label="Salpicadero" value={salpTxt} onEdit={() => setPaso(4)} />
