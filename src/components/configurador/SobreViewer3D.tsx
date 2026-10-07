@@ -31,20 +31,6 @@ function useSobreMaterial(imagen: string | undefined, swatch: string | undefined
   }, [tex, imagen, swatch, brillo]);
 }
 
-/** Reasigna UVs por proyección superior (para que la textura mapee una vez sobre la cara). */
-function remapUVPlanar(g: THREE.BufferGeometry) {
-  g.computeBoundingBox();
-  const bb = g.boundingBox!;
-  const sx = bb.max.x - bb.min.x || 1;
-  const sz = bb.max.z - bb.min.z || 1;
-  const pos = g.attributes.position;
-  const uv = g.attributes.uv;
-  for (let i = 0; i < pos.count; i++) {
-    uv.setXY(i, (pos.getX(i) - bb.min.x) / sx, (pos.getZ(i) - bb.min.z) / sz);
-  }
-  uv.needsUpdate = true;
-}
-
 /** Caja (losa) con grosor th, centrada en su base. */
 function Losa({
   args,
@@ -86,7 +72,13 @@ function Salpicadero({
   );
 }
 
-/** Sobre en L: una sola pieza extruida (fiel a largo, corto y ancho). */
+/**
+ * Sobre en L: dos losas perpendiculares (brazo largo + brazo corto) que
+ * comparten la esquina. El brazo corto siempre sobresale, así se ve como L
+ * cualquiera sean las proporciones.
+ *   - Brazo largo: a lo largo de X, longitud = largo, ancho = ancho.
+ *   - Brazo corto: a lo largo de Z desde el extremo, longitud = corto, ancho = ancho.
+ */
 function LModel({ material }: { material: THREE.Material }) {
   const s = useConfigurador();
   const mat = getMaterial(s.materialId);
@@ -96,27 +88,14 @@ function LModel({ material }: { material: THREE.Material }) {
   const an = mmM(s.medidas.a?.prof); // ancho común
   const hs = s.salpicaderoTipo === "no" ? 0 : (s.salpicaderoTipo === "10" ? 10 : s.salpicaderoAlturaCm) / 100;
 
-  const geom = useMemo(() => {
-    const shape = new THREE.Shape();
-    // L: pierna larga (vertical, ancho=an, alto=aL) + pie corto (horizontal, largo=bL, alto=an)
-    shape.moveTo(0, 0);
-    shape.lineTo(bL, 0);
-    shape.lineTo(bL, an);
-    shape.lineTo(an, an);
-    shape.lineTo(an, aL);
-    shape.lineTo(0, aL);
-    shape.closePath();
-    const g = new THREE.ExtrudeGeometry(shape, { depth: th, bevelEnabled: false });
-    g.rotateX(-Math.PI / 2); // acostar la pieza: la base queda en y=0 y el grosor sube a y=th
-    remapUVPlanar(g);
-    return g;
-  }, [aL, bL, an, th]);
-
   return (
     <group>
-      <mesh geometry={geom} material={material} castShadow receiveShadow />
-      {/* Salpicadero a lo largo de la pierna larga (borde exterior x=0, z de 0 a -aL) */}
-      <Salpicadero largo={aL} altura={hs} th={th} position={[0.01, 0, -aL / 2]} material={material} />
+      {/* Brazo largo (a lo largo de X) */}
+      <Losa args={[aL, th, an]} position={[aL / 2, 0, an / 2]} material={material} />
+      {/* Brazo corto (a lo largo de Z, sobresaliendo desde el extremo izquierdo) */}
+      <Losa args={[an, th, bL]} position={[an / 2, 0, an + bL / 2]} material={material} />
+      {/* Salpicadero a lo largo del brazo largo */}
+      <Salpicadero largo={aL} altura={hs} th={th} position={[aL / 2, 0, 0.01]} material={material} />
     </group>
   );
 }
