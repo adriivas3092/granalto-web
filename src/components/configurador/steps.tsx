@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Pencil, Loader2, AlertTriangle, MessageCircle } from "lucide-react";
+import { Check, Pencil, Loader2, AlertTriangle, MessageCircle, ZoomIn, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatPrice } from "@/lib/store/format";
 import { getWhatsAppUrl } from "@/config/site";
@@ -18,6 +18,7 @@ import {
   MOLDURA_GROSORES_CM,
   getGeometria,
   getMaterial,
+  type Color,
 } from "@/data/configurador";
 import { calcularPrecio } from "@/lib/configurador/pricing";
 import { useConfigurador, PASOS, MM_POR_UNIDAD, type Unidad } from "@/store/configuradorStore";
@@ -114,6 +115,7 @@ export function StepMaterial() {
   const setAcabado = useConfigurador((s) => s.setAcabado);
   const material = getMaterial(materialId);
   const colorSel = material?.colores.find((c) => c.id === colorId);
+  const [zoom, setZoom] = useState(false);
   return (
     <div>
       <StepTitle n={2} title="Material y color" subtitle="El espesor se asigna solo según el material que elijas." />
@@ -150,6 +152,16 @@ export function StepMaterial() {
           <h3 className="mb-3 text-sm font-medium text-ink">
             Color — {material.nombre} <span className="text-mineral">({material.espesorMm} mm)</span>
           </h3>
+
+          {/* Vista grande del material elegido */}
+          <MaterialPreview
+            material={material.nombre}
+            color={colorSel}
+            acabado={acabado}
+            onZoom={() => colorSel && setZoom(true)}
+          />
+
+          <p className="mb-2 mt-6 text-xs text-mineral">Elegí un color para verlo en grande:</p>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
             {material.colores.map((c) => {
               const on = colorId === c.id;
@@ -217,6 +229,133 @@ export function StepMaterial() {
           </div>
         </div>
       )}
+
+      {zoom && colorSel && (
+        <MaterialLightbox
+          material={material?.nombre ?? ""}
+          color={colorSel}
+          acabado={acabado}
+          onClose={() => setZoom(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+/** Vista grande y atractiva del material seleccionado, con botón para ampliar. */
+function MaterialPreview({
+  material,
+  color,
+  acabado,
+  onZoom,
+}: {
+  material: string;
+  color: Color | undefined;
+  acabado: "brillo" | "mate" | null;
+  onZoom: () => void;
+}) {
+  if (!color) {
+    return (
+      <div className="flex h-48 w-full items-center justify-center rounded-sm border border-dashed border-stone-beige bg-ivory/40 text-sm text-mineral sm:h-60">
+        Elegí un color para previsualizar el material.
+      </div>
+    );
+  }
+  return (
+    <button
+      type="button"
+      onClick={onZoom}
+      className="group relative block h-56 w-full overflow-hidden rounded-sm border border-stone-beige sm:h-72 lg:h-80"
+      aria-label={`Ampliar ${material} ${color.nombre}`}
+    >
+      <span
+        className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
+        style={color.imagen ? { backgroundImage: `url(${color.imagen})` } : { background: color.swatch }}
+      />
+      {/* Brillo sutil cuando el acabado es brillante */}
+      {acabado === "brillo" && (
+        <span className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/15 to-white/35 mix-blend-screen" />
+      )}
+      {/* Degradado inferior para legibilidad del texto */}
+      <span className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/55 to-transparent" />
+
+      {color.agotado && (
+        <span className="absolute left-3 top-3 rounded-sm bg-[#b8863b] px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide text-white">
+          Agotado
+        </span>
+      )}
+
+      <span className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-sm bg-black/40 px-2.5 py-1.5 text-xs text-white backdrop-blur-sm transition-colors group-hover:bg-black/60">
+        <ZoomIn className="h-3.5 w-3.5" /> Ampliar
+      </span>
+
+      <span className="absolute inset-x-0 bottom-0 flex flex-col p-4 text-left text-white">
+        <span className="font-serif text-xl md:text-2xl">{color.nombre}</span>
+        <span className="mt-0.5 text-xs text-white/85">
+          {material}
+          {acabado ? ` · Acabado ${acabado === "brillo" ? "brillo" : "mate"}` : ""}
+        </span>
+      </span>
+    </button>
+  );
+}
+
+/** Lightbox a pantalla completa del material. */
+function MaterialLightbox({
+  material,
+  color,
+  acabado,
+  onClose,
+}: {
+  material: string;
+  color: { nombre: string; swatch: string; imagen?: string; agotado?: boolean };
+  acabado: "brillo" | "mate" | null;
+  onClose: () => void;
+}) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    document.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [onClose]);
+
+  return (
+    <div
+      className="fixed inset-0 z-[70] flex items-center justify-center bg-black/85 p-4 sm:p-8"
+      role="dialog"
+      aria-modal="true"
+      onClick={onClose}
+    >
+      <button
+        type="button"
+        onClick={onClose}
+        className="absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20"
+        aria-label="Cerrar"
+      >
+        <X className="h-5 w-5" />
+      </button>
+      <figure className="flex max-h-full w-full max-w-4xl flex-col items-center" onClick={(e) => e.stopPropagation()}>
+        <div className="relative w-full overflow-hidden rounded-sm">
+          <div
+            className="aspect-[4/3] w-full bg-cover bg-center"
+            style={color.imagen ? { backgroundImage: `url(${color.imagen})` } : { background: color.swatch }}
+          />
+          {acabado === "brillo" && (
+            <span className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-white/25 mix-blend-screen" />
+          )}
+        </div>
+        <figcaption className="mt-4 text-center text-white">
+          <p className="font-serif text-2xl">{color.nombre}</p>
+          <p className="mt-1 text-sm text-white/80">
+            {material}
+            {acabado ? ` · Acabado ${acabado === "brillo" ? "brillo" : "mate"}` : ""}
+            {color.agotado ? " · Agotado" : ""}
+          </p>
+        </figcaption>
+      </figure>
     </div>
   );
 }
