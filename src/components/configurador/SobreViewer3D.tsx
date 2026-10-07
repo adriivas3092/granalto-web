@@ -82,24 +82,26 @@ function Mueble({
   );
 }
 
-/** Salpicadero: pieza vertical al fondo, apoyada sobre el sobre (base en position[1]+th). */
+/** Salpicadero: pieza vertical, apoyada sobre el sobre (base en position[1]+th). */
 function Salpicadero({
-  largo,
+  w,
+  d,
   altura,
   th,
   position,
   material,
 }: {
-  largo: number;
+  w: number;
+  d: number;
   altura: number;
   th: number;
   position: [number, number, number];
   material: THREE.Material;
 }) {
-  if (altura <= 0 || largo <= 0) return null;
+  if (altura <= 0) return null;
   return (
     <mesh position={[position[0], position[1] + th + altura / 2, position[2]]} material={material} castShadow receiveShadow>
-      <boxGeometry args={[largo, altura, 0.02]} />
+      <boxGeometry args={[w, altura, d]} />
     </mesh>
   );
 }
@@ -117,14 +119,15 @@ function LModel({ stone, mueble }: Mats) {
 
   return (
     <group>
-      {/* Muebles bajo cada brazo */}
+      {/* Mueble en L continuo: el brazo corto se solapa con el largo (sin separación) */}
       <Mueble w={aL} d={an} position={[aL / 2, 0, an / 2]} material={mueble} />
-      <Mueble w={an} d={bL} position={[an / 2, 0, an + bL / 2]} material={mueble} />
+      <Mueble w={an} d={an + bL} position={[an / 2, 0, (an + bL) / 2]} material={mueble} />
       {/* Sobres */}
       <Losa args={[aL, th, an]} position={[aL / 2, CAB_H, an / 2]} material={stone} />
       <Losa args={[an, th, bL]} position={[an / 2, CAB_H, an + bL / 2]} material={stone} />
-      {/* Salpicadero a lo largo del brazo largo */}
-      <Salpicadero largo={aL} altura={hs} th={th} position={[aL / 2, CAB_H, 0.01]} material={stone} />
+      {/* Salpicadero en L: fondo (brazo largo) + lateral (borde exterior izquierdo) */}
+      <Salpicadero w={aL} d={0.02} altura={hs} th={th} position={[aL / 2, CAB_H, 0.01]} material={stone} />
+      <Salpicadero w={0.02} d={an + bL} altura={hs} th={th} position={[0.01, CAB_H, (an + bL) / 2]} material={stone} />
     </group>
   );
 }
@@ -148,7 +151,8 @@ function BoxModel({ stone, mueble }: Mats) {
         <Mueble w={bL} d={an} position={[bL / 2, 0, an + gap + an / 2]} material={mueble} />
         <Losa args={[aL, th, an]} position={[aL / 2, CAB_H, an / 2]} material={stone} />
         <Losa args={[bL, th, an]} position={[bL / 2, CAB_H, an + gap + an / 2]} material={stone} />
-        <Salpicadero largo={aL} altura={hs} th={th} position={[aL / 2, CAB_H, 0.01]} material={stone} />
+        <Salpicadero w={aL} d={0.02} altura={hs} th={th} position={[aL / 2, CAB_H, 0.01]} material={stone} />
+        <Salpicadero w={bL} d={0.02} altura={hs} th={th} position={[bL / 2, CAB_H, an + gap + 0.01]} material={stone} />
       </group>
     );
   }
@@ -160,7 +164,7 @@ function BoxModel({ stone, mueble }: Mats) {
     <group>
       <Mueble w={lg} d={an} position={[lg / 2, 0, an / 2]} material={mueble} />
       <Losa args={[lg, th, an]} position={[lg / 2, CAB_H, an / 2]} material={stone} />
-      <Salpicadero largo={lg} altura={hs} th={th} position={[lg / 2, CAB_H, 0.01]} material={stone} />
+      <Salpicadero w={lg} d={0.02} altura={hs} th={th} position={[lg / 2, CAB_H, 0.01]} material={stone} />
     </group>
   );
 }
