@@ -359,6 +359,39 @@ function MaterialLightbox({
   );
 }
 
+/** Diagrama de referencia de la L: parte larga, parte corta y la unión. */
+function LReferenceDiagram({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 300 240" className={className} role="img" aria-label="Diagrama del sobre en L: largo, corto y unión">
+      {/* Perfil de la L (parte larga vertical + parte corta horizontal) */}
+      <polygon
+        points="50,20 85,20 85,150 180,150 180,185 50,185"
+        fill="rgba(38,58,44,0.06)"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinejoin="round"
+      />
+      {/* Línea de la unión (donde se junta la parte larga con la corta) */}
+      <line x1="50" y1="150" x2="85" y2="150" stroke="#b8863b" strokeWidth="3.5" />
+
+      {/* Etiqueta: Largo */}
+      <line x1="112" y1="70" x2="92" y2="70" stroke="currentColor" strokeWidth="1.3" />
+      <polygon points="88,70 96,66 96,74" fill="currentColor" />
+      <text x="118" y="75" fontSize="16" fill="currentColor">Largo</text>
+
+      {/* Etiqueta: Unión */}
+      <line x1="112" y1="140" x2="90" y2="149" stroke="currentColor" strokeWidth="1.3" />
+      <polygon points="85,151 94,145 95,153" fill="#b8863b" />
+      <text x="118" y="146" fontSize="16" fill="#8a5f24">Unión</text>
+
+      {/* Etiqueta: Corto */}
+      <line x1="115" y1="212" x2="115" y2="189" stroke="currentColor" strokeWidth="1.3" />
+      <polygon points="115,185 111,193 119,193" fill="currentColor" />
+      <text x="115" y="230" fontSize="16" fill="currentColor" textAnchor="middle">Corto</text>
+    </svg>
+  );
+}
+
 /* ── Paso 3 — Medidas ──────────────────────────────────────── */
 /** Convierte mm a texto en la unidad elegida (sin ceros sobrantes). */
 function mmAUnidadStr(mm: number, unidad: Unidad): string {
@@ -473,14 +506,21 @@ export function StepMedidas() {
 
       {esL ? (
         <>
-          <div className="mb-4 flex items-center gap-3">
-            <div className="h-12 w-16 text-ink/50">
-              <GeoDiagram id={geo.id} className="h-full w-full" />
+          <div className="mb-6 flex flex-col items-center gap-4 rounded-sm border border-stone-beige bg-white p-5 sm:flex-row sm:items-center">
+            <div className="h-40 w-full max-w-[220px] shrink-0 text-ink/70">
+              <LReferenceDiagram className="h-full w-full" />
             </div>
-            <p className="text-sm text-charcoal/80">
-              El <strong>Tramo A</strong> es la parte larga y el <strong>Tramo B</strong> la parte corta. El ancho es
-              común a toda la L.
-            </p>
+            <div className="text-sm text-charcoal/80">
+              <p>
+                El <strong>Tramo A</strong> es la parte <strong>larga</strong> y el <strong>Tramo B</strong> la parte{" "}
+                <strong>corta</strong>. El <strong>ancho</strong> es común a toda la L.
+              </p>
+              <p className="mt-2">
+                La <strong className="text-[#8a5f24]">unión</strong> es donde se junta la parte larga con la corta. Si
+                querés indicar hacia qué lado va la parte corta u otra orientación, usá el campo de especificaciones de
+                abajo.
+              </p>
+            </div>
           </div>
           <div className="grid gap-6 lg:grid-cols-3">
             <div className="rounded-sm border border-stone-beige bg-white p-5">
