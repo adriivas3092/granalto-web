@@ -13,6 +13,9 @@ import {
   MEDIDAS_LIMITES,
   SALPICADERO,
   PLAZO_DIAS_HABILES,
+  ACABADOS,
+  L_UNIONES,
+  MOLDURA_GROSORES_CM,
   getGeometria,
   getMaterial,
 } from "@/data/configurador";
@@ -105,8 +108,10 @@ function DisclaimerAgotado({ nombre }: { nombre?: string }) {
 export function StepMaterial() {
   const materialId = useConfigurador((s) => s.materialId);
   const colorId = useConfigurador((s) => s.colorId);
+  const acabado = useConfigurador((s) => s.acabado);
   const setMaterial = useConfigurador((s) => s.setMaterial);
   const setColor = useConfigurador((s) => s.setColor);
+  const setAcabado = useConfigurador((s) => s.setAcabado);
   const material = getMaterial(materialId);
   const colorSel = material?.colores.find((c) => c.id === colorId);
   return (
@@ -155,37 +160,83 @@ export function StepMaterial() {
                   onClick={() => setColor(c.id)}
                   aria-pressed={on}
                   className={cn(
-                    "flex items-center gap-3 rounded-sm border p-3 text-left transition-colors",
-                    on ? cardOn : cardOff,
-                    c.agotado && !on && "opacity-70",
+                    "group/color relative flex flex-col overflow-hidden rounded-sm border text-left transition-colors",
+                    on ? "border-ink ring-1 ring-ink" : "border-stone-beige hover:border-mineral",
+                    c.agotado && !on && "opacity-80",
                   )}
                 >
+                  {/* Vista del material (foto si existe; si no, el color) */}
                   <span
-                    className="relative h-9 w-9 shrink-0 rounded-full border border-stone-beige"
-                    style={{ background: c.swatch }}
+                    className="relative block h-24 w-full bg-cover bg-center"
+                    style={c.imagen ? { backgroundImage: `url(${c.imagen})` } : { background: c.swatch }}
                   >
-                    {c.agotado && (
-                      <span className="absolute inset-0 rounded-full ring-1 ring-inset ring-[#b8863b]/60" />
+                    {on && (
+                      <span className="absolute right-2 top-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-ink text-ivory">
+                        <Check className="h-3.5 w-3.5" />
+                      </span>
                     )}
-                  </span>
-                  <span className="flex flex-col">
-                    <span className="text-sm text-ink">{c.nombre}</span>
                     {c.agotado && (
-                      <span className="mt-0.5 inline-block w-fit rounded-sm bg-[#b8863b]/15 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[#8a5f24]">
+                      <span className="absolute left-2 top-2 rounded-sm bg-[#b8863b] px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-white">
                         Agotado
                       </span>
                     )}
                   </span>
-                  {on && <Check className="ml-auto h-4 w-4 text-ink" />}
+                  <span className="px-3 py-2 text-sm text-ink">{c.nombre}</span>
                 </button>
               );
             })}
           </div>
 
           {colorSel?.agotado && <DisclaimerAgotado nombre={colorSel.nombre} />}
+
+          {/* Acabado: brillo o mate */}
+          <div className="mt-8">
+            <h3 className="mb-3 text-sm font-medium text-ink">Acabado</h3>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {ACABADOS.map((a) => {
+                const on = acabado === a.id;
+                return (
+                  <button
+                    key={a.id}
+                    type="button"
+                    onClick={() => setAcabado(a.id)}
+                    aria-pressed={on}
+                    className={cn(card, on ? cardOn : cardOff)}
+                  >
+                    {on && (
+                      <span className="absolute right-3 top-3 inline-flex h-6 w-6 items-center justify-center rounded-full bg-ink text-ivory">
+                        <Check className="h-3.5 w-3.5" />
+                      </span>
+                    )}
+                    <span className="font-medium text-ink">{a.nombre}</span>
+                    <span className="mt-1 text-xs text-charcoal/70">{a.desc}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
       )}
     </div>
+  );
+}
+
+/** Diagrama simple de la L en planta, según la esquina de la unión. */
+function LUnionDiagram({ lado, className }: { lado: "izquierda" | "derecha"; className?: string }) {
+  const pts =
+    lado === "izquierda"
+      ? "8,6 22,6 22,26 60,26 60,40 8,40"
+      : "60,6 46,6 46,26 8,26 8,40 60,40";
+  return (
+    <svg viewBox="0 0 68 46" className={className} aria-hidden="true">
+      <polygon
+        points={pts}
+        fill="rgba(38,58,44,0.08)"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }
 
@@ -260,8 +311,11 @@ export function StepMedidas() {
   const yaDerivado = useConfigurador((st) => st.derivar);
   const unidad = useConfigurador((st) => st.unidad);
   const setUnidad = useConfigurador((st) => st.setUnidad);
+  const lUnion = useConfigurador((st) => st.lUnion);
+  const setLUnion = useConfigurador((st) => st.setLUnion);
   const geo = getGeometria(geometriaId);
   const L = MEDIDAS_LIMITES;
+  const esL = geo?.id === "l";
 
   // Los sobres se miden siempre en metros.
   useEffect(() => {
@@ -291,6 +345,41 @@ export function StepMedidas() {
   return (
     <div>
       <StepTitle n={3} title="Medidas" subtitle="Ingresá el largo y el ancho de cada tramo, en metros." />
+
+      {/* Sobre en L: esquina de la unión */}
+      {esL && (
+        <div className="mb-6 rounded-sm border border-stone-beige bg-white p-5">
+          <h3 className="mb-1 font-medium text-ink">Esquina de la unión</h3>
+          <p className="mb-3 text-xs text-charcoal/70">
+            Indicá hacia qué lado se dobla la L (visto de frente). El tramo A es el principal y el B el que se une en la esquina.
+          </p>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {L_UNIONES.map((u) => {
+              const on = lUnion === u.id;
+              return (
+                <button
+                  key={u.id}
+                  type="button"
+                  onClick={() => setLUnion(u.id)}
+                  aria-pressed={on}
+                  className={cn(card, on ? cardOn : cardOff)}
+                >
+                  {on && (
+                    <span className="absolute right-3 top-3 inline-flex h-6 w-6 items-center justify-center rounded-full bg-ink text-ivory">
+                      <Check className="h-3.5 w-3.5" />
+                    </span>
+                  )}
+                  <div className="mb-2 h-14 w-full text-ink/70">
+                    <LUnionDiagram lado={u.id} className="h-full w-full" />
+                  </div>
+                  <span className="text-sm font-medium text-ink">{u.nombre}</span>
+                </button>
+              );
+            })}
+          </div>
+          {!lUnion && <p className="mt-2 text-xs text-mineral">Elegí la esquina de la unión para continuar.</p>}
+        </div>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-2">
         {geo.tramos.map((t) => (
@@ -336,9 +425,11 @@ export function StepMedidas() {
 export function StepMoldura() {
   const moldura = useConfigurador((s) => s.moldura);
   const setMoldura = useConfigurador((s) => s.setMoldura);
+  const grosor = useConfigurador((s) => s.molduraGrosorCm);
+  const setGrosor = useConfigurador((s) => s.setMolduraGrosor);
   const opciones = [
     { v: false, t: "Sin moldura", d: "Canto estándar, línea limpia y minimalista." },
-    { v: true, t: "Con moldura básica", d: "Borde con moldura para un acabado con más presencia." },
+    { v: true, t: "Con moldura", d: "Borde con moldura para un acabado con más presencia." },
   ];
   return (
     <div>
@@ -365,6 +456,45 @@ export function StepMoldura() {
           );
         })}
       </div>
+
+      {/* Grosor de la moldura (2 o 4 cm) */}
+      {moldura === true && (
+        <div className="mt-8">
+          <h3 className="mb-1 text-sm font-medium text-ink">Grosor de la moldura</h3>
+          <p className="mb-3 text-xs text-charcoal/70">Elegí el grosor del canto con moldura.</p>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {MOLDURA_GROSORES_CM.map((g) => {
+              const on = grosor === g;
+              return (
+                <button
+                  key={g}
+                  type="button"
+                  onClick={() => setGrosor(g)}
+                  aria-pressed={on}
+                  className={cn(card, on ? cardOn : cardOff)}
+                >
+                  {on && (
+                    <span className="absolute right-3 top-3 inline-flex h-6 w-6 items-center justify-center rounded-full bg-ink text-ivory">
+                      <Check className="h-3.5 w-3.5" />
+                    </span>
+                  )}
+                  <div className="mb-3 h-12 w-full">
+                    <svg viewBox="0 0 120 40" className="h-full w-full text-ink/70" aria-hidden="true">
+                      <rect x="10" y="10" width="100" height="10" fill="rgba(38,58,44,0.06)" stroke="currentColor" strokeWidth="2" />
+                      <rect x="10" y="20" width="100" height={g === 2 ? 5 : 10} fill="rgba(38,58,44,0.18)" stroke="currentColor" strokeWidth="1.5" />
+                    </svg>
+                  </div>
+                  <span className="font-medium text-ink">{g} cm</span>
+                  <span className="mt-1 text-xs text-charcoal/70">
+                    {g === 2 ? "Moldura discreta." : "Moldura más marcada."}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+          {!grosor && <p className="mt-2 text-xs text-mineral">Elegí el grosor para continuar.</p>}
+        </div>
+      )}
     </div>
   );
 }
@@ -462,10 +592,22 @@ export function StepResumen() {
       <StepTitle n={6} title="Resumen y precio" subtitle="Este es el costo final de tu sobre. Podés editar cualquier sección y el precio se recalcula al instante." />
       <div className="rounded-sm border border-stone-beige bg-white p-5">
         <ResumenFila label="Tipo de proyecto" value={geo?.nombre ?? "—"} onEdit={() => setPaso(0)} />
+        {geo?.id === "l" && (
+          <ResumenFila
+            label="Unión de la L"
+            value={s.lUnion ? (s.lUnion === "izquierda" ? "A la izquierda" : "A la derecha") : "—"}
+            onEdit={() => setPaso(2)}
+          />
+        )}
         <ResumenFila label="Material" value={material ? `${material.nombre} · ${material.espesorMm} mm` : "—"} onEdit={() => setPaso(1)} />
         <ResumenFila label="Color" value={color?.nombre ?? "—"} onEdit={() => setPaso(1)} />
+        <ResumenFila label="Acabado" value={s.acabado ? (s.acabado === "brillo" ? "Brillo" : "Mate") : "—"} onEdit={() => setPaso(1)} />
         <ResumenFila label="Medidas" value={medidasTxt || "—"} onEdit={() => setPaso(2)} />
-        <ResumenFila label="Moldura" value={s.moldura ? "Con moldura básica" : "Sin moldura"} onEdit={() => setPaso(3)} />
+        <ResumenFila
+          label="Moldura"
+          value={s.moldura ? `Con moldura${s.molduraGrosorCm ? ` · ${s.molduraGrosorCm} cm` : ""}` : "Sin moldura"}
+          onEdit={() => setPaso(3)}
+        />
         <ResumenFila label="Salpicadero" value={salpTxt} onEdit={() => setPaso(4)} />
         <ResumenFila label="Área total" value={`${price.areaTotal.toFixed(2)} m²`} />
         {price.molduraMl > 0 && <ResumenFila label="Moldura (frente)" value={`${price.molduraMl.toFixed(2)} m`} />}
@@ -570,9 +712,12 @@ export function StepDatos() {
           materialId: s.materialId,
           colorId: s.colorId,
           medidas: s.medidas,
+          acabado: s.acabado,
           moldura: s.moldura,
+          molduraGrosorCm: s.molduraGrosorCm,
           salpicaderoTipo: s.salpicaderoTipo,
           salpicaderoAlturaCm: s.salpicaderoAlturaCm,
+          lUnion: s.lUnion,
           unidad: s.unidad,
           derivar: s.derivar,
           personalizado: esPersonalizado,

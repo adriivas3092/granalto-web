@@ -172,11 +172,24 @@ function LiveSummary() {
       <h3 className="text-sm font-medium text-ink">Tu configuración</h3>
       <dl className="mt-3 space-y-2 text-sm">
         <Row label="Proyecto" value={geo?.nombre} />
+        {geo?.id === "l" && (
+          <Row label="Unión" value={s.lUnion ? (s.lUnion === "izquierda" ? "Izquierda" : "Derecha") : undefined} />
+        )}
         {!esPersonalizado && (
           <>
             <Row label="Material" value={material ? `${material.nombre} · ${material.espesorMm} mm` : undefined} />
             <Row label="Color" value={color?.nombre} />
-            <Row label="Moldura" value={s.moldura == null ? undefined : s.moldura ? "Con moldura" : "Sin moldura"} />
+            <Row label="Acabado" value={s.acabado ? (s.acabado === "brillo" ? "Brillo" : "Mate") : undefined} />
+            <Row
+              label="Moldura"
+              value={
+                s.moldura == null
+                  ? undefined
+                  : s.moldura
+                    ? `Con moldura${s.molduraGrosorCm ? ` · ${s.molduraGrosorCm} cm` : ""}`
+                    : "Sin moldura"
+              }
+            />
             <Row
               label="Salpicadero"
               value={
@@ -240,10 +253,12 @@ function validar(paso: number, s: ReturnType<typeof useConfigurador.getState>): 
     case 0:
       return !!s.geometriaId;
     case 1:
-      return !!s.materialId && !!s.colorId;
+      return !!s.materialId && !!s.colorId && !!s.acabado;
     case 2: {
       const geo = getGeometria(s.geometriaId);
       if (!geo || geo.tramos.length === 0) return false;
+      // Para el sobre en L hay que elegir la esquina de la unión.
+      if (geo.id === "l" && !s.lUnion) return false;
       const L = MEDIDAS_LIMITES;
       // Válido para continuar automáticamente: todas las piezas positivas y
       // dentro del máximo estándar. Si alguna excede, no avanza por aquí: se
@@ -260,7 +275,10 @@ function validar(paso: number, s: ReturnType<typeof useConfigurador.getState>): 
       });
     }
     case 3:
-      return s.moldura !== null;
+      if (s.moldura === null) return false;
+      // Si lleva moldura, hay que elegir el grosor (2 o 4 cm).
+      if (s.moldura === true && !s.molduraGrosorCm) return false;
+      return true;
     case 4:
       if (s.salpicaderoTipo === "custom") {
         return (

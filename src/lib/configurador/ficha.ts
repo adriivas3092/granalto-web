@@ -20,6 +20,12 @@ export type FichaCliente = {
 
 export type FichaInput = ConfigInput & {
   unidad: Unidad;
+  /** Acabado de superficie. */
+  acabado?: "brillo" | "mate" | null;
+  /** Grosor de la moldura en cm (2 o 4). */
+  molduraGrosorCm?: number | null;
+  /** Esquina de la unión del sobre en L. */
+  lUnion?: "izquierda" | "derecha" | null;
   /** true cuando el proyecto se derivó a cotización personalizada. */
   derivar?: boolean;
   cliente?: FichaCliente;
@@ -66,10 +72,14 @@ export function buildFicha(input: FichaInput): {
 
   // Configuración
   const config: FichaFila[] = [{ label: "Tipo de proyecto", value: geo?.nombre ?? "—" }];
+  if (geo?.id === "l" && input.lUnion) {
+    config.push({ label: "Unión de la L", value: input.lUnion === "izquierda" ? "A la izquierda" : "A la derecha" });
+  }
   if (!esPersonalizado || material) {
     config.push({ label: "Material", value: material ? material.nombre : "—" });
     config.push({ label: "Color", value: color?.nombre ?? "—" });
     config.push({ label: "Espesor", value: material ? `${material.espesorMm} mm` : "—" });
+    if (input.acabado) config.push({ label: "Acabado", value: input.acabado === "brillo" ? "Brillo" : "Mate" });
   }
   secciones.push({ titulo: "Configuración", filas: config });
 
@@ -88,7 +98,12 @@ export function buildFicha(input: FichaInput): {
 
   // Acabados
   const acabados: FichaFila[] = [
-    { label: "Moldura", value: input.moldura ? "Con moldura básica" : "Sin moldura" },
+    {
+      label: "Moldura",
+      value: input.moldura
+        ? `Con moldura${input.molduraGrosorCm ? ` (${input.molduraGrosorCm} cm)` : ""}`
+        : "Sin moldura",
+    },
   ];
   if (price.molduraMl > 0) acabados.push({ label: "Moldura (frente)", value: `${price.molduraMl.toFixed(2)} m` });
   const salpTxt =

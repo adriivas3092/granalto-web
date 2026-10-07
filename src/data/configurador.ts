@@ -50,6 +50,24 @@ export const SALPICADERO = {
   customMaxCm: 30,
 };
 
+/** Grosores de moldura disponibles (cm). RN: el cliente elige 2 o 4 cm. */
+export const MOLDURA_GROSORES_CM = [2, 4] as const;
+export type MolduraGrosorCm = (typeof MOLDURA_GROSORES_CM)[number];
+
+/** Acabado de superficie. */
+export type Acabado = "brillo" | "mate";
+export const ACABADOS: { id: Acabado; nombre: string; desc: string }[] = [
+  { id: "brillo", nombre: "Brillo", desc: "Superficie pulida y reflectante." },
+  { id: "mate", nombre: "Mate", desc: "Superficie sin brillo, de aspecto natural." },
+];
+
+/** Esquina de la unión para el sobre en L (vista en planta). */
+export type LUnion = "izquierda" | "derecha";
+export const L_UNIONES: { id: LUnion; nombre: string }[] = [
+  { id: "izquierda", nombre: "Unión a la izquierda" },
+  { id: "derecha", nombre: "Unión a la derecha" },
+];
+
 export type TramoDef = { key: string; label: string };
 
 export type Geometria = {
@@ -124,6 +142,8 @@ export type Color = {
   id: string;
   nombre: string;
   swatch: string;
+  /** Foto del material (textura/acabado). Si existe, se muestra en vez del swatch. */
+  imagen?: string;
   /** true = material sin disponibilidad (no cotiza; se consulta con asesor). */
   agotado?: boolean;
   /** Precio por m² específico del color (anula el del material). */

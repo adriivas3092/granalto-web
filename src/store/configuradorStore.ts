@@ -51,9 +51,15 @@ type State = {
   colorId: string | null;
   medidas: Record<string, Medida>;
   unidad: Unidad;
+  /** Acabado de superficie: brillo o mate (null = sin elegir). */
+  acabado: "brillo" | "mate" | null;
   moldura: boolean | null;
+  /** Grosor de la moldura en cm (2 o 4) cuando lleva moldura. */
+  molduraGrosorCm: number | null;
   salpicaderoTipo: SalpicaderoTipo;
   salpicaderoAlturaCm: number;
+  /** Esquina de la unión del sobre en L. */
+  lUnion: "izquierda" | "derecha" | null;
   /** true cuando el proyecto se deriva a cotización personalizada (p. ej. medidas fuera de rango). */
   derivar: boolean;
   cliente: Cliente;
@@ -68,7 +74,10 @@ type State = {
   setColor: (id: string) => void;
   setMedida: (tramo: string, campo: keyof Medida, valor: number) => void;
   setUnidad: (u: Unidad) => void;
+  setAcabado: (a: "brillo" | "mate") => void;
   setMoldura: (v: boolean) => void;
+  setMolduraGrosor: (cm: number) => void;
+  setLUnion: (u: "izquierda" | "derecha") => void;
   setSalpicadero: (tipo: SalpicaderoTipo, alturaCm?: number) => void;
   setDerivar: (v: boolean) => void;
   setCliente: (patch: Partial<Cliente>) => void;
@@ -84,9 +93,12 @@ const initial = {
   colorId: null,
   medidas: {} as Record<string, Medida>,
   unidad: "m" as Unidad,
+  acabado: null as "brillo" | "mate" | null,
   moldura: null,
+  molduraGrosorCm: null as number | null,
   salpicaderoTipo: "no" as SalpicaderoTipo,
   salpicaderoAlturaCm: 0,
+  lUnion: null as "izquierda" | "derecha" | null,
   derivar: false,
   cliente: clienteVacio,
   folio: null,
@@ -103,7 +115,7 @@ export const useConfigurador = create<State>()(
       prev: () => set((s) => ({ paso: Math.max(0, s.paso - 1) })),
 
       setGeometria: (id) =>
-        set((s) => (s.geometriaId === id ? s : { geometriaId: id, medidas: {}, derivar: false })),
+        set((s) => (s.geometriaId === id ? s : { geometriaId: id, medidas: {}, derivar: false, lUnion: null })),
       setMaterial: (id) =>
         set((s) => (s.materialId === id ? s : { materialId: id, colorId: null })),
       setColor: (id) => set({ colorId: id }),
@@ -120,7 +132,10 @@ export const useConfigurador = create<State>()(
         })),
 
       setUnidad: (u) => set({ unidad: u }),
-      setMoldura: (v) => set({ moldura: v }),
+      setAcabado: (a) => set({ acabado: a }),
+      setMoldura: (v) => set((s) => ({ moldura: v, molduraGrosorCm: v ? s.molduraGrosorCm : null })),
+      setMolduraGrosor: (cm) => set({ molduraGrosorCm: cm }),
+      setLUnion: (u) => set({ lUnion: u }),
       setDerivar: (v) => set({ derivar: v }),
       setSalpicadero: (tipo, alturaCm) =>
         set({
@@ -144,9 +159,12 @@ export const useConfigurador = create<State>()(
         colorId: s.colorId,
         medidas: s.medidas,
         unidad: s.unidad,
+        acabado: s.acabado,
         moldura: s.moldura,
+        molduraGrosorCm: s.molduraGrosorCm,
         salpicaderoTipo: s.salpicaderoTipo,
         salpicaderoAlturaCm: s.salpicaderoAlturaCm,
+        lUnion: s.lUnion,
         derivar: s.derivar,
       }),
     },
