@@ -24,6 +24,10 @@ export const MM_POR_UNIDAD: Record<Unidad, number> = { mm: 1, cm: 10, m: 1000 };
 /** Plazo estándar de producción (RN-08). Editable por Granalto. */
 export const PLAZO_DIAS_HABILES = 10;
 
+/** Nota técnica: todo sobre requiere un contrasobre de soporte. */
+export const NOTA_CONTRASOBRE =
+  "Los sobres requieren un contrasobre de mínimo 18 mm para dar soporte al material del sobre.";
+
 /** Precio por metro lineal de moldura básica (CRC). 0 = a confirmar. */
 export const PRECIO_MOLDURA_ML = 0;
 

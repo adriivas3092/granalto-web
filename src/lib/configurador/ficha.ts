@@ -1,6 +1,7 @@
 import {
   MM_POR_UNIDAD,
   PLAZO_DIAS_HABILES,
+  NOTA_CONTRASOBRE,
   getGeometria,
   getMaterial,
   type Unidad,
@@ -132,6 +133,7 @@ export function buildFicha(input: FichaInput): {
     precio.push({ label: "Precio", value: "A confirmar" });
   }
   precio.push({ label: "Plazo de producción", value: `${PLAZO_DIAS_HABILES} días hábiles` });
+  precio.push({ label: "Nota técnica", value: NOTA_CONTRASOBRE });
   secciones.push({ titulo: "Precio y plazo", filas: precio });
 
   // Entrega y cliente

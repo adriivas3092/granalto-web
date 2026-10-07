@@ -13,6 +13,7 @@ import {
   MEDIDAS_LIMITES,
   SALPICADERO,
   PLAZO_DIAS_HABILES,
+  NOTA_CONTRASOBRE,
   ACABADOS,
   L_UNIONES,
   MOLDURA_GROSORES_CM,
@@ -812,6 +813,12 @@ export function StepResumen() {
           Plazo de producción estimado: <strong className="text-ink">{PLAZO_DIAS_HABILES} días hábiles</strong> desde la confirmación del pedido.
           Las medidas están sujetas a validación técnica.
         </p>
+      </div>
+
+      {/* Nota técnica: contrasobre de soporte */}
+      <div className="mt-4 flex items-start gap-2 rounded-sm border border-stone-beige bg-ivory/60 p-4">
+        <AlertTriangle aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-[#b8863b]" />
+        <p className="text-xs leading-relaxed text-charcoal/85">{NOTA_CONTRASOBRE}</p>
       </div>
     </div>
   );

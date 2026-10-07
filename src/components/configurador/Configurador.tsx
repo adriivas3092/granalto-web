@@ -8,6 +8,7 @@ import {
   MEDIDAS_LIMITES,
   SALPICADERO,
   PLAZO_DIAS_HABILES,
+  NOTA_CONTRASOBRE,
   getGeometria,
   getMaterial,
 } from "@/data/configurador";
@@ -233,6 +234,7 @@ function LiveSummary() {
         <p className="mt-3 text-[11px] leading-relaxed text-mineral">
           Plazo estimado: {PLAZO_DIAS_HABILES} días hábiles. Medidas sujetas a validación técnica.
         </p>
+        <p className="mt-2 text-[11px] leading-relaxed text-charcoal/70">{NOTA_CONTRASOBRE}</p>
       </div>
     </div>
   );
