@@ -108,22 +108,63 @@ function Salpicadero({
 
 type Mats = { mats: StoneMats; mueble: THREE.Material };
 
-/**
- * Grosor del canto de la losa. Sin moldura queda un canto fino; con moldura el
- * canto crece notoriamente (se exagera x2.5 respecto al grosor real sólo para
- * que la moldura se aprecie bien en la vista previa).
- */
-const MOLDURA_VIS = 2.5;
+/** La losa siempre es fina; la moldura se muestra como un canto aparte que cuelga del borde. */
 function useThickness() {
+  return BASE_TH;
+}
+
+/** Grosor de la moldura (m) para la vista; 0 si no lleva. Se exagera un poco para que se note. */
+function useMolduraGrosor() {
   const moldura = useConfigurador((s) => s.moldura);
   const grosor = useConfigurador((s) => s.molduraGrosorCm);
-  return BASE_TH + (moldura ? ((grosor ?? 0) / 100) * MOLDURA_VIS : 0);
+  return moldura ? ((grosor ?? 0) / 100) * 1.8 : 0;
+}
+
+/**
+ * Moldura: canto que cuelga del borde del sobre (como un faldón alrededor del
+ * perímetro). Es un elemento visible y agregado, igual que el salpicadero.
+ */
+function MolduraFrame({
+  w,
+  d,
+  position,
+  grosor,
+  material,
+}: {
+  w: number;
+  d: number;
+  position: [number, number, number];
+  grosor: number;
+  material: THREE.Material;
+}) {
+  if (grosor <= 0) return null;
+  const cx = position[0];
+  const cz = position[2];
+  const y = CAB_H - grosor / 2; // cuelga justo debajo de la losa
+  const t = 0.03; // espesor del canto
+  const out = 0.02; // sobresale hacia afuera (visible también desde arriba)
+  const boxes: { args: [number, number, number]; pos: [number, number, number] }[] = [
+    { args: [w + 2 * out, grosor, t], pos: [cx, y, cz + d / 2 + out] }, // frente
+    { args: [w + 2 * out, grosor, t], pos: [cx, y, cz - d / 2 - out] }, // atrás
+    { args: [t, grosor, d + 2 * out], pos: [cx - w / 2 - out, y, cz] }, // izquierda
+    { args: [t, grosor, d + 2 * out], pos: [cx + w / 2 + out, y, cz] }, // derecha
+  ];
+  return (
+    <group>
+      {boxes.map((b, i) => (
+        <mesh key={i} position={b.pos} material={material} castShadow receiveShadow>
+          <boxGeometry args={b.args} />
+        </mesh>
+      ))}
+    </group>
+  );
 }
 
 /** Sobre en L: dos losas perpendiculares (el brazo corto siempre sobresale). */
 function LModel({ mats, mueble }: Mats) {
   const s = useConfigurador();
   const th = useThickness();
+  const mg = useMolduraGrosor();
   const aL = mmM(s.medidas.a?.largo);
   const bL = mmM(s.medidas.b?.largo);
   const an = mmM(s.medidas.a?.prof);
@@ -137,6 +178,9 @@ function LModel({ mats, mueble }: Mats) {
       {/* Sobres */}
       <Losa args={[aL, th, an]} position={[aL / 2, CAB_H, an / 2]} mats={mats} />
       <Losa args={[an, th, bL]} position={[an / 2, CAB_H, an + bL / 2]} mats={mats} />
+      {/* Moldura (canto que cuelga del borde) */}
+      <MolduraFrame w={aL} d={an} position={[aL / 2, 0, an / 2]} grosor={mg} material={mats.edge} />
+      <MolduraFrame w={an} d={bL} position={[an / 2, 0, an + bL / 2]} grosor={mg} material={mats.edge} />
       {/* Salpicadero en L: fondo (brazo largo) + lateral exterior */}
       <Salpicadero w={aL} d={0.02} altura={hs} th={th} position={[aL / 2, CAB_H, 0.01]} material={mats.top} />
       <Salpicadero w={0.02} d={an + bL} altura={hs} th={th} position={[0.01, CAB_H, (an + bL) / 2]} material={mats.top} />
@@ -149,6 +193,7 @@ function BoxModel({ mats, mueble }: Mats) {
   const s = useConfigurador();
   const geo = getGeometria(s.geometriaId);
   const th = useThickness();
+  const mg = useMolduraGrosor();
   const hs = s.salpicaderoTipo === "no" ? 0 : (s.salpicaderoTipo === "10" ? 10 : s.salpicaderoAlturaCm) / 100;
   if (!geo) return null;
 
@@ -163,6 +208,8 @@ function BoxModel({ mats, mueble }: Mats) {
         <Mueble w={bL} d={an} position={[bL / 2, 0, an + gap + an / 2]} material={mueble} />
         <Losa args={[aL, th, an]} position={[aL / 2, CAB_H, an / 2]} mats={mats} />
         <Losa args={[bL, th, an]} position={[bL / 2, CAB_H, an + gap + an / 2]} mats={mats} />
+        <MolduraFrame w={aL} d={an} position={[aL / 2, 0, an / 2]} grosor={mg} material={mats.edge} />
+        <MolduraFrame w={bL} d={an} position={[bL / 2, 0, an + gap + an / 2]} grosor={mg} material={mats.edge} />
         <Salpicadero w={aL} d={0.02} altura={hs} th={th} position={[aL / 2, CAB_H, 0.01]} material={mats.top} />
         <Salpicadero w={bL} d={0.02} altura={hs} th={th} position={[bL / 2, CAB_H, an + gap + 0.01]} material={mats.top} />
       </group>
@@ -176,6 +223,7 @@ function BoxModel({ mats, mueble }: Mats) {
     <group>
       <Mueble w={lg} d={an} position={[lg / 2, 0, an / 2]} material={mueble} />
       <Losa args={[lg, th, an]} position={[lg / 2, CAB_H, an / 2]} mats={mats} />
+      <MolduraFrame w={lg} d={an} position={[lg / 2, 0, an / 2]} grosor={mg} material={mats.edge} />
       <Salpicadero w={lg} d={0.02} altura={hs} th={th} position={[lg / 2, CAB_H, 0.01]} material={mats.top} />
     </group>
   );
