@@ -113,51 +113,52 @@ function useThickness() {
   return BASE_TH;
 }
 
-/** Grosor de la moldura (m) para la vista; 0 si no lleva. Se exagera un poco para que se note. */
+/** Grosor (bajante) de la moldura en m; 0 si no lleva. */
 function useMolduraGrosor() {
   const moldura = useConfigurador((s) => s.moldura);
   const grosor = useConfigurador((s) => s.molduraGrosorCm);
-  return moldura ? ((grosor ?? 0) / 100) * 1.8 : 0;
+  return moldura ? (grosor ?? 0) / 100 : 0;
 }
 
 /**
- * Moldura: canto que cuelga del borde del sobre (como un faldón alrededor del
- * perímetro). Es un elemento visible y agregado, igual que el salpicadero.
+ * Moldura = canto frontal con corte a 45° y bajante (según la referencia del
+ * paso de moldura). Se arma como un perfil extruido a lo largo del borde:
+ * el frente baja `grosor` y la esquina superior-frontal va biselada a 45°.
+ * `axis` indica si el borde corre a lo largo de X ("x") o de Z ("z").
  */
-function MolduraFrame({
-  w,
-  d,
-  position,
+function MolduraCanto({
+  len,
   grosor,
+  position,
+  axis,
   material,
 }: {
-  w: number;
-  d: number;
-  position: [number, number, number];
+  len: number;
   grosor: number;
+  position: [number, number, number];
+  axis: "x" | "z";
   material: THREE.Material;
 }) {
-  if (grosor <= 0) return null;
-  const cx = position[0];
-  const cz = position[2];
-  const y = CAB_H - grosor / 2; // cuelga justo debajo de la losa
-  const t = 0.03; // espesor del canto
-  const out = 0.02; // sobresale hacia afuera (visible también desde arriba)
-  const boxes: { args: [number, number, number]; pos: [number, number, number] }[] = [
-    { args: [w + 2 * out, grosor, t], pos: [cx, y, cz + d / 2 + out] }, // frente
-    { args: [w + 2 * out, grosor, t], pos: [cx, y, cz - d / 2 - out] }, // atrás
-    { args: [t, grosor, d + 2 * out], pos: [cx - w / 2 - out, y, cz] }, // izquierda
-    { args: [t, grosor, d + 2 * out], pos: [cx + w / 2 + out, y, cz] }, // derecha
-  ];
-  return (
-    <group>
-      {boxes.map((b, i) => (
-        <mesh key={i} position={b.pos} material={material} castShadow receiveShadow>
-          <boxGeometry args={b.args} />
-        </mesh>
-      ))}
-    </group>
-  );
+  const geom = useMemo(() => {
+    if (grosor <= 0 || len <= 0) return null;
+    const pd = 0.05; // profundidad del canto (hacia adentro)
+    const c = Math.min(grosor * 0.6, 0.02); // tamaño del bisel a 45°
+    const shape = new THREE.Shape();
+    shape.moveTo(c, 0); // arranca del bisel, en la cara superior
+    shape.lineTo(pd, 0); // cara superior hacia adentro
+    shape.lineTo(pd, -grosor); // baja por el fondo
+    shape.lineTo(0, -grosor); // base del frente
+    shape.lineTo(0, -c); // sube por la cara frontal hasta el bisel
+    shape.closePath(); // bisel a 45° de (0,-c) a (c,0)
+    const g = new THREE.ExtrudeGeometry(shape, { depth: len, bevelEnabled: false });
+    g.rotateY(Math.PI / 2); // perfil en ZY, extruido a lo largo de X: cara frontal en z=0
+    return g;
+  }, [len, grosor]);
+  if (!geom) return null;
+  // axis "x": el borde corre a lo largo de X (cara frontal mira a +Z).
+  // axis "z": se rota 90° para que corra a lo largo de Z (cara frontal mira a +X).
+  const rotation: [number, number, number] = axis === "z" ? [0, -Math.PI / 2, 0] : [0, 0, 0];
+  return <mesh geometry={geom} position={position} rotation={rotation} material={material} castShadow receiveShadow />;
 }
 
 /** Sobre en L: dos losas perpendiculares (el brazo corto siempre sobresale). */
@@ -178,9 +179,9 @@ function LModel({ mats, mueble }: Mats) {
       {/* Sobres */}
       <Losa args={[aL, th, an]} position={[aL / 2, CAB_H, an / 2]} mats={mats} />
       <Losa args={[an, th, bL]} position={[an / 2, CAB_H, an + bL / 2]} mats={mats} />
-      {/* Moldura (canto que cuelga del borde) */}
-      <MolduraFrame w={aL} d={an} position={[aL / 2, 0, an / 2]} grosor={mg} material={mats.edge} />
-      <MolduraFrame w={an} d={bL} position={[an / 2, 0, an + bL / 2]} grosor={mg} material={mats.edge} />
+      {/* Moldura: canto frontal con corte a 45° (frente del brazo largo + frente del brazo corto) */}
+      <MolduraCanto len={aL} grosor={mg} position={[0, CAB_H, an]} axis="x" material={mats.top} />
+      <MolduraCanto len={an} grosor={mg} position={[0, CAB_H, an + bL]} axis="x" material={mats.top} />
       {/* Salpicadero en L: fondo (brazo largo) + lateral exterior */}
       <Salpicadero w={aL} d={0.02} altura={hs} th={th} position={[aL / 2, CAB_H, 0.01]} material={mats.top} />
       <Salpicadero w={0.02} d={an + bL} altura={hs} th={th} position={[0.01, CAB_H, (an + bL) / 2]} material={mats.top} />
@@ -208,8 +209,8 @@ function BoxModel({ mats, mueble }: Mats) {
         <Mueble w={bL} d={an} position={[bL / 2, 0, an + gap + an / 2]} material={mueble} />
         <Losa args={[aL, th, an]} position={[aL / 2, CAB_H, an / 2]} mats={mats} />
         <Losa args={[bL, th, an]} position={[bL / 2, CAB_H, an + gap + an / 2]} mats={mats} />
-        <MolduraFrame w={aL} d={an} position={[aL / 2, 0, an / 2]} grosor={mg} material={mats.edge} />
-        <MolduraFrame w={bL} d={an} position={[bL / 2, 0, an + gap + an / 2]} grosor={mg} material={mats.edge} />
+        <MolduraCanto len={aL} grosor={mg} position={[0, CAB_H, an]} axis="x" material={mats.top} />
+        <MolduraCanto len={bL} grosor={mg} position={[0, CAB_H, an + gap + an]} axis="x" material={mats.top} />
         <Salpicadero w={aL} d={0.02} altura={hs} th={th} position={[aL / 2, CAB_H, 0.01]} material={mats.top} />
         <Salpicadero w={bL} d={0.02} altura={hs} th={th} position={[bL / 2, CAB_H, an + gap + 0.01]} material={mats.top} />
       </group>
@@ -223,7 +224,7 @@ function BoxModel({ mats, mueble }: Mats) {
     <group>
       <Mueble w={lg} d={an} position={[lg / 2, 0, an / 2]} material={mueble} />
       <Losa args={[lg, th, an]} position={[lg / 2, CAB_H, an / 2]} mats={mats} />
-      <MolduraFrame w={lg} d={an} position={[lg / 2, 0, an / 2]} grosor={mg} material={mats.edge} />
+      <MolduraCanto len={lg} grosor={mg} position={[0, CAB_H, an]} axis="x" material={mats.top} />
       <Salpicadero w={lg} d={0.02} altura={hs} th={th} position={[lg / 2, CAB_H, 0.01]} material={mats.top} />
     </group>
   );
