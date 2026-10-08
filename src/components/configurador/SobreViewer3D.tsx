@@ -117,49 +117,47 @@ function useThickness() {
 function useMolduraGrosor() {
   const moldura = useConfigurador((s) => s.moldura);
   const grosor = useConfigurador((s) => s.molduraGrosorCm);
-  return moldura ? ((grosor ?? 0) / 100) * 2.5 : 0;
+  return moldura ? ((grosor ?? 0) / 100) * 1.6 : 0;
 }
 
+/** Material de la línea de junta del inglete (la marca del corte a 45°). */
+const JOINT_MAT = new THREE.MeshStandardMaterial({ color: new THREE.Color("#2b2b2b"), roughness: 0.6, metalness: 0 });
+
 /**
- * Moldura = canto frontal con corte a 45° y bajante (según la referencia del
- * paso de moldura). Se arma como un perfil extruido a lo largo del borde:
- * el frente baja `grosor` y la esquina superior-frontal va biselada a 45°.
- * `axis` indica si el borde corre a lo largo de X ("x") o de Z ("z").
+ * Moldura = canto frontal CUADRADO que baja `grosor` (cara frontal vertical),
+ * con la línea de junta del inglete a 45° marcada sobre la cara superior,
+ * igual que la referencia del paso de moldura (bajante + corte a 45°).
+ * `position` = [x0, CAB_H, frontZ]; el borde frontal corre a lo largo de X.
  */
 function MolduraCanto({
   len,
   grosor,
   position,
-  axis,
   material,
 }: {
   len: number;
   grosor: number;
   position: [number, number, number];
-  axis: "x" | "z";
+  axis?: "x" | "z";
   material: THREE.Material;
 }) {
-  const geom = useMemo(() => {
-    if (grosor <= 0 || len <= 0) return null;
-    // Perfil del canto: todo el frente es una cara inclinada a 45° (la bajante).
-    // z = profundidad (0 = cara frontal superior, hacia adentro +), y = altura (0 = cara inferior de la losa).
-    const H = grosor; // bajante (2 o 4 cm)
-    const pd = H + 0.02; // algo de fondo plano detrás del bisel
-    const shape = new THREE.Shape();
-    shape.moveTo(0, 0); // esquina superior-frontal (al ras de la losa)
-    shape.lineTo(pd, 0); // cara superior hacia adentro
-    shape.lineTo(pd, -H); // baja por el fondo
-    shape.lineTo(H, -H); // base: el frente retrocede H (corte a 45°)
-    shape.closePath(); // cara frontal inclinada a 45° de (H,-H) a (0,0)
-    const g = new THREE.ExtrudeGeometry(shape, { depth: len, bevelEnabled: false });
-    g.rotateY(Math.PI / 2); // perfil en ZY, extruido a lo largo de X: cara frontal en z=0
-    return g;
-  }, [len, grosor]);
-  if (!geom) return null;
-  // axis "x": el borde corre a lo largo de X (cara frontal mira a +Z).
-  // axis "z": se rota 90° para que corra a lo largo de Z (cara frontal mira a +X).
-  const rotation: [number, number, number] = axis === "z" ? [0, -Math.PI / 2, 0] : [0, 0, 0];
-  return <mesh geometry={geom} position={position} rotation={rotation} material={material} castShadow receiveShadow />;
+  if (grosor <= 0 || len <= 0) return null;
+  const [x0, baseY, frontZ] = position; // baseY = cara inferior de la losa (CAB_H)
+  const cx = x0 + len / 2;
+  const pd = 0.05; // profundidad del canto hacia adentro
+  const diag = Math.max(grosor, 0.012); // largo de la junta a 45° sobre el top
+  return (
+    <group>
+      {/* Bajante: canto frontal cuadrado (cara frontal vertical), cuelga de la losa */}
+      <mesh position={[cx, baseY - grosor / 2, frontZ - pd / 2]} material={material} castShadow receiveShadow>
+        <boxGeometry args={[len, grosor, pd]} />
+      </mesh>
+      {/* Marca de la junta a 45° (inglete): línea sobre la cara superior, retranqueada */}
+      <mesh position={[cx, baseY + BASE_TH + 0.001, frontZ - diag]} material={JOINT_MAT}>
+        <boxGeometry args={[len, 0.0025, 0.004]} />
+      </mesh>
+    </group>
+  );
 }
 
 /** Sobre en L: dos losas perpendiculares (el brazo corto siempre sobresale). */
