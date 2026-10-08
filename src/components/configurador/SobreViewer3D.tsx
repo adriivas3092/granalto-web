@@ -141,15 +141,16 @@ function MolduraCanto({
 }) {
   const geom = useMemo(() => {
     if (grosor <= 0 || len <= 0) return null;
-    const pd = 0.05; // profundidad del canto (hacia adentro)
-    const c = Math.min(grosor * 0.6, 0.02); // tamaño del bisel a 45°
+    // Perfil del canto: todo el frente es una cara inclinada a 45° (la bajante).
+    // z = profundidad (0 = cara frontal superior, hacia adentro +), y = altura (0 = cara inferior de la losa).
+    const H = grosor; // bajante (2 o 4 cm)
+    const pd = H + 0.02; // algo de fondo plano detrás del bisel
     const shape = new THREE.Shape();
-    shape.moveTo(c, 0); // arranca del bisel, en la cara superior
+    shape.moveTo(0, 0); // esquina superior-frontal (al ras de la losa)
     shape.lineTo(pd, 0); // cara superior hacia adentro
-    shape.lineTo(pd, -grosor); // baja por el fondo
-    shape.lineTo(0, -grosor); // base del frente
-    shape.lineTo(0, -c); // sube por la cara frontal hasta el bisel
-    shape.closePath(); // bisel a 45° de (0,-c) a (c,0)
+    shape.lineTo(pd, -H); // baja por el fondo
+    shape.lineTo(H, -H); // base: el frente retrocede H (corte a 45°)
+    shape.closePath(); // cara frontal inclinada a 45° de (H,-H) a (0,0)
     const g = new THREE.ExtrudeGeometry(shape, { depth: len, bevelEnabled: false });
     g.rotateY(Math.PI / 2); // perfil en ZY, extruido a lo largo de X: cara frontal en z=0
     return g;
