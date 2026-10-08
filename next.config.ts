@@ -10,6 +10,20 @@ const nextConfig: NextConfig = {
     // Imágenes de productos alojadas en Supabase Storage.
     remotePatterns: [{ protocol: "https", hostname: "*.supabase.co" }],
   },
+  async headers() {
+    // El cotizador no se cachea en el navegador para que siempre cargue la
+    // última versión (evita ver una versión vieja por caché del navegador).
+    return [
+      {
+        source: "/cotizar/:path*",
+        headers: [{ key: "Cache-Control", value: "no-store, must-revalidate" }],
+      },
+      {
+        source: "/cotizar",
+        headers: [{ key: "Cache-Control", value: "no-store, must-revalidate" }],
+      },
+    ];
+  },
   async redirects() {
     // Redirecciones desde URLs del sitio anterior (granaltocr.net).
     // PENDIENTE_VALIDAR: completar con el inventario final de URLs antiguas.

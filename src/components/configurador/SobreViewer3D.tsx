@@ -113,11 +113,11 @@ function useThickness() {
   return BASE_TH;
 }
 
-/** Grosor (bajante) de la moldura en m; 0 si no lleva. */
+/** Grosor (bajante) de la moldura en m; 0 si no lleva. Se agranda x2.5 para que el corte a 45° se aprecie. */
 function useMolduraGrosor() {
   const moldura = useConfigurador((s) => s.moldura);
   const grosor = useConfigurador((s) => s.molduraGrosorCm);
-  return moldura ? (grosor ?? 0) / 100 : 0;
+  return moldura ? ((grosor ?? 0) / 100) * 2.5 : 0;
 }
 
 /**
@@ -181,8 +181,8 @@ function LModel({ mats, mueble }: Mats) {
       <Losa args={[aL, th, an]} position={[aL / 2, CAB_H, an / 2]} mats={mats} />
       <Losa args={[an, th, bL]} position={[an / 2, CAB_H, an + bL / 2]} mats={mats} />
       {/* Moldura: canto frontal con corte a 45° (frente del brazo largo + frente del brazo corto) */}
-      <MolduraCanto len={aL} grosor={mg} position={[0, CAB_H, an]} axis="x" material={mats.top} />
-      <MolduraCanto len={an} grosor={mg} position={[0, CAB_H, an + bL]} axis="x" material={mats.top} />
+      <MolduraCanto len={aL} grosor={mg} position={[0, CAB_H, an]} axis="x" material={mats.edge} />
+      <MolduraCanto len={an} grosor={mg} position={[0, CAB_H, an + bL]} axis="x" material={mats.edge} />
       {/* Salpicadero en L: fondo (brazo largo) + lateral exterior */}
       <Salpicadero w={aL} d={0.02} altura={hs} th={th} position={[aL / 2, CAB_H, 0.01]} material={mats.top} />
       <Salpicadero w={0.02} d={an + bL} altura={hs} th={th} position={[0.01, CAB_H, (an + bL) / 2]} material={mats.top} />
@@ -210,8 +210,8 @@ function BoxModel({ mats, mueble }: Mats) {
         <Mueble w={bL} d={an} position={[bL / 2, 0, an + gap + an / 2]} material={mueble} />
         <Losa args={[aL, th, an]} position={[aL / 2, CAB_H, an / 2]} mats={mats} />
         <Losa args={[bL, th, an]} position={[bL / 2, CAB_H, an + gap + an / 2]} mats={mats} />
-        <MolduraCanto len={aL} grosor={mg} position={[0, CAB_H, an]} axis="x" material={mats.top} />
-        <MolduraCanto len={bL} grosor={mg} position={[0, CAB_H, an + gap + an]} axis="x" material={mats.top} />
+        <MolduraCanto len={aL} grosor={mg} position={[0, CAB_H, an]} axis="x" material={mats.edge} />
+        <MolduraCanto len={bL} grosor={mg} position={[0, CAB_H, an + gap + an]} axis="x" material={mats.edge} />
         <Salpicadero w={aL} d={0.02} altura={hs} th={th} position={[aL / 2, CAB_H, 0.01]} material={mats.top} />
         <Salpicadero w={bL} d={0.02} altura={hs} th={th} position={[bL / 2, CAB_H, an + gap + 0.01]} material={mats.top} />
       </group>
@@ -225,7 +225,7 @@ function BoxModel({ mats, mueble }: Mats) {
     <group>
       <Mueble w={lg} d={an} position={[lg / 2, 0, an / 2]} material={mueble} />
       <Losa args={[lg, th, an]} position={[lg / 2, CAB_H, an / 2]} mats={mats} />
-      <MolduraCanto len={lg} grosor={mg} position={[0, CAB_H, an]} axis="x" material={mats.top} />
+      <MolduraCanto len={lg} grosor={mg} position={[0, CAB_H, an]} axis="x" material={mats.edge} />
       <Salpicadero w={lg} d={0.02} altura={hs} th={th} position={[lg / 2, CAB_H, 0.01]} material={mats.top} />
     </group>
   );
@@ -265,7 +265,7 @@ export function SobreViewer3D() {
         <directionalLight position={[4, 8, 4]} intensity={1.6} castShadow shadow-mapSize={[1024, 1024]} />
         <directionalLight position={[-4, 4, -3]} intensity={0.4} />
         <Suspense fallback={null}>
-          <Bounds fit clip observe margin={1.15}>
+          <Bounds fit clip observe margin={1.02}>
             <Center disableY key={`${s.geometriaId}-${JSON.stringify(s.medidas)}-${s.moldura}-${s.molduraGrosorCm}-${s.salpicaderoTipo}-${s.salpicaderoAlturaCm}`}>
               <ModelWrapper color={color} brillo={s.acabado === "brillo"} />
             </Center>
