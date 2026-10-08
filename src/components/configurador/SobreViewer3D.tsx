@@ -13,10 +13,9 @@ const PX =
 
 const mmM = (v?: number) => (v && v > 0 ? v / 1000 : 0);
 
-/** Altura del mueble bajo (m), inserción del mueble y espesor base de la losa. */
+/** Altura del mueble bajo (m) e inserción del mueble respecto al sobre. */
 const CAB_H = 0.7;
 const INSET = 0.05;
-const BASE_TH = 0.015;
 
 type StoneMats = { top: THREE.Material; edge: THREE.Material };
 
@@ -108,54 +107,62 @@ function Salpicadero({
 
 type Mats = { mats: StoneMats; mueble: THREE.Material };
 
-/** La losa siempre es fina; la moldura se muestra como un canto aparte que cuelga del borde. */
+/** Grosor de la losa = espesor real del material (12 mm porcelánico, 15 mm cuarzo). */
 function useThickness() {
-  return BASE_TH;
+  const materialId = useConfigurador((s) => s.materialId);
+  return Math.max((getMaterial(materialId)?.espesorMm ?? 15) / 1000, 0.01);
 }
 
-/** Grosor (bajante) de la moldura en m; 0 si no lleva. Se agranda x2.5 para que el corte a 45° se aprecie. */
+/** Bajante de la moldura en m; 0 si no lleva. Ligeramente agrandada para que se aprecie. */
 function useMolduraGrosor() {
   const moldura = useConfigurador((s) => s.moldura);
   const grosor = useConfigurador((s) => s.molduraGrosorCm);
-  return moldura ? ((grosor ?? 0) / 100) * 1.6 : 0;
+  return moldura ? ((grosor ?? 0) / 100) * 1.3 : 0;
 }
 
-/** Material de la línea de junta del inglete (la marca del corte a 45°). */
-const JOINT_MAT = new THREE.MeshStandardMaterial({ color: new THREE.Color("#2b2b2b"), roughness: 0.6, metalness: 0 });
+/** Espesor del material (m): la moldura es una tira delgada del mismo material. */
+function useEspesor() {
+  const materialId = useConfigurador((s) => s.materialId);
+  return Math.max((getMaterial(materialId)?.espesorMm ?? 15) / 1000, 0.01);
+}
 
 /**
- * Moldura = canto frontal CUADRADO que baja `grosor` (cara frontal vertical),
- * con la línea de junta del inglete a 45° marcada sobre la cara superior,
- * igual que la referencia del paso de moldura (bajante + corte a 45°).
- * `position` = [x0, CAB_H, frontZ]; el borde frontal corre a lo largo de X.
+ * Moldura = canto DELGADO (del mismo material, ~12 mm) que baja `grosor` (la
+ * bajante) y recorre TODO el perímetro del sobre. Es una tira fina pegada al
+ * borde, no un bloque macizo.
  */
-function MolduraCanto({
-  len,
-  grosor,
+function MolduraPerimetro({
+  w,
+  d,
   position,
+  grosor,
+  espesor,
   material,
 }: {
-  len: number;
-  grosor: number;
+  w: number;
+  d: number;
   position: [number, number, number];
-  axis?: "x" | "z";
+  grosor: number;
+  espesor: number;
   material: THREE.Material;
 }) {
-  if (grosor <= 0 || len <= 0) return null;
-  const [x0, baseY, frontZ] = position; // baseY = cara inferior de la losa (CAB_H)
-  const cx = x0 + len / 2;
-  const pd = 0.05; // profundidad del canto hacia adentro
-  const diag = Math.max(grosor, 0.012); // largo de la junta a 45° sobre el top
+  if (grosor <= 0) return null;
+  const [cx, baseY, cz] = position; // baseY = cara inferior de la losa (CAB_H)
+  const y = baseY - grosor / 2; // cuelga del borde
+  const st = espesor; // grosor de la tira (= espesor del material)
+  const strips: { args: [number, number, number]; pos: [number, number, number] }[] = [
+    { args: [w, grosor, st], pos: [cx, y, cz + d / 2 - st / 2] }, // frente
+    { args: [w, grosor, st], pos: [cx, y, cz - d / 2 + st / 2] }, // atrás
+    { args: [st, grosor, d], pos: [cx - w / 2 + st / 2, y, cz] }, // izquierda
+    { args: [st, grosor, d], pos: [cx + w / 2 - st / 2, y, cz] }, // derecha
+  ];
   return (
     <group>
-      {/* Bajante: canto frontal cuadrado (cara frontal vertical), cuelga de la losa */}
-      <mesh position={[cx, baseY - grosor / 2, frontZ - pd / 2]} material={material} castShadow receiveShadow>
-        <boxGeometry args={[len, grosor, pd]} />
-      </mesh>
-      {/* Marca de la junta a 45° (inglete): línea sobre la cara superior, retranqueada */}
-      <mesh position={[cx, baseY + BASE_TH + 0.001, frontZ - diag]} material={JOINT_MAT}>
-        <boxGeometry args={[len, 0.0025, 0.004]} />
-      </mesh>
+      {strips.map((s, i) => (
+        <mesh key={i} position={s.pos} material={material} castShadow receiveShadow>
+          <boxGeometry args={s.args} />
+        </mesh>
+      ))}
     </group>
   );
 }
@@ -165,6 +172,7 @@ function LModel({ mats, mueble }: Mats) {
   const s = useConfigurador();
   const th = useThickness();
   const mg = useMolduraGrosor();
+  const esp = useEspesor();
   const aL = mmM(s.medidas.a?.largo);
   const bL = mmM(s.medidas.b?.largo);
   const an = mmM(s.medidas.a?.prof);
@@ -178,9 +186,9 @@ function LModel({ mats, mueble }: Mats) {
       {/* Sobres */}
       <Losa args={[aL, th, an]} position={[aL / 2, CAB_H, an / 2]} mats={mats} />
       <Losa args={[an, th, bL]} position={[an / 2, CAB_H, an + bL / 2]} mats={mats} />
-      {/* Moldura: canto frontal con corte a 45° (frente del brazo largo + frente del brazo corto) */}
-      <MolduraCanto len={aL} grosor={mg} position={[0, CAB_H, an]} axis="x" material={mats.edge} />
-      <MolduraCanto len={an} grosor={mg} position={[0, CAB_H, an + bL]} axis="x" material={mats.edge} />
+      {/* Moldura: canto delgado (mismo material) en todo el perímetro de cada tramo */}
+      <MolduraPerimetro w={aL} d={an} position={[aL / 2, CAB_H, an / 2]} grosor={mg} espesor={esp} material={mats.top} />
+      <MolduraPerimetro w={an} d={bL} position={[an / 2, CAB_H, an + bL / 2]} grosor={mg} espesor={esp} material={mats.top} />
       {/* Salpicadero en L: fondo (brazo largo) + lateral exterior */}
       <Salpicadero w={aL} d={0.02} altura={hs} th={th} position={[aL / 2, CAB_H, 0.01]} material={mats.top} />
       <Salpicadero w={0.02} d={an + bL} altura={hs} th={th} position={[0.01, CAB_H, (an + bL) / 2]} material={mats.top} />
@@ -194,6 +202,7 @@ function BoxModel({ mats, mueble }: Mats) {
   const geo = getGeometria(s.geometriaId);
   const th = useThickness();
   const mg = useMolduraGrosor();
+  const esp = useEspesor();
   const hs = s.salpicaderoTipo === "no" ? 0 : (s.salpicaderoTipo === "10" ? 10 : s.salpicaderoAlturaCm) / 100;
   if (!geo) return null;
 
@@ -208,8 +217,8 @@ function BoxModel({ mats, mueble }: Mats) {
         <Mueble w={bL} d={an} position={[bL / 2, 0, an + gap + an / 2]} material={mueble} />
         <Losa args={[aL, th, an]} position={[aL / 2, CAB_H, an / 2]} mats={mats} />
         <Losa args={[bL, th, an]} position={[bL / 2, CAB_H, an + gap + an / 2]} mats={mats} />
-        <MolduraCanto len={aL} grosor={mg} position={[0, CAB_H, an]} axis="x" material={mats.edge} />
-        <MolduraCanto len={bL} grosor={mg} position={[0, CAB_H, an + gap + an]} axis="x" material={mats.edge} />
+        <MolduraPerimetro w={aL} d={an} position={[aL / 2, CAB_H, an / 2]} grosor={mg} espesor={esp} material={mats.top} />
+        <MolduraPerimetro w={bL} d={an} position={[bL / 2, CAB_H, an + gap + an / 2]} grosor={mg} espesor={esp} material={mats.top} />
         <Salpicadero w={aL} d={0.02} altura={hs} th={th} position={[aL / 2, CAB_H, 0.01]} material={mats.top} />
         <Salpicadero w={bL} d={0.02} altura={hs} th={th} position={[bL / 2, CAB_H, an + gap + 0.01]} material={mats.top} />
       </group>
@@ -223,7 +232,7 @@ function BoxModel({ mats, mueble }: Mats) {
     <group>
       <Mueble w={lg} d={an} position={[lg / 2, 0, an / 2]} material={mueble} />
       <Losa args={[lg, th, an]} position={[lg / 2, CAB_H, an / 2]} mats={mats} />
-      <MolduraCanto len={lg} grosor={mg} position={[0, CAB_H, an]} axis="x" material={mats.edge} />
+      <MolduraPerimetro w={lg} d={an} position={[lg / 2, CAB_H, an / 2]} grosor={mg} espesor={esp} material={mats.top} />
       <Salpicadero w={lg} d={0.02} altura={hs} th={th} position={[lg / 2, CAB_H, 0.01]} material={mats.top} />
     </group>
   );
