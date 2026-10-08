@@ -108,11 +108,16 @@ function Salpicadero({
 
 type Mats = { mats: StoneMats; mueble: THREE.Material };
 
-/** Grosor del canto de la losa: base + moldura elegida (para que se note en 3D). */
+/**
+ * Grosor del canto de la losa. Sin moldura queda un canto fino; con moldura el
+ * canto crece notoriamente (se exagera x2.5 respecto al grosor real sólo para
+ * que la moldura se aprecie bien en la vista previa).
+ */
+const MOLDURA_VIS = 2.5;
 function useThickness() {
   const moldura = useConfigurador((s) => s.moldura);
   const grosor = useConfigurador((s) => s.molduraGrosorCm);
-  return BASE_TH + (moldura ? (grosor ?? 0) / 100 : 0);
+  return BASE_TH + (moldura ? ((grosor ?? 0) / 100) * MOLDURA_VIS : 0);
 }
 
 /** Sobre en L: dos losas perpendiculares (el brazo corto siempre sobresale). */
