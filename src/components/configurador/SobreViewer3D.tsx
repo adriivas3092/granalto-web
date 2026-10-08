@@ -13,49 +13,49 @@ const PX =
 
 const mmM = (v?: number) => (v && v > 0 ? v / 1000 : 0);
 
-/** Altura del mueble bajo (m) e inserción respecto al borde del sobre. */
+/** Altura del mueble bajo (m), inserción del mueble y espesor base de la losa. */
 const CAB_H = 0.7;
-const INSET = 0.04;
+const INSET = 0.05;
+const BASE_TH = 0.015;
 
-/** Material del sobre: foto del acabado (si existe) o color, con brillo/mate. */
-function useSobreMaterial(imagen: string | undefined, swatch: string | undefined, brillo: boolean) {
+type StoneMats = { top: THREE.Material; edge: THREE.Material };
+
+/** Materiales del sobre: cara superior (foto/color) y canto (más oscuro, para que se note). */
+function useSobreMaterials(imagen: string | undefined, swatch: string | undefined, brillo: boolean): StoneMats {
   const tex = useTexture(imagen || PX);
   return useMemo(() => {
-    const m = new THREE.MeshStandardMaterial();
-    if (imagen) {
-      tex.colorSpace = THREE.SRGBColorSpace;
-      tex.anisotropy = 8;
-      m.map = tex;
-    } else {
-      m.color = new THREE.Color(swatch || "#cccccc");
-    }
-    m.roughness = brillo ? 0.12 : 0.8;
-    m.metalness = 0;
-    return m;
+    const make = (darken: number) => {
+      const m = new THREE.MeshStandardMaterial();
+      if (imagen) {
+        tex.colorSpace = THREE.SRGBColorSpace;
+        tex.anisotropy = 8;
+        m.map = tex;
+        m.color = new THREE.Color(darken, darken, darken);
+      } else {
+        m.color = new THREE.Color(swatch || "#cccccc").multiplyScalar(darken);
+      }
+      m.roughness = brillo ? 0.12 : 0.8;
+      m.metalness = 0;
+      return m;
+    };
+    return { top: make(1), edge: make(0.68) };
   }, [tex, imagen, swatch, brillo]);
 }
 
-/** Grosor del sobre: espesor base + la moldura elegida (para que se note en 3D). */
-function useThickness() {
-  const moldura = useConfigurador((s) => s.moldura);
-  const grosor = useConfigurador((s) => s.molduraGrosorCm);
-  const materialId = useConfigurador((s) => s.materialId);
-  const base = Math.max((getMaterial(materialId)?.espesorMm ?? 20) / 1000, 0.02);
-  return base + (moldura ? (grosor ?? 0) / 100 : 0);
-}
-
-/** Losa (sobre) con grosor th; la base queda en position[1]. */
+/** Losa (sobre): cara superior con el material y canto más oscuro. Base en position[1]. */
 function Losa({
   args,
   position,
-  material,
+  mats,
 }: {
   args: [number, number, number];
   position: [number, number, number];
-  material: THREE.Material;
+  mats: StoneMats;
 }) {
+  // Orden de caras del box: [+x, -x, +y(top), -y(bottom), +z, -z]
+  const faces = [mats.edge, mats.edge, mats.top, mats.top, mats.edge, mats.edge];
   return (
-    <mesh position={[position[0], position[1] + args[1] / 2, position[2]]} material={material} castShadow receiveShadow>
+    <mesh position={[position[0], position[1] + args[1] / 2, position[2]]} material={faces} castShadow receiveShadow>
       <boxGeometry args={args} />
     </mesh>
   );
@@ -106,10 +106,17 @@ function Salpicadero({
   );
 }
 
-type Mats = { stone: THREE.Material; mueble: THREE.Material };
+type Mats = { mats: StoneMats; mueble: THREE.Material };
+
+/** Grosor del canto de la losa: base + moldura elegida (para que se note en 3D). */
+function useThickness() {
+  const moldura = useConfigurador((s) => s.moldura);
+  const grosor = useConfigurador((s) => s.molduraGrosorCm);
+  return BASE_TH + (moldura ? (grosor ?? 0) / 100 : 0);
+}
 
 /** Sobre en L: dos losas perpendiculares (el brazo corto siempre sobresale). */
-function LModel({ stone, mueble }: Mats) {
+function LModel({ mats, mueble }: Mats) {
   const s = useConfigurador();
   const th = useThickness();
   const aL = mmM(s.medidas.a?.largo);
@@ -119,21 +126,21 @@ function LModel({ stone, mueble }: Mats) {
 
   return (
     <group>
-      {/* Mueble en L continuo: el brazo corto se solapa con el largo (sin separación) */}
+      {/* Mueble en L continuo */}
       <Mueble w={aL} d={an} position={[aL / 2, 0, an / 2]} material={mueble} />
       <Mueble w={an} d={an + bL} position={[an / 2, 0, (an + bL) / 2]} material={mueble} />
       {/* Sobres */}
-      <Losa args={[aL, th, an]} position={[aL / 2, CAB_H, an / 2]} material={stone} />
-      <Losa args={[an, th, bL]} position={[an / 2, CAB_H, an + bL / 2]} material={stone} />
-      {/* Salpicadero en L: fondo (brazo largo) + lateral (borde exterior izquierdo) */}
-      <Salpicadero w={aL} d={0.02} altura={hs} th={th} position={[aL / 2, CAB_H, 0.01]} material={stone} />
-      <Salpicadero w={0.02} d={an + bL} altura={hs} th={th} position={[0.01, CAB_H, (an + bL) / 2]} material={stone} />
+      <Losa args={[aL, th, an]} position={[aL / 2, CAB_H, an / 2]} mats={mats} />
+      <Losa args={[an, th, bL]} position={[an / 2, CAB_H, an + bL / 2]} mats={mats} />
+      {/* Salpicadero en L: fondo (brazo largo) + lateral exterior */}
+      <Salpicadero w={aL} d={0.02} altura={hs} th={th} position={[aL / 2, CAB_H, 0.01]} material={mats.top} />
+      <Salpicadero w={0.02} d={an + bL} altura={hs} th={th} position={[0.01, CAB_H, (an + bL) / 2]} material={mats.top} />
     </group>
   );
 }
 
 /** Rectos / barra / isla / paralela: losas rectangulares con su mueble. */
-function BoxModel({ stone, mueble }: Mats) {
+function BoxModel({ mats, mueble }: Mats) {
   const s = useConfigurador();
   const geo = getGeometria(s.geometriaId);
   const th = useThickness();
@@ -149,10 +156,10 @@ function BoxModel({ stone, mueble }: Mats) {
       <group>
         <Mueble w={aL} d={an} position={[aL / 2, 0, an / 2]} material={mueble} />
         <Mueble w={bL} d={an} position={[bL / 2, 0, an + gap + an / 2]} material={mueble} />
-        <Losa args={[aL, th, an]} position={[aL / 2, CAB_H, an / 2]} material={stone} />
-        <Losa args={[bL, th, an]} position={[bL / 2, CAB_H, an + gap + an / 2]} material={stone} />
-        <Salpicadero w={aL} d={0.02} altura={hs} th={th} position={[aL / 2, CAB_H, 0.01]} material={stone} />
-        <Salpicadero w={bL} d={0.02} altura={hs} th={th} position={[bL / 2, CAB_H, an + gap + 0.01]} material={stone} />
+        <Losa args={[aL, th, an]} position={[aL / 2, CAB_H, an / 2]} mats={mats} />
+        <Losa args={[bL, th, an]} position={[bL / 2, CAB_H, an + gap + an / 2]} mats={mats} />
+        <Salpicadero w={aL} d={0.02} altura={hs} th={th} position={[aL / 2, CAB_H, 0.01]} material={mats.top} />
+        <Salpicadero w={bL} d={0.02} altura={hs} th={th} position={[bL / 2, CAB_H, an + gap + 0.01]} material={mats.top} />
       </group>
     );
   }
@@ -163,21 +170,21 @@ function BoxModel({ stone, mueble }: Mats) {
   return (
     <group>
       <Mueble w={lg} d={an} position={[lg / 2, 0, an / 2]} material={mueble} />
-      <Losa args={[lg, th, an]} position={[lg / 2, CAB_H, an / 2]} material={stone} />
-      <Salpicadero w={lg} d={0.02} altura={hs} th={th} position={[lg / 2, CAB_H, 0.01]} material={stone} />
+      <Losa args={[lg, th, an]} position={[lg / 2, CAB_H, an / 2]} mats={mats} />
+      <Salpicadero w={lg} d={0.02} altura={hs} th={th} position={[lg / 2, CAB_H, 0.01]} material={mats.top} />
     </group>
   );
 }
 
 function ModelWrapper({ color, brillo }: { color: Color | undefined; brillo: boolean }) {
-  const stone = useSobreMaterial(color?.imagen, color?.swatch, brillo);
+  const mats = useSobreMaterials(color?.imagen, color?.swatch, brillo);
   const mueble = useMemo(
     () => new THREE.MeshStandardMaterial({ color: new THREE.Color("#cfc7b6"), roughness: 0.95, metalness: 0 }),
     [],
   );
   const geometriaId = useConfigurador((s) => s.geometriaId);
-  const mats = { stone, mueble };
-  return getGeometria(geometriaId)?.id === "l" ? <LModel {...mats} /> : <BoxModel {...mats} />;
+  const props = { mats, mueble };
+  return getGeometria(geometriaId)?.id === "l" ? <LModel {...props} /> : <BoxModel {...props} />;
 }
 
 export function SobreViewer3D() {
@@ -190,7 +197,7 @@ export function SobreViewer3D() {
 
   if (!hasDims) {
     return (
-      <div className="flex h-[340px] w-full items-center justify-center rounded-sm border border-stone-beige bg-ivory/40 text-sm text-mineral">
+      <div className="flex h-[360px] w-full items-center justify-center rounded-sm border border-stone-beige bg-ivory/40 text-sm text-mineral">
         Ingresá las medidas para ver la vista 3D.
       </div>
     );
@@ -198,12 +205,12 @@ export function SobreViewer3D() {
 
   return (
     <div className="relative h-[360px] w-full overflow-hidden rounded-sm border border-stone-beige bg-[#f1efe9]">
-      <Canvas shadows dpr={[1, 2]} camera={{ position: [2.2, 1.7, 2.4], fov: 42 }}>
+      <Canvas shadows dpr={[1, 2]} camera={{ position: [2.3, 1.05, 2.7], fov: 44 }}>
         <ambientLight intensity={0.6} />
         <directionalLight position={[4, 8, 4]} intensity={1.6} castShadow shadow-mapSize={[1024, 1024]} />
         <directionalLight position={[-4, 4, -3]} intensity={0.4} />
         <Suspense fallback={null}>
-          <Bounds fit clip observe margin={1.2}>
+          <Bounds fit clip observe margin={1.15}>
             <Center disableY key={`${s.geometriaId}-${JSON.stringify(s.medidas)}-${s.moldura}-${s.molduraGrosorCm}-${s.salpicaderoTipo}-${s.salpicaderoAlturaCm}`}>
               <ModelWrapper color={color} brillo={s.acabado === "brillo"} />
             </Center>
