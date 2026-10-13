@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 const items = [
   { href: "/admin", label: "Inicio", icon: LayoutDashboard, exact: true },
   { href: "/admin/productos", label: "Productos", icon: Package },
-  { href: "/admin/materiales", label: "Materiales", icon: Layers },
+  { href: "/admin/materiales", label: "Materiales cotizador", icon: Layers },
   { href: "/admin/pedidos", label: "Pedidos", icon: ShoppingBag },
   { href: "/admin/solicitudes", label: "Pedidos de sobres", icon: FileText },
   { href: "/admin/clientes", label: "Clientes", icon: Users },

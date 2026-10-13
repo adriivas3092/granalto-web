@@ -9,6 +9,7 @@ import {
   ArrowRight,
   Plus,
   Store,
+  Layers,
 } from "lucide-react";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { requireAdmin } from "@/lib/supabase/admin-guard";
@@ -74,6 +75,7 @@ export default async function AdminInicioPage() {
 
   const secciones = [
     { href: "/admin/productos", title: "Productos", desc: "Catálogo de la tienda: precios, stock y visibilidad.", icon: Package },
+    { href: "/admin/materiales", title: "Materiales cotizador", desc: "Activá o desactivá la disponibilidad de cada color del cotizador.", icon: Layers },
     { href: "/admin/pedidos", title: "Pedidos", desc: "Pedidos de la tienda en línea y su estado.", icon: ShoppingBag },
     { href: "/admin/solicitudes", title: "Pedidos de sobres", desc: "Solicitudes que llegan desde el cotizador.", icon: FileText },
     { href: "/admin/clientes", title: "Clientes", desc: "Clientes que han comprado y su historial.", icon: Users },
