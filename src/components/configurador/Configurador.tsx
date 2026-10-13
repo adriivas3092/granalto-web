@@ -46,9 +46,40 @@ export function Configurador({ disponibilidad }: { disponibilidad?: Record<strin
   }, []);
 
   // Disponibilidad de materiales (agotado/disponible) definida por el admin.
+  // Valor inicial del servidor (sin parpadeo) y luego refresco en vivo para
+  // que los cambios del admin se reflejen en tiempo real sin recargar.
   useEffect(() => {
     if (disponibilidad) useConfigurador.getState().setDisponibilidad(disponibilidad);
   }, [disponibilidad]);
+
+  useEffect(() => {
+    let activo = true;
+    const refrescar = async () => {
+      try {
+        const res = await fetch("/api/disponibilidad", { cache: "no-store" });
+        if (!res.ok) return;
+        const json = (await res.json()) as { disponibilidad?: Record<string, boolean> };
+        if (activo && json.disponibilidad) {
+          useConfigurador.getState().setDisponibilidad(json.disponibilidad);
+        }
+      } catch {
+        // Silencioso: se mantiene el último valor conocido.
+      }
+    };
+    refrescar(); // al montar
+    const onVisible = () => {
+      if (document.visibilityState === "visible") refrescar();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("focus", refrescar);
+    const id = window.setInterval(refrescar, 30_000);
+    return () => {
+      activo = false;
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("focus", refrescar);
+      window.clearInterval(id);
+    };
+  }, []);
 
   const geo = getGeometria(s.geometriaId);
   const geoPersonalizado = geo?.autoPrecio === false;
