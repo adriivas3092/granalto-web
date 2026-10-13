@@ -42,7 +42,10 @@ export default function AdminLoginPage() {
     });
     setLoading(false);
     if (error) {
-      setError("No se pudo enviar el correo. Verifique que la dirección sea la de su cuenta.");
+      setError(
+        `No se pudo enviar el correo. Motivo: ${error.message}. ` +
+          "Si dice algo de 'email'/'SMTP'/'rate limit', hay que configurar el envío de correos en Supabase.",
+      );
       return;
     }
     setAviso(
