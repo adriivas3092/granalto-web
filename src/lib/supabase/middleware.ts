@@ -33,7 +33,10 @@ export async function updateSession(request: NextRequest) {
   // --- Panel de administración ---
   const isAdmin = path.startsWith("/admin");
   const isAdminLogin = path === "/admin/login";
-  if (isAdmin && !isAdminLogin && !user) {
+  // Páginas de acceso público dentro de /admin (login y recuperación de clave).
+  // La recuperación no puede exigir sesión: el usuario llega sin estar logueado.
+  const isAdminPublic = isAdminLogin || path === "/admin/reset";
+  if (isAdmin && !isAdminPublic && !user) {
     const url = request.nextUrl.clone();
     url.pathname = "/admin/login";
     return NextResponse.redirect(url);
