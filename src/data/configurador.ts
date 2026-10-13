@@ -174,9 +174,13 @@ export type MaterialCat = {
   colores: Color[];
 };
 
-/** Precio por m² efectivo de un color (override del color o, si no, del material). */
+/**
+ * Precio por m² de un color (precio propio del color o, si no, el del material).
+ * No depende de la disponibilidad: el bloqueo por "agotado" (incluido el
+ * override del admin) lo decide calcularPrecio con la disponibilidad efectiva.
+ */
 export function precioM2Color(material: MaterialCat | undefined, color: Color | undefined): number {
-  if (!material || !color || color.agotado) return 0;
+  if (!material || !color) return 0;
   return color.precioM2 ?? material.precioM2;
 }
 
