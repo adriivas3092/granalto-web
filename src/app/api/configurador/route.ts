@@ -4,6 +4,7 @@ import { rateLimit, clientIp } from "@/lib/api/rate-limit";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { buildFicha } from "@/lib/configurador/ficha";
 import { enviarNotificaciones } from "@/lib/configurador/email";
+import { getDisponibilidad } from "@/lib/configurador/disponibilidad";
 
 /**
  * POST /api/configurador — registra una configuración de sobre (Documento 4).
@@ -76,9 +77,13 @@ export async function POST(req: Request) {
   const folio = generarFolio();
   const d = parsed.data;
 
+  // Disponibilidad actual (agotado/disponible) definida por el admin.
+  const agotadoOverrides = await getDisponibilidad();
+
   // Ficha técnica: respaldo del cliente y paquete para los equipos internos.
   const { secciones, esPersonalizado, entregaDomicilio } = buildFicha({
     geometriaId: d.geometriaId,
+    agotadoOverrides,
     materialId: d.materialId ?? null,
     colorId: d.colorId ?? null,
     medidas: d.medidas ?? {},

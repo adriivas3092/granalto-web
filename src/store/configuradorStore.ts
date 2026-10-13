@@ -64,6 +64,8 @@ type State = {
   lUnion: "izquierda" | "derecha" | null;
   /** Especificaciones libres del cliente (armado/orientación, detalles). */
   notas: string;
+  /** Disponibilidad por color (clave "material:color" → agotado), desde el admin. */
+  agotadoOverrides: Record<string, boolean>;
   /** true cuando el proyecto se deriva a cotización personalizada (p. ej. medidas fuera de rango). */
   derivar: boolean;
   cliente: Cliente;
@@ -84,6 +86,7 @@ type State = {
   setMolduraPerfil: (id: number) => void;
   setLUnion: (u: "izquierda" | "derecha") => void;
   setNotas: (t: string) => void;
+  setDisponibilidad: (d: Record<string, boolean>) => void;
   setSalpicadero: (tipo: SalpicaderoTipo, alturaCm?: number) => void;
   setDerivar: (v: boolean) => void;
   setCliente: (patch: Partial<Cliente>) => void;
@@ -107,6 +110,7 @@ const initial = {
   salpicaderoAlturaCm: 0,
   lUnion: null as "izquierda" | "derecha" | null,
   notas: "",
+  agotadoOverrides: {} as Record<string, boolean>,
   derivar: false,
   cliente: clienteVacio,
   folio: null,
@@ -127,6 +131,7 @@ export const useConfigurador = create<State>()(
       setMaterial: (id) =>
         set((s) => (s.materialId === id ? s : { materialId: id, colorId: null })),
       setColor: (id) => set({ colorId: id }),
+      setDisponibilidad: (d) => set({ agotadoOverrides: d ?? {} }),
 
       setMedida: (tramo, campo, valor) =>
         set((s) => ({

@@ -34,7 +34,7 @@ const stepComponents = [
   StepDatos,
 ];
 
-export function Configurador() {
+export function Configurador({ disponibilidad }: { disponibilidad?: Record<string, boolean> }) {
   const [mounted, setMounted] = useState(false);
   const s = useConfigurador();
   // Mostrar siempre la introducción al abrir el cotizador. La configuración en
@@ -44,6 +44,11 @@ export function Configurador() {
     useConfigurador.getState().setIniciado(false);
     setMounted(true);
   }, []);
+
+  // Disponibilidad de materiales (agotado/disponible) definida por el admin.
+  useEffect(() => {
+    if (disponibilidad) useConfigurador.getState().setDisponibilidad(disponibilidad);
+  }, [disponibilidad]);
 
   const geo = getGeometria(s.geometriaId);
   const geoPersonalizado = geo?.autoPrecio === false;

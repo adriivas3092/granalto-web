@@ -2,6 +2,7 @@ import {
   IVA_RATE,
   MONEDA,
   PRECIO_MOLDURA_ML,
+  claveDisponibilidad,
   getGeometria,
   getMaterial,
   precioM2Color,
@@ -18,6 +19,8 @@ export type ConfigInput = {
   moldura: boolean | null;
   salpicaderoTipo: SalpicaderoTipo;
   salpicaderoAlturaCm: number;
+  /** Overrides de disponibilidad por color (clave "material:color" → agotado). */
+  agotadoOverrides?: Record<string, boolean>;
 };
 
 export type PriceResult = {
@@ -88,7 +91,11 @@ export function calcularPrecio(input: ConfigInput): PriceResult {
   const molduraMl = input.moldura ? frente : 0;
 
   const color = material?.colores.find((c) => c.id === input.colorId);
-  const agotado = !!color?.agotado;
+  const keyDisp = claveDisponibilidad(input.materialId, input.colorId);
+  const agotado =
+    input.agotadoOverrides && Object.prototype.hasOwnProperty.call(input.agotadoOverrides, keyDisp)
+      ? input.agotadoOverrides[keyDisp]
+      : !!color?.agotado;
   const precioM2 = precioM2Color(material, color);
   const autoPrecio = geo?.autoPrecio ?? false;
   const tienePrecio = autoPrecio && !agotado && precioM2 > 0;

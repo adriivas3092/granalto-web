@@ -214,3 +214,23 @@ export const MATERIALES: MaterialCat[] = [
 export function getMaterial(id: string | null): MaterialCat | undefined {
   return MATERIALES.find((m) => m.id === id);
 }
+
+/** Clave única de disponibilidad para un color (material + color). */
+export function claveDisponibilidad(materialId: string | null | undefined, colorId: string | null | undefined): string {
+  return `${materialId ?? ""}:${colorId ?? ""}`;
+}
+
+/**
+ * Disponibilidad efectiva de un color: usa el override del admin (tabla
+ * material_disponibilidad) si existe; si no, el valor del catálogo.
+ */
+export function resolveAgotado(
+  materialId: string | null | undefined,
+  color: Color | undefined,
+  overrides?: Record<string, boolean>,
+): boolean {
+  if (!color) return false;
+  const key = claveDisponibilidad(materialId, color.id);
+  if (overrides && Object.prototype.hasOwnProperty.call(overrides, key)) return overrides[key];
+  return !!color.agotado;
+}

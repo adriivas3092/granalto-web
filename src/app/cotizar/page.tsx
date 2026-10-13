@@ -1,5 +1,6 @@
 import { Configurador } from "@/components/configurador/Configurador";
 import { buildMetadata } from "@/lib/metadata";
+import { getDisponibilidad } from "@/lib/configurador/disponibilidad";
 
 export const metadata = buildMetadata({
   title: "Cotizador de sobres",
@@ -8,7 +9,11 @@ export const metadata = buildMetadata({
   path: "/cotizar",
 });
 
-export default function CotizarPage() {
+// Dinámica: la disponibilidad de materiales puede cambiar desde el admin.
+export const dynamic = "force-dynamic";
+
+export default async function CotizarPage() {
+  const disponibilidad = await getDisponibilidad();
   return (
     <section className="mx-auto max-w-6xl px-4 pb-16 pt-24 sm:px-6 lg:px-8 lg:pt-32">
       <header className="mb-10 max-w-2xl">
@@ -20,7 +25,7 @@ export default function CotizarPage() {
           Te guiamos con opciones claras. Al final ves tu estimado y el plazo, y un asesor confirma los detalles.
         </p>
       </header>
-      <Configurador />
+      <Configurador disponibilidad={disponibilidad} />
     </section>
   );
 }

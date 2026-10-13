@@ -18,6 +18,7 @@ import {
   ACABADOS,
   getGeometria,
   getMaterial,
+  resolveAgotado,
   type Color,
 } from "@/data/configurador";
 import { calcularPrecio } from "@/lib/configurador/pricing";
@@ -126,8 +127,10 @@ export function StepMaterial() {
   const setMaterial = useConfigurador((s) => s.setMaterial);
   const setColor = useConfigurador((s) => s.setColor);
   const setAcabado = useConfigurador((s) => s.setAcabado);
+  const overrides = useConfigurador((s) => s.agotadoOverrides);
   const material = getMaterial(materialId);
   const colorSel = material?.colores.find((c) => c.id === colorId);
+  const colorSelAgotado = resolveAgotado(materialId, colorSel, overrides);
   const [zoom, setZoom] = useState(false);
   return (
     <div>
@@ -170,6 +173,7 @@ export function StepMaterial() {
           <MaterialPreview
             material={material.nombre}
             color={colorSel}
+            agotado={colorSelAgotado}
             acabado={acabado}
             onZoom={() => colorSel && setZoom(true)}
           />
@@ -178,6 +182,7 @@ export function StepMaterial() {
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
             {material.colores.map((c) => {
               const on = colorId === c.id;
+              const ago = resolveAgotado(materialId, c, overrides);
               return (
                 <button
                   key={c.id}
@@ -187,7 +192,7 @@ export function StepMaterial() {
                   className={cn(
                     "group/color relative flex flex-col overflow-hidden rounded-sm border text-left transition-colors",
                     on ? "border-ink ring-1 ring-ink" : "border-stone-beige hover:border-mineral",
-                    c.agotado && !on && "opacity-80",
+                    ago && !on && "opacity-80",
                   )}
                 >
                   {/* Vista del material (foto si existe; si no, el color) */}
@@ -200,7 +205,7 @@ export function StepMaterial() {
                         <Check className="h-3.5 w-3.5" />
                       </span>
                     )}
-                    {c.agotado && (
+                    {ago && (
                       <span className="absolute left-2 top-2 rounded-sm bg-[#b8863b] px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-white">
                         Agotado
                       </span>
@@ -212,7 +217,7 @@ export function StepMaterial() {
             })}
           </div>
 
-          {colorSel?.agotado && <DisclaimerAgotado nombre={colorSel.nombre} />}
+          {colorSelAgotado && colorSel && <DisclaimerAgotado nombre={colorSel.nombre} />}
 
           {/* Acabado: brillo o mate */}
           <div className="mt-8">
@@ -247,6 +252,7 @@ export function StepMaterial() {
         <MaterialLightbox
           material={material?.nombre ?? ""}
           color={colorSel}
+          agotado={colorSelAgotado}
           acabado={acabado}
           onClose={() => setZoom(false)}
         />
@@ -259,11 +265,13 @@ export function StepMaterial() {
 function MaterialPreview({
   material,
   color,
+  agotado,
   acabado,
   onZoom,
 }: {
   material: string;
   color: Color | undefined;
+  agotado?: boolean;
   acabado: "brillo" | "mate" | null;
   onZoom: () => void;
 }) {
@@ -292,7 +300,7 @@ function MaterialPreview({
       {/* Degradado inferior para legibilidad del texto */}
       <span className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/55 to-transparent" />
 
-      {color.agotado && (
+      {agotado && (
         <span className="absolute left-3 top-3 rounded-sm bg-[#b8863b] px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide text-white">
           Agotado
         </span>
@@ -317,11 +325,13 @@ function MaterialPreview({
 function MaterialLightbox({
   material,
   color,
+  agotado,
   acabado,
   onClose,
 }: {
   material: string;
   color: { nombre: string; swatch: string; imagen?: string; agotado?: boolean };
+  agotado?: boolean;
   acabado: "brillo" | "mate" | null;
   onClose: () => void;
 }) {
@@ -365,7 +375,7 @@ function MaterialLightbox({
           <p className="mt-1 text-sm text-white/80">
             {material}
             {acabado ? ` · Acabado ${acabado === "brillo" ? "brillo" : "mate"}` : ""}
-            {color.agotado ? " · Agotado" : ""}
+            {agotado ? " · Agotado" : ""}
           </p>
         </figcaption>
       </figure>

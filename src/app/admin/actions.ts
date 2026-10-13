@@ -216,6 +216,21 @@ export async function deleteSolicitud(id: string) {
   redirect("/admin/solicitudes");
 }
 
+/** Cambiar la disponibilidad (agotado/disponible) de un color para el cotizador. */
+export async function setMaterialDisponibilidad(materialId: string, colorId: string, agotado: boolean) {
+  await requireAdmin();
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase
+    .from("material_disponibilidad")
+    .upsert(
+      { material_id: materialId, color_id: colorId, agotado, updated_at: new Date().toISOString() },
+      { onConflict: "material_id,color_id" },
+    );
+  if (error) throw new Error(error.message);
+  revalidatePath("/admin/materiales");
+  revalidatePath("/cotizar");
+}
+
 export async function signOut() {
   const supabase = await createSupabaseServerClient();
   await supabase.auth.signOut();
