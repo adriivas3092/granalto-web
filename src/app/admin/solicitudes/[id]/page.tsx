@@ -5,8 +5,10 @@ import { AdminShell } from "@/components/admin/AdminShell";
 import { requireAdmin } from "@/lib/supabase/admin-guard";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { buildFicha, type FichaCliente } from "@/lib/configurador/ficha";
+import { buildPlanoSVG } from "@/lib/configurador/plano";
 import { updateSolicitud, deleteSolicitud } from "@/app/admin/actions";
 import { DeleteWithConfirm } from "@/components/admin/DeleteWithConfirm";
+import { PlanoAcciones } from "@/components/configurador/PlanoAcciones";
 import type { Medida, SalpicaderoTipo } from "@/lib/configurador/pricing";
 import type { Unidad } from "@/data/configurador";
 
@@ -28,6 +30,9 @@ type Payload = {
   colorId?: string | null;
   medidas?: Record<string, Medida>;
   moldura?: boolean | null;
+  molduraGrosorCm?: number | null;
+  acabado?: "brillo" | "mate" | null;
+  lUnion?: "izquierda" | "derecha" | null;
   salpicaderoTipo?: SalpicaderoTipo;
   salpicaderoAlturaCm?: number;
   unidad?: Unidad;
@@ -66,6 +71,26 @@ export default async function SolicitudDetallePage({
     folio: data.folio,
     fecha: new Date(data.created_at).toLocaleString("es-CR"),
   });
+
+  const esPersonalizado = p.derivar || p.geometriaId === "personalizado" || !p.geometriaId;
+  const planoSvg = esPersonalizado
+    ? null
+    : buildPlanoSVG({
+        geometriaId: p.geometriaId ?? null,
+        materialId: p.materialId ?? null,
+        colorId: p.colorId ?? null,
+        medidas: p.medidas ?? {},
+        moldura: p.moldura ?? null,
+        molduraGrosorCm: p.molduraGrosorCm ?? null,
+        acabado: p.acabado ?? null,
+        lUnion: p.lUnion ?? null,
+        salpicaderoTipo: p.salpicaderoTipo ?? "no",
+        salpicaderoAlturaCm: p.salpicaderoAlturaCm ?? 0,
+        unidad: p.unidad ?? "mm",
+        cliente: p.cliente,
+        folio: data.folio,
+        fecha: new Date(data.created_at).toLocaleDateString("es-CR"),
+      });
 
   const notif = data.notificacion as { canal?: string } | null;
   const estadoActual = (data.estado as string) ?? "nuevo";
@@ -148,6 +173,17 @@ export default async function SolicitudDetallePage({
           </div>
         </div>
       </div>
+
+      {planoSvg && (
+        <div className="mt-6 rounded-sm border border-stone-beige bg-white p-6">
+          <h2 className="mb-1 font-sans text-lg font-bold text-ink">Plano de Taller</h2>
+          <p className="mb-4 text-sm text-charcoal/70">
+            Generado automáticamente desde la configuración. Para dibujo y corte. Los huecos (si los hubiera) los
+            marca dibujo.
+          </p>
+          <PlanoAcciones svg={planoSvg} folio={data.folio} />
+        </div>
+      )}
     </AdminShell>
   );
 }

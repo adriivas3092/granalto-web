@@ -6,6 +6,8 @@ import { CheckCircle2, Printer, MessageCircle, RotateCcw } from "lucide-react";
 import { useConfigurador } from "@/store/configuradorStore";
 import { getGeometria } from "@/data/configurador";
 import { buildFicha } from "@/lib/configurador/ficha";
+import { buildPlanoSVG } from "@/lib/configurador/plano";
+import { PlanoAcciones } from "@/components/configurador/PlanoAcciones";
 import { getWhatsAppUrl } from "@/config/site";
 
 /** Confirmación y respaldo completo tras enviar la configuración. */
@@ -53,6 +55,25 @@ export default function CotizarExitoPage() {
     fecha: new Date().toLocaleString("es-CR"),
   });
 
+  const planoSvg = esPersonalizado
+    ? null
+    : buildPlanoSVG({
+        geometriaId: s.geometriaId,
+        materialId: s.materialId,
+        colorId: s.colorId,
+        medidas: s.medidas,
+        moldura: s.moldura,
+        molduraGrosorCm: s.molduraGrosorCm,
+        acabado: s.acabado,
+        lUnion: s.lUnion,
+        salpicaderoTipo: s.salpicaderoTipo,
+        salpicaderoAlturaCm: s.salpicaderoAlturaCm,
+        unidad: s.unidad,
+        cliente: tieneCliente ? { nombre: s.cliente.nombre, telefono: s.cliente.telefono, direccion: s.cliente.direccion } : null,
+        folio,
+        fecha: new Date().toLocaleDateString("es-CR"),
+      });
+
   const wa = getWhatsAppUrl(`Hola, envié la solicitud ${folio} desde el cotizador. Quisiera continuar.`);
 
   return (
@@ -87,6 +108,18 @@ export default function CotizarExitoPage() {
           Recibirás también este respaldo por correo.
         </p>
       </div>
+
+      {/* Plano de taller: constancia de lo que se va a producir */}
+      {planoSvg && (
+        <div className="mt-8 rounded-sm border border-stone-beige bg-white p-6">
+          <h2 className="font-serif text-xl text-ink">Tu plano de taller</h2>
+          <p className="mb-4 mt-1 text-sm text-charcoal/80">
+            Este es el plano con las medidas y acabados de tu sobre, tal como se enviará a producción. Descargalo o
+            imprimilo como constancia. Las medidas quedan sujetas a validación técnica.
+          </p>
+          <PlanoAcciones svg={planoSvg} folio={folio} />
+        </div>
+      )}
 
       <div className="mt-8 flex flex-wrap justify-center gap-3">
         <button onClick={() => window.print()} className="inline-flex min-h-[44px] items-center gap-2 rounded-sm border border-stone-beige bg-white px-5 py-2.5 text-sm font-medium text-charcoal hover:border-ink">
