@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { GoogleSignInButton } from "@/components/account/GoogleSignInButton";
 
 function LoginInner() {
   const router = useRouter();
@@ -62,6 +63,13 @@ function LoginInner() {
             Ingresar
           </button>
         </form>
+
+        <div className="my-5 flex items-center gap-3">
+          <span className="h-px flex-1 bg-stone-beige" />
+          <span className="text-xs uppercase tracking-wide text-mineral">o</span>
+          <span className="h-px flex-1 bg-stone-beige" />
+        </div>
+        <GoogleSignInButton next={next} />
 
         <p className="mt-5 text-sm text-charcoal">
           ¿No tienes cuenta?{" "}
