@@ -21,12 +21,12 @@ const nextConfig: NextConfig = {
       "object-src 'none'",
       "frame-ancestors 'self'",
       "form-action 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://va.vercel-scripts.com https://*.vercel-insights.com",
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://va.vercel-scripts.com https://*.vercel-insights.com https://*.kommo.com https://*.amocrm.com",
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.kommo.com https://*.amocrm.com",
       "img-src 'self' data: blob: https:",
-      "font-src 'self' data: https://fonts.gstatic.com",
-      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://*.vercel-insights.com https://vitals.vercel-insights.com",
-      "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://www.google.com",
+      "font-src 'self' data: https://fonts.gstatic.com https://*.kommo.com https://*.amocrm.com",
+      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://*.vercel-insights.com https://vitals.vercel-insights.com https://*.kommo.com wss://*.kommo.com https://*.amocrm.com wss://*.amocrm.com",
+      "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://www.google.com https://*.kommo.com https://*.amocrm.com",
       "upgrade-insecure-requests",
     ].join("; ");
 

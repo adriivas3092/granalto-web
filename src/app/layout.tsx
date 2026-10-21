@@ -4,9 +4,9 @@ import "./globals.css";
 import { siteConfig, getSiteUrl } from "@/config/site";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
 import { CookieBanner } from "@/components/layout/CookieBanner";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
+import { KommoChat } from "@/components/integrations/KommoChat";
 import { JsonLd } from "@/components/ui/JsonLd";
 import { organizationSchema } from "@/lib/schema";
 
@@ -56,9 +56,9 @@ export default function RootLayout({
         <Header />
         <main id="contenido-principal">{children}</main>
         <Footer />
-        <WhatsAppButton />
         <CookieBanner />
         <GoogleAnalytics />
+        <KommoChat />
       </body>
     </html>
   );
