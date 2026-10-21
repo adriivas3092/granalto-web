@@ -28,6 +28,12 @@ export function CookieBanner() {
     } catch {
       // Ignorar errores de almacenamiento.
     }
+    // Avisar a la analítica (GA) para que se active/desactive sin recargar.
+    try {
+      window.dispatchEvent(new Event("cookie-consent-change"));
+    } catch {
+      // Entorno sin window: ignorar.
+    }
     setVisible(false);
   };
 
