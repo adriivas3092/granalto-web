@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useMemo, useState, useTransition } from "react";
-import { Pencil, Eye, EyeOff, Trash2 } from "lucide-react";
+import { Pencil, Eye, EyeOff, Trash2, AlertTriangle } from "lucide-react";
 import { formatPrice } from "@/lib/store/format";
+import { stockBajo, STOCK_BLOQUEO } from "@/lib/store/stock";
 import {
   bulkDeleteProducts,
   bulkSetAvailabilityForIds,
@@ -75,8 +76,24 @@ export function ProductsTable({
     });
   };
 
+  const bloqueados = products.filter((p) => p.stock <= STOCK_BLOQUEO).length;
+  const pocos = products.filter((p) => p.stock > STOCK_BLOQUEO && stockBajo(p.stock)).length;
+
   return (
     <div>
+      {/* Alerta de stock */}
+      {(bloqueados > 0 || pocos > 0) && (
+        <div className="mb-3 flex flex-wrap items-center gap-2 rounded-sm border border-[#b8863b]/40 bg-[#b8863b]/10 p-3 text-sm text-[#8a5f24]">
+          <AlertTriangle className="h-4 w-4 shrink-0" />
+          <span>
+            {bloqueados > 0 && (
+              <strong>{bloqueados} producto(s) bloqueado(s) por quedarse sin stock. </strong>
+            )}
+            {pocos > 0 && <>{pocos} con poco stock (≤ {3} unidades). Revisá y reponé.</>}
+          </span>
+        </div>
+      )}
+
       {/* Barra de acciones en bloque */}
       <div
         className={cn(
@@ -182,7 +199,20 @@ export function ProductsTable({
                   <td className="px-4 py-3 text-ink">
                     {formatPrice(p.price, p.currency)}
                   </td>
-                  <td className="px-4 py-3 text-charcoal">{p.stock}</td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-charcoal">{p.stock}</span>
+                      {p.stock <= STOCK_BLOQUEO ? (
+                        <span className="inline-flex items-center gap-1 rounded-sm bg-[#a03826]/10 px-2 py-0.5 text-[11px] font-medium text-[#a03826]">
+                          <AlertTriangle className="h-3 w-3" /> Sin stock · bloqueado
+                        </span>
+                      ) : stockBajo(p.stock) ? (
+                        <span className="inline-flex items-center gap-1 rounded-sm bg-[#b8863b]/15 px-2 py-0.5 text-[11px] font-medium text-[#8a5f24]">
+                          <AlertTriangle className="h-3 w-3" /> Poco stock
+                        </span>
+                      ) : null}
+                    </div>
+                  </td>
                   <td className="px-4 py-3">
                     <button
                       type="button"

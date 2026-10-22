@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/admin-guard";
+import { debeBloquearPorStock } from "@/lib/store/stock";
 import type { ProductInput } from "@/types/store";
 
 function parseForm(formData: FormData): ProductInput {
@@ -21,6 +22,7 @@ function parseForm(formData: FormData): ProductInput {
     });
 
   const price = num(formData.get("price"));
+  const stock = Math.round(num(formData.get("stock")));
 
   // "En oferta": basta con marcar la casilla para que la tienda muestre la
   // etiqueta. Si además hay un "precio regular" mayor, se usa para el tachado
@@ -47,8 +49,10 @@ function parseForm(formData: FormData): ProductInput {
     price,
     currency: (formData.get("currency") as string) || "CRC",
     compare_at_price,
-    stock: Math.round(num(formData.get("stock"))),
-    available: formData.get("available") === "on",
+    stock,
+    // Regla de stock: con 1 unidad o menos, el producto queda bloqueado
+    // (no disponible) aunque se marque visible.
+    available: formData.get("available") === "on" && !debeBloquearPorStock(stock),
     featured: formData.get("featured") === "on",
     image_url: ((formData.get("image_url") as string) || "").trim() || null,
     gallery,

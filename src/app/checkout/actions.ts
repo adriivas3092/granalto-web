@@ -3,7 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { bnConfigurado, crearTransaccionBN } from "@/lib/pago/bn";
+import { debeBloquearPorStock } from "@/lib/store/stock";
 import { getSiteUrl } from "@/config/site";
 import type { Product } from "@/types/store";
 
@@ -87,6 +89,25 @@ export async function createOrder(formData: FormData) {
   const rows = items.map((i) => ({ ...i, order_id: order.id }));
   const { error: itemsError } = await supabase.from("order_items").insert(rows);
   if (itemsError) throw new Error(itemsError.message);
+
+  // Descuento de stock + bloqueo automático a ≤1 unidad. Usa el cliente de
+  // servicio (service role) porque actualizar productos requiere permisos de
+  // admin por RLS. Si no está configurado, el stock no se descuenta.
+  try {
+    const service = createSupabaseServiceClient();
+    if (service) {
+      for (const it of items) {
+        const prod = byId.get(it.product_id);
+        if (!prod) continue;
+        const nuevoStock = Math.max(0, (prod.stock ?? 0) - it.quantity);
+        const patch: { stock: number; available?: boolean } = { stock: nuevoStock };
+        if (debeBloquearPorStock(nuevoStock)) patch.available = false;
+        await service.from("products").update(patch).eq("id", prod.id);
+      }
+    }
+  } catch {
+    // No bloquear la compra si falla el ajuste de stock.
+  }
 
   // Guarda/actualiza datos de contacto en el perfil.
   await supabase
