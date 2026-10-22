@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { Lock } from "lucide-react";
 import { getSessionUser, getMyOrderById } from "@/lib/store/account";
 import { formatPrice } from "@/lib/store/format";
 import { OrderStatusBadge } from "@/components/store/OrderStatusBadge";
@@ -36,6 +37,22 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
         <OrderStatusBadge status={order.status as OrderStatus} />
       </div>
       <p className="mt-2 text-sm text-mineral">{fmtDate(order.created_at)}</p>
+
+      {/* Pendiente de pago → el cliente puede pagar ahora */}
+      {order.status === "pendiente" && (
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-sm border border-ink/30 bg-ivory/60 p-5">
+          <div>
+            <p className="font-medium text-ink">Tu pedido está pendiente de pago</p>
+            <p className="mt-0.5 text-sm text-charcoal/75">Completá el pago para que procesemos tu pedido.</p>
+          </div>
+          <Link
+            href={`/checkout/pago?pedido=${order.id}`}
+            className="inline-flex min-h-[48px] items-center gap-2 rounded-sm bg-ink px-6 py-3 text-sm font-medium text-ivory hover:bg-charcoal"
+          >
+            <Lock className="h-4 w-4" /> Pagar ahora · {formatPrice(order.total, order.currency)}
+          </Link>
+        </div>
+      )}
 
       <div className="mt-8 overflow-hidden rounded-sm border border-stone-beige bg-white">
         <table className="w-full text-sm">
@@ -92,8 +109,9 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
       </div>
 
       <p className="mt-6 text-xs text-mineral">
-        El pago con tarjeta en línea estará disponible pronto. Nuestro equipo te
-        contactará para coordinar el pago y la entrega de este pedido.
+        {order.status === "pendiente"
+          ? "El pago se procesa de forma segura. Si preferís coordinar el pago por otro medio, escribinos por WhatsApp."
+          : "Gracias por tu compra. Ante cualquier consulta sobre tu pedido, escribinos."}
       </p>
     </div>
   );
