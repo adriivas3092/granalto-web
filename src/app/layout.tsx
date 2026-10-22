@@ -33,11 +33,13 @@ export const metadata: Metadata = {
     images: [{ url: siteConfig.seo.defaultOgImage }],
   },
   twitter: { card: "summary_large_image" },
-  // Verificación de Google Search Console (se completa con la variable
-  // NEXT_PUBLIC_GSC_VERIFICATION = código que da Search Console).
-  verification: process.env.NEXT_PUBLIC_GSC_VERIFICATION
-    ? { google: process.env.NEXT_PUBLIC_GSC_VERIFICATION }
-    : undefined,
+  // Verificación de Google Search Console (código público que va en el HTML).
+  // Se puede sobrescribir con NEXT_PUBLIC_GSC_VERIFICATION.
+  verification: {
+    google:
+      process.env.NEXT_PUBLIC_GSC_VERIFICATION ||
+      "DXu7ykF88h0euzGTMxPolu0gx9RHipKUys3W_XFP9Uc",
+  },
 };
 
 export default function RootLayout({
