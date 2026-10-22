@@ -2,8 +2,10 @@ import Link from "next/link";
 import { Plus, Eye, EyeOff } from "lucide-react";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { ProductsTable } from "@/components/admin/ProductsTable";
+import { StockAlertaToggle } from "@/components/admin/StockAlertaToggle";
 import { getAllProducts } from "@/lib/store/admin";
 import { getCategories } from "@/lib/store/queries";
+import { getStockAlertaActiva } from "@/lib/store/settings";
 import { requireAdmin } from "@/lib/supabase/admin-guard";
 import { bulkAvailability } from "@/app/admin/actions";
 import { cn } from "@/lib/utils";
@@ -21,6 +23,7 @@ export default async function AdminProductosPage({
   const categories = await getCategories();
   const activeCat = categoria ? categories.find((c) => c.slug === categoria) : undefined;
   const products = await getAllProducts(activeCat?.id);
+  const alertaActiva = await getStockAlertaActiva();
 
   const visibleCount = products.filter((p) => p.available).length;
   const hiddenCount = products.length - visibleCount;
@@ -35,13 +38,16 @@ export default async function AdminProductosPage({
             {products.length} en total · {visibleCount} visibles · {hiddenCount} ocultos
           </p>
         </div>
-        <Link
-          href="/admin/productos/nuevo"
-          className="inline-flex min-h-[44px] items-center gap-2 rounded-sm bg-ink px-5 py-2.5 text-sm font-medium text-ivory hover:bg-charcoal"
-        >
-          <Plus aria-hidden="true" className="h-4 w-4" />
-          Nuevo producto
-        </Link>
+        <div className="flex flex-wrap items-center gap-2">
+          <StockAlertaToggle activa={alertaActiva} />
+          <Link
+            href="/admin/productos/nuevo"
+            className="inline-flex min-h-[44px] items-center gap-2 rounded-sm bg-ink px-5 py-2.5 text-sm font-medium text-ivory hover:bg-charcoal"
+          >
+            <Plus aria-hidden="true" className="h-4 w-4" />
+            Nuevo producto
+          </Link>
+        </div>
       </div>
 
       <div className="mt-5 flex flex-wrap gap-2">
@@ -98,7 +104,7 @@ export default async function AdminProductosPage({
       </div>
 
       <div className="mt-6">
-        <ProductsTable products={products} categories={categories} />
+        <ProductsTable products={products} categories={categories} alertaActiva={alertaActiva} />
       </div>
     </AdminShell>
   );

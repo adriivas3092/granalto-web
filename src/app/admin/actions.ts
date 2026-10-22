@@ -5,9 +5,10 @@ import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/admin-guard";
 import { debeBloquearPorStock } from "@/lib/store/stock";
+import { getStockAlertaActiva } from "@/lib/store/settings";
 import type { ProductInput } from "@/types/store";
 
-function parseForm(formData: FormData): ProductInput {
+function parseForm(formData: FormData, bloqueoStock: boolean): ProductInput {
   const num = (v: FormDataEntryValue | null) =>
     v == null || v === "" ? 0 : Number(v);
   const attrRaw = (formData.get("attributes") as string) || "";
@@ -50,9 +51,9 @@ function parseForm(formData: FormData): ProductInput {
     currency: (formData.get("currency") as string) || "CRC",
     compare_at_price,
     stock,
-    // Regla de stock: con 1 unidad o menos, el producto queda bloqueado
-    // (no disponible) aunque se marque visible.
-    available: formData.get("available") === "on" && !debeBloquearPorStock(stock),
+    // Regla de stock (si la alerta está activa): con 1 unidad o menos, el
+    // producto queda bloqueado (no disponible) aunque se marque visible.
+    available: formData.get("available") === "on" && !(bloqueoStock && debeBloquearPorStock(stock)),
     featured: formData.get("featured") === "on",
     image_url: ((formData.get("image_url") as string) || "").trim() || null,
     gallery,
@@ -61,7 +62,8 @@ function parseForm(formData: FormData): ProductInput {
 }
 
 export async function createProduct(formData: FormData) {
-  const input = parseForm(formData);
+  const alertaActiva = await getStockAlertaActiva();
+  const input = parseForm(formData, alertaActiva);
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.from("products").insert(input);
   if (error) throw new Error(error.message);
@@ -72,7 +74,8 @@ export async function createProduct(formData: FormData) {
 }
 
 export async function updateProduct(id: string, formData: FormData) {
-  const input = parseForm(formData);
+  const alertaActiva = await getStockAlertaActiva();
+  const input = parseForm(formData, alertaActiva);
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.from("products").update(input).eq("id", id);
   if (error) throw new Error(error.message);
@@ -233,6 +236,21 @@ export async function setMaterialDisponibilidad(materialId: string, colorId: str
   if (error) throw new Error(error.message);
   revalidatePath("/admin/materiales");
   revalidatePath("/cotizar");
+}
+
+/** Activa/desactiva la alerta + bloqueo automático por stock. */
+export async function setStockAlerta(activa: boolean) {
+  await requireAdmin();
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase
+    .from("app_settings")
+    .upsert(
+      { clave: "stock_alerta_activa", valor: activa, updated_at: new Date().toISOString() },
+      { onConflict: "clave" },
+    );
+  if (error) throw new Error(error.message);
+  revalidatePath("/admin/productos");
+  revalidatePath("/tienda");
 }
 
 export async function signOut() {

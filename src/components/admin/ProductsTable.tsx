@@ -18,9 +18,11 @@ import type { Product, Category } from "@/types/store";
 export function ProductsTable({
   products,
   categories,
+  alertaActiva = true,
 }: {
   products: Product[];
   categories: Category[];
+  alertaActiva?: boolean;
 }) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [pending, startTransition] = useTransition();
@@ -82,7 +84,7 @@ export function ProductsTable({
   return (
     <div>
       {/* Alerta de stock */}
-      {(bloqueados > 0 || pocos > 0) && (
+      {alertaActiva && (bloqueados > 0 || pocos > 0) && (
         <div className="mb-3 flex flex-wrap items-center gap-2 rounded-sm border border-[#b8863b]/40 bg-[#b8863b]/10 p-3 text-sm text-[#8a5f24]">
           <AlertTriangle className="h-4 w-4 shrink-0" />
           <span>
@@ -202,7 +204,7 @@ export function ProductsTable({
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                       <span className="text-charcoal">{p.stock}</span>
-                      {p.stock <= STOCK_BLOQUEO ? (
+                      {!alertaActiva ? null : p.stock <= STOCK_BLOQUEO ? (
                         <span className="inline-flex items-center gap-1 rounded-sm bg-[#a03826]/10 px-2 py-0.5 text-[11px] font-medium text-[#a03826]">
                           <AlertTriangle className="h-3 w-3" /> Sin stock · bloqueado
                         </span>

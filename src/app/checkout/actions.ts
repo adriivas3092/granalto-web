@@ -6,6 +6,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { bnConfigurado, crearTransaccionBN } from "@/lib/pago/bn";
 import { debeBloquearPorStock } from "@/lib/store/stock";
+import { getStockAlertaActiva } from "@/lib/store/settings";
 import { getSiteUrl } from "@/config/site";
 import type { Product } from "@/types/store";
 
@@ -96,12 +97,13 @@ export async function createOrder(formData: FormData) {
   try {
     const service = createSupabaseServiceClient();
     if (service) {
+      const alertaActiva = await getStockAlertaActiva();
       for (const it of items) {
         const prod = byId.get(it.product_id);
         if (!prod) continue;
         const nuevoStock = Math.max(0, (prod.stock ?? 0) - it.quantity);
         const patch: { stock: number; available?: boolean } = { stock: nuevoStock };
-        if (debeBloquearPorStock(nuevoStock)) patch.available = false;
+        if (alertaActiva && debeBloquearPorStock(nuevoStock)) patch.available = false;
         await service.from("products").update(patch).eq("id", prod.id);
       }
     }
