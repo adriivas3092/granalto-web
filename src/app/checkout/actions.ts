@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { bnConfigurado, crearTransaccionBN } from "@/lib/pago/bn";
+import { getSiteUrl } from "@/config/site";
 import type { Product } from "@/types/store";
 
 type IncomingItem = { id: string; quantity: number };
@@ -93,5 +95,47 @@ export async function createOrder(formData: FormData) {
 
   revalidatePath("/cuenta");
   revalidatePath("/admin/pedidos");
-  redirect(`/checkout/gracias?pedido=${order.id}`);
+  // Tras crear la orden (pendiente de pago) → página de pago.
+  redirect(`/checkout/pago?pedido=${order.id}`);
+}
+
+/**
+ * Inicia el pago de una orden con la pasarela del Banco Nacional.
+ * Verifica que la orden sea del usuario y esté pendiente, crea la transacción
+ * en el BN y redirige a su página de pago segura. Si el BN aún no está
+ * configurado (sin credenciales), deja la orden pendiente y manda a la
+ * confirmación, donde un asesor coordina el pago.
+ */
+export async function iniciarPagoBN(orderId: string) {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/cuenta/login?next=/checkout");
+
+  const { data: order } = await supabase
+    .from("orders")
+    .select("id, customer_id, status, total, currency, customer_email, customer_name")
+    .eq("id", orderId)
+    .maybeSingle();
+
+  if (!order || order.customer_id !== user.id) redirect("/cuenta/pedidos");
+  if (order.status !== "pendiente") redirect(`/checkout/gracias?pedido=${orderId}`);
+
+  if (!bnConfigurado()) {
+    // Sin credenciales del BN todavía: se coordina el pago con un asesor.
+    redirect(`/checkout/gracias?pedido=${orderId}&pago=coordinar`);
+  }
+
+  const tx = await crearTransaccionBN({
+    orderId: order.id,
+    amount: order.total,
+    currency: order.currency,
+    returnUrl: `${getSiteUrl()}/checkout/gracias?pedido=${order.id}`,
+    customerEmail: order.customer_email ?? undefined,
+    customerName: order.customer_name ?? undefined,
+  });
+
+  if (tx?.redirectUrl) redirect(tx.redirectUrl);
+  redirect(`/checkout/gracias?pedido=${orderId}&pago=coordinar`);
 }
