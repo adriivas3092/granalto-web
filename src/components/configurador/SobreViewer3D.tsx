@@ -3,7 +3,7 @@
 import { Suspense, useMemo } from "react";
 import * as THREE from "three";
 import { Canvas } from "@react-three/fiber";
-import { Bounds, Center, ContactShadows, OrbitControls, useTexture } from "@react-three/drei";
+import { Bounds, Center, ContactShadows, Environment, Lightformer, OrbitControls, useTexture } from "@react-three/drei";
 import { useConfigurador } from "@/store/configuradorStore";
 import { getGeometria, getMaterial, type Color } from "@/data/configurador";
 
@@ -33,8 +33,10 @@ function useSobreMaterials(imagen: string | undefined, swatch: string | undefine
       } else {
         m.color = new THREE.Color(swatch || "#cccccc").multiplyScalar(darken);
       }
-      m.roughness = brillo ? 0.12 : 0.8;
+      m.roughness = brillo ? 0.07 : 0.7;
       m.metalness = 0;
+      // Reflejos del entorno: fuertes en brillo (pulido), suaves en mate.
+      m.envMapIntensity = brillo ? 1.2 : 0.4;
       return m;
     };
     return { top: make(1), edge: make(0.68) };
@@ -267,18 +269,30 @@ export function SobreViewer3D() {
 
   return (
     <div className="relative h-[360px] w-full overflow-hidden rounded-sm border border-stone-beige bg-[#f1efe9]">
-      <Canvas shadows dpr={[1, 2]} camera={{ position: [2.3, 1.05, 2.7], fov: 44 }}>
-        <ambientLight intensity={0.6} />
-        <directionalLight position={[4, 8, 4]} intensity={1.6} castShadow shadow-mapSize={[1024, 1024]} />
-        <directionalLight position={[-4, 4, -3]} intensity={0.4} />
+      <Canvas shadows dpr={[1, 2]} camera={{ position: [2.3, 1.05, 2.7], fov: 42 }}>
+        <ambientLight intensity={0.35} />
+        <directionalLight position={[4, 8, 4]} intensity={1.5} castShadow shadow-mapSize={[2048, 2048]} shadow-bias={-0.0002} />
+        <directionalLight position={[-5, 4, -3]} intensity={0.35} />
+        {/* Entorno de estudio (sin archivos externos): da reflejos al brillo */}
+        <Environment resolution={256} frames={1}>
+          <Lightformer intensity={1.1} position={[0, 5, 2]} scale={[10, 5, 1]} />
+          <Lightformer intensity={0.5} position={[-5, 2, -2]} scale={[8, 5, 1]} />
+          <Lightformer intensity={0.5} position={[5, 2, -2]} scale={[8, 5, 1]} />
+          <Lightformer intensity={0.4} position={[0, 2, 6]} scale={[10, 4, 1]} />
+        </Environment>
+        {/* Piso suave para apoyar la escena */}
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.003, 0]} receiveShadow>
+          <planeGeometry args={[40, 40]} />
+          <meshStandardMaterial color="#e7e4dc" roughness={1} metalness={0} />
+        </mesh>
         <Suspense fallback={null}>
-          <Bounds fit clip observe margin={1.02}>
+          <Bounds fit clip observe margin={1.0}>
             <Center disableY key={`${s.geometriaId}-${JSON.stringify(s.medidas)}-${s.moldura}-${s.molduraGrosorCm}-${s.salpicaderoTipo}-${s.salpicaderoAlturaCm}`}>
               <ModelWrapper color={color} brillo={s.acabado === "brillo"} />
             </Center>
           </Bounds>
         </Suspense>
-        <ContactShadows position={[0, 0, 0]} opacity={0.34} scale={10} blur={2.4} far={4} />
+        <ContactShadows position={[0, 0, 0]} opacity={0.4} scale={12} blur={2.6} far={5} resolution={1024} />
         <OrbitControls
           makeDefault
           enablePan={false}
