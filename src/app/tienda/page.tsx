@@ -73,7 +73,7 @@ export default async function StorePage({
               type="search"
               name="q"
               defaultValue={q ?? ""}
-              placeholder="Buscar productos…"
+              placeholder="Buscar por nombre o categoría…"
               className="w-full rounded-sm border border-stone-beige bg-white py-2.5 pl-9 pr-3 text-sm text-ink placeholder:text-mineral focus:border-ink focus:outline-none"
             />
             {categoria && <input type="hidden" name="categoria" value={categoria} />}

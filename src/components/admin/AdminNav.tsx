@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Package, ShoppingBag, FileText, Users, Layers } from "lucide-react";
+import { LayoutDashboard, Package, Tags, ShoppingBag, FileText, Users, Layers } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const items = [
   { href: "/admin", label: "Inicio", icon: LayoutDashboard, exact: true },
   { href: "/admin/productos", label: "Productos", icon: Package },
+  { href: "/admin/categorias", label: "Categorías", icon: Tags },
   { href: "/admin/materiales", label: "Materiales cotizador", icon: Layers },
   { href: "/admin/pedidos", label: "Pedidos", icon: ShoppingBag },
   { href: "/admin/solicitudes", label: "Pedidos de sobres", icon: FileText },

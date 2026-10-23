@@ -253,6 +253,67 @@ export async function setStockAlerta(activa: boolean) {
   revalidatePath("/tienda");
 }
 
+/** Convierte un texto en slug (minúsculas, sin acentos, con guiones). */
+function slugify(s: string): string {
+  return s
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
+/** Crea una categoría nueva. El slug se genera del nombre si no se envía. */
+export async function createCategory(formData: FormData) {
+  await requireAdmin();
+  const name = ((formData.get("name") as string) || "").trim();
+  if (!name) throw new Error("El nombre es obligatorio");
+  const slug = slugify(((formData.get("slug") as string) || "").trim() || name);
+  if (!slug) throw new Error("No se pudo generar un slug a partir del nombre");
+  const position = Math.round(Number(formData.get("position")) || 0);
+
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.from("categories").insert({ name, slug, position });
+  if (error) {
+    if (error.code === "23505") throw new Error(`Ya existe una categoría con el slug «${slug}»`);
+    throw new Error(error.message);
+  }
+  revalidatePath("/admin/categorias");
+  revalidatePath("/admin/productos");
+  revalidatePath("/tienda");
+  redirect("/admin/categorias");
+}
+
+/** Renombra / reordena una categoría existente. */
+export async function updateCategory(id: string, formData: FormData) {
+  await requireAdmin();
+  const name = ((formData.get("name") as string) || "").trim();
+  if (!name) throw new Error("El nombre es obligatorio");
+  const position = Math.round(Number(formData.get("position")) || 0);
+
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.from("categories").update({ name, position }).eq("id", id);
+  if (error) throw new Error(error.message);
+  revalidatePath("/admin/categorias");
+  revalidatePath("/admin/productos");
+  revalidatePath("/tienda");
+  redirect("/admin/categorias");
+}
+
+/**
+ * Elimina una categoría. Los productos que la tenían quedan "Sin categoría"
+ * (la llave foránea usa ON DELETE SET NULL), no se borran.
+ */
+export async function deleteCategory(id: string) {
+  await requireAdmin();
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.from("categories").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+  revalidatePath("/admin/categorias");
+  revalidatePath("/admin/productos");
+  revalidatePath("/tienda");
+}
+
 export async function signOut() {
   const supabase = await createSupabaseServerClient();
   await supabase.auth.signOut();
