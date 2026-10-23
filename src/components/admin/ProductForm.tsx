@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { Loader2, Upload } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { TENAX_CATEGORIAS } from "@/lib/store/tenax";
 import type { Category, Product } from "@/types/store";
 
 function slugify(s: string) {
@@ -123,6 +124,28 @@ export function ProductForm({
               </option>
             ))}
           </select>
+        </div>
+
+        <div>
+          <label htmlFor="tenax_category" className={label}>
+            Categoría Tenax
+          </label>
+          <select
+            id="tenax_category"
+            name="tenax_category"
+            defaultValue={product?.tenax_category ?? ""}
+            className={field}
+          >
+            <option value="">No aplica (no es Tenax)</option>
+            {TENAX_CATEGORIAS.map((c) => (
+              <option key={c.value} value={c.value}>
+                {c.label}
+              </option>
+            ))}
+          </select>
+          <p className="mt-1 text-xs text-mineral">
+            Solo para productos de la línea Tenax. Dejalo en «No aplica» para el resto.
+          </p>
         </div>
 
         <div>

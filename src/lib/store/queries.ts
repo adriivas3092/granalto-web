@@ -1,4 +1,5 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { tenaxLabel } from "@/lib/store/tenax";
 import type { Category, Product } from "@/types/store";
 
 // Reexportado para conservar compatibilidad con importaciones existentes.
@@ -44,7 +45,9 @@ export async function getProducts(options?: {
         categories.filter((c) => normalize(c.name).includes(needle)).map((c) => c.id),
       );
       products = products.filter((p) => {
-        const haystack = normalize(`${p.name} ${p.sku ?? ""} ${p.description ?? ""}`);
+        const haystack = normalize(
+          `${p.name} ${p.sku ?? ""} ${p.description ?? ""} ${tenaxLabel(p.tenax_category) ?? ""}`,
+        );
         return haystack.includes(needle) || (p.category_id != null && catIds.has(p.category_id));
       });
     }

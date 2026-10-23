@@ -46,6 +46,7 @@ function parseForm(formData: FormData, bloqueoStock: boolean): ProductInput {
     slug: (formData.get("slug") as string)?.trim() ?? "",
     sku: ((formData.get("sku") as string) || "").trim() || null,
     category_id: ((formData.get("category_id") as string) || "") || null,
+    tenax_category: ((formData.get("tenax_category") as string) || "").trim() || null,
     description: ((formData.get("description") as string) || "").trim() || null,
     price,
     currency: (formData.get("currency") as string) || "CRC",

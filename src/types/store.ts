@@ -11,6 +11,8 @@ export type Product = {
   slug: string;
   sku: string | null;
   category_id: string | null;
+  /** Subcategoría Tenax (línea Tenax únicamente); null si no aplica. */
+  tenax_category: string | null;
   description: string | null;
   price: number;
   currency: string;
@@ -96,6 +98,7 @@ export type ProductInput = {
   slug: string;
   sku: string | null;
   category_id: string | null;
+  tenax_category: string | null;
   description: string | null;
   price: number;
   currency: string;
