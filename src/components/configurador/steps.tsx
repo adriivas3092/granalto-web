@@ -429,12 +429,15 @@ function CampoMedida({
   label,
   mmValue,
   maxMm,
+  minMm = 0,
   unidad,
   onChangeMm,
 }: {
   label: string;
   mmValue: number;
   maxMm: number;
+  /** Mínimo permitido en mm (0 = sin mínimo). */
+  minMm?: number;
   unidad: Unidad;
   onChangeMm: (mm: number) => void;
 }) {
@@ -442,7 +445,9 @@ function CampoMedida({
   const factor = MM_POR_UNIDAD[unidad];
   const excede = mmValue > maxMm;
   const vacio = mmValue <= 0;
+  const bajoMin = minMm > 0 && mmValue > 0 && mmValue < minMm;
   const maxUnidad = parseFloat((maxMm / factor).toFixed(3));
+  const minUnidad = parseFloat((minMm / factor).toFixed(3));
   const step = unidad === "mm" ? 1 : unidad === "cm" ? 0.1 : 0.001;
 
   return (
@@ -452,7 +457,7 @@ function CampoMedida({
         <input
           type="number"
           inputMode="decimal"
-          min={0}
+          min={minMm > 0 ? minUnidad : 0}
           step={step}
           value={draft}
           onChange={(e) => {
@@ -461,18 +466,24 @@ function CampoMedida({
             const num = parseFloat(raw.replace(",", "."));
             onChangeMm(Number.isFinite(num) && num > 0 ? Math.round(num * factor) : 0);
           }}
-          placeholder="0"
+          placeholder={minMm > 0 ? String(minUnidad).replace(".", ",") : "0"}
           className={cn(
             "w-full rounded-sm border bg-white px-3 py-2.5 pr-12 text-ink outline-none focus:border-ink",
-            excede ? "border-[#b8863b]" : "border-stone-beige",
+            excede || bajoMin ? "border-[#b8863b]" : "border-stone-beige",
           )}
         />
         <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-mineral">{unidad}</span>
       </div>
       <span className="mt-1 block text-xs text-mineral">
+        {minMm > 0 && `Mín. ${String(minUnidad).replace(".", ",")} · `}
         Máx. estándar {String(maxUnidad).replace(".", ",")} {unidad}
       </span>
       {excede && <span className="mt-0.5 block text-xs text-[#b8863b]">Supera el máximo estándar</span>}
+      {bajoMin && (
+        <span className="mt-0.5 block text-xs text-[#b8863b]">
+          El ancho mínimo es {String(minUnidad).replace(".", ",")} {unidad}
+        </span>
+      )}
       {vacio && <span className="mt-0.5 block text-xs text-mineral">Requerido</span>}
     </label>
   );
@@ -557,7 +568,7 @@ export function StepMedidas() {
             </div>
             <div className="rounded-sm border border-stone-beige bg-white p-5">
               <h3 className="mb-4 font-medium text-ink">Ancho (común)</h3>
-              <CampoMedida label="Ancho" mmValue={medidas.a?.prof ?? 0} maxMm={L.profMaxMm} unidad={unidad} onChangeMm={setAnchoL} />
+              <CampoMedida label="Ancho" mmValue={medidas.a?.prof ?? 0} maxMm={L.profMaxMm} minMm={L.profMinMm} unidad={unidad} onChangeMm={setAnchoL} />
             </div>
           </div>
         </>
@@ -573,7 +584,7 @@ export function StepMedidas() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <CampoMedida key={`${t.key}-largo`} label="Largo" mmValue={medidas[t.key]?.largo ?? 0} maxMm={L.largoMaxMm} unidad={unidad} onChangeMm={(n) => setMedida(t.key, "largo", n)} />
-                <CampoMedida key={`${t.key}-ancho`} label="Ancho" mmValue={medidas[t.key]?.prof ?? 0} maxMm={L.profMaxMm} unidad={unidad} onChangeMm={(n) => setMedida(t.key, "prof", n)} />
+                <CampoMedida key={`${t.key}-ancho`} label="Ancho" mmValue={medidas[t.key]?.prof ?? 0} maxMm={L.profMaxMm} minMm={L.profMinMm} unidad={unidad} onChangeMm={(n) => setMedida(t.key, "prof", n)} />
               </div>
             </div>
           ))}

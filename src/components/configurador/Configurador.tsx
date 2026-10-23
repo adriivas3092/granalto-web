@@ -301,7 +301,7 @@ function validar(paso: number, s: ReturnType<typeof useConfigurador.getState>): 
         return (
           m &&
           m.largo > 0 &&
-          m.prof > 0 &&
+          m.prof >= L.profMinMm &&
           m.largo <= L.largoMaxMm &&
           m.prof <= L.profMaxMm
         );

@@ -40,6 +40,10 @@ export const PRECIO_MOLDURA_ML = 0;
 export const MEDIDAS_LIMITES = {
   largoMaxMm: 3100,
   profMaxMm: 1400,
+  // Ancho (profundidad) mínimo estándar: 0,65 m. Se ofrece prellenado como
+  // valor por defecto; el cliente puede borrarlo y poner un ancho mayor.
+  profMinMm: 650,
+  profDefaultMm: 650,
 };
 
 /** true si la medida de una pieza supera el máximo estándar (deriva a personalizado). */

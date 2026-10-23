@@ -3,7 +3,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Medida, SalpicaderoTipo } from "@/lib/configurador/pricing";
-import { MM_POR_UNIDAD, type Unidad } from "@/data/configurador";
+import { MM_POR_UNIDAD, MEDIDAS_LIMITES, getGeometria, type Unidad } from "@/data/configurador";
 
 export { MM_POR_UNIDAD };
 export type { Unidad };
@@ -127,7 +127,17 @@ export const useConfigurador = create<State>()(
       prev: () => set((s) => ({ paso: Math.max(0, s.paso - 1) })),
 
       setGeometria: (id) =>
-        set((s) => (s.geometriaId === id ? s : { geometriaId: id, medidas: {}, derivar: false, lUnion: null })),
+        set((s) => {
+          if (s.geometriaId === id) return s;
+          // Prellena el ancho (prof) de cada tramo con el valor por defecto
+          // (0,65 m). El largo queda en 0 para que lo ingrese el cliente.
+          const geo = getGeometria(id);
+          const medidas: Record<string, Medida> = {};
+          for (const t of geo?.tramos ?? []) {
+            medidas[t.key] = { largo: 0, prof: MEDIDAS_LIMITES.profDefaultMm };
+          }
+          return { geometriaId: id, medidas, derivar: false, lUnion: null };
+        }),
       setMaterial: (id) =>
         set((s) => (s.materialId === id ? s : { materialId: id, colorId: null })),
       setColor: (id) => set({ colorId: id }),
