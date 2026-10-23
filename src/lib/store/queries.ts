@@ -16,6 +16,7 @@ export async function getCategories(): Promise<Category[]> {
 
 export async function getProducts(options?: {
   categorySlug?: string;
+  tenaxCategory?: string;
   search?: string;
 }): Promise<Product[]> {
   const supabase = await createSupabaseServerClient();
@@ -29,10 +30,15 @@ export async function getProducts(options?: {
   const needCategories = Boolean(options?.categorySlug || options?.search);
   const categories = needCategories ? await getCategories() : [];
 
-  // Filtro por categoría (chips de la tienda).
+  // Filtro por categoría general (chips de la tienda).
   if (options?.categorySlug) {
     const cat = categories.find((c) => c.slug === options.categorySlug);
     if (cat) products = products.filter((p) => p.category_id === cat.id);
+  }
+
+  // Filtro por subcategoría Tenax.
+  if (options?.tenaxCategory) {
+    products = products.filter((p) => p.tenax_category === options.tenaxCategory);
   }
 
   // Búsqueda libre: coincide por nombre o SKU/descripción del producto, o por

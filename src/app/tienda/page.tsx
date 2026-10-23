@@ -6,6 +6,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { StoreProductCard } from "@/components/store/StoreProductCard";
 import { getCategories, getProducts } from "@/lib/store/queries";
+import { TENAX_CATEGORIAS } from "@/lib/store/tenax";
 import { buildMetadata } from "@/lib/metadata";
 import { cn } from "@/lib/utils";
 
@@ -21,17 +22,27 @@ export const dynamic = "force-dynamic";
 export default async function StorePage({
   searchParams,
 }: {
-  searchParams: Promise<{ categoria?: string; q?: string }>;
+  searchParams: Promise<{ categoria?: string; tenax?: string; q?: string }>;
 }) {
-  const { categoria, q } = await searchParams;
+  const { categoria, tenax, q } = await searchParams;
   const [categories, products] = await Promise.all([
     getCategories(),
-    getProducts({ categorySlug: categoria, search: q }),
+    getProducts({ categorySlug: categoria, tenaxCategory: tenax, search: q }),
   ]);
 
+  // Enlace de un chip de categoría general (conserva búsqueda; limpia Tenax).
   const buildHref = (slug?: string) => {
     const params = new URLSearchParams();
     if (slug) params.set("categoria", slug);
+    if (q) params.set("q", q);
+    const s = params.toString();
+    return `/tienda${s ? `?${s}` : ""}`;
+  };
+
+  // Enlace de un chip de subcategoría Tenax (conserva búsqueda; limpia general).
+  const buildTenaxHref = (slug?: string) => {
+    const params = new URLSearchParams();
+    if (slug) params.set("tenax", slug);
     if (q) params.set("q", q);
     const s = params.toString();
     return `/tienda${s ? `?${s}` : ""}`;
@@ -77,33 +88,72 @@ export default async function StorePage({
               className="w-full rounded-sm border border-stone-beige bg-white py-2.5 pl-9 pr-3 text-sm text-ink placeholder:text-mineral focus:border-ink focus:outline-none"
             />
             {categoria && <input type="hidden" name="categoria" value={categoria} />}
+            {tenax && <input type="hidden" name="tenax" value={tenax} />}
           </div>
         </form>
 
-        <div className="mb-8 flex flex-wrap gap-2">
-          <Link
-            href={buildHref()}
-            className={cn(
-              "rounded-sm border px-3 py-1.5 text-sm transition-colors",
-              !categoria
-                ? "border-ink bg-ink text-ivory"
-                : "border-stone-beige text-charcoal hover:border-mineral",
-            )}
-          >
-            Todos
-          </Link>
-          {categories.map((c) => (
+        {/* Filtro por categoría general */}
+        {categories.length > 0 && (
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            <span className="mr-1 text-xs font-medium uppercase tracking-wide text-mineral">
+              Categoría
+            </span>
             <Link
-              key={c.id}
-              href={buildHref(c.slug)}
+              href={buildHref()}
               className={cn(
                 "rounded-sm border px-3 py-1.5 text-sm transition-colors",
-                categoria === c.slug
+                !categoria
                   ? "border-ink bg-ink text-ivory"
                   : "border-stone-beige text-charcoal hover:border-mineral",
               )}
             >
-              {c.name}
+              Todas
+            </Link>
+            {categories.map((c) => (
+              <Link
+                key={c.id}
+                href={buildHref(c.slug)}
+                className={cn(
+                  "rounded-sm border px-3 py-1.5 text-sm transition-colors",
+                  categoria === c.slug
+                    ? "border-ink bg-ink text-ivory"
+                    : "border-stone-beige text-charcoal hover:border-mineral",
+                )}
+              >
+                {c.name}
+              </Link>
+            ))}
+          </div>
+        )}
+
+        {/* Filtro por subcategoría Tenax */}
+        <div className="mb-8 flex flex-wrap items-center gap-2">
+          <span className="mr-1 text-xs font-medium uppercase tracking-wide text-mineral">
+            Tenax
+          </span>
+          <Link
+            href={buildTenaxHref()}
+            className={cn(
+              "rounded-sm border px-3 py-1.5 text-sm transition-colors",
+              !tenax
+                ? "border-ink bg-ink text-ivory"
+                : "border-stone-beige text-charcoal hover:border-mineral",
+            )}
+          >
+            Todas
+          </Link>
+          {TENAX_CATEGORIAS.map((c) => (
+            <Link
+              key={c.value}
+              href={buildTenaxHref(c.value)}
+              className={cn(
+                "rounded-sm border px-3 py-1.5 text-sm transition-colors",
+                tenax === c.value
+                  ? "border-ink bg-ink text-ivory"
+                  : "border-stone-beige text-charcoal hover:border-mineral",
+              )}
+            >
+              {c.label}
             </Link>
           ))}
         </div>
