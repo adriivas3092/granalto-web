@@ -30,6 +30,8 @@ export default async function StorePage({
     getProducts({ categorySlug: categoria, tenaxCategory: tenax, search: q }),
   ]);
 
+  const categoryNames = new Map(categories.map((c) => [c.id, c.name]));
+
   // Enlace de un chip de categoría general (conserva búsqueda; limpia Tenax).
   const buildHref = (slug?: string) => {
     const params = new URLSearchParams();
@@ -161,7 +163,11 @@ export default async function StorePage({
         {products.length > 0 ? (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
             {products.map((p) => (
-              <StoreProductCard key={p.id} product={p} />
+              <StoreProductCard
+                key={p.id}
+                product={p}
+                categoryName={p.category_id ? categoryNames.get(p.category_id) : null}
+              />
             ))}
           </div>
         ) : (

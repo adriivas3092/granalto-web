@@ -2,9 +2,18 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Product } from "@/types/store";
 import { formatPrice } from "@/lib/store/queries";
+import { tenaxLabel } from "@/lib/store/tenax";
 
 /** Tarjeta de producto para la tienda pública. */
-export function StoreProductCard({ product }: { product: Product }) {
+export function StoreProductCard({
+  product,
+  categoryName,
+}: {
+  product: Product;
+  /** Nombre de la categoría general (la tarjeta solo tiene el id). */
+  categoryName?: string | null;
+}) {
+  const tenax = tenaxLabel(product.tenax_category);
   const onSale = product.compare_at_price != null && product.compare_at_price >= product.price;
   const hasDiscount = product.compare_at_price != null && product.compare_at_price > product.price;
   const discountPct = hasDiscount
@@ -38,6 +47,20 @@ export function StoreProductCard({ product }: { product: Product }) {
           <span className="absolute right-2 top-2 rounded-sm bg-ink/80 px-2 py-1 text-[0.65rem] uppercase tracking-wide text-ivory">
             No disponible
           </span>
+        )}
+        {(categoryName || tenax) && (
+          <div className="absolute bottom-2 left-2 flex flex-wrap gap-1">
+            {categoryName && (
+              <span className="rounded-sm bg-ink/80 px-2 py-0.5 text-[0.6rem] font-medium uppercase tracking-wide text-ivory backdrop-blur-sm">
+                {categoryName}
+              </span>
+            )}
+            {tenax && (
+              <span className="rounded-sm bg-[#b8863b]/90 px-2 py-0.5 text-[0.6rem] font-medium uppercase tracking-wide text-white backdrop-blur-sm">
+                {tenax}
+              </span>
+            )}
+          </div>
         )}
       </div>
       <div className="flex flex-1 flex-col p-4">
