@@ -118,6 +118,9 @@ export async function crearOrdenGreenpay(params: CrearOrdenParams): Promise<Orde
           },
         ];
 
+  // `additional` es opcional. Lo incluimos solo si GREENPAY_SEND_ADDITIONAL
+  // está activo; así podemos aislar si el rechazo de validación viene de ahí.
+  const incluirAdicional = process.env.GREENPAY_SEND_ADDITIONAL === "true";
   const body = {
     secret: process.env.GREENPAY_SECRET,
     merchantId: process.env.GREENPAY_MERCHANT_ID,
@@ -126,7 +129,7 @@ export async function crearOrdenGreenpay(params: CrearOrdenParams): Promise<Orde
     currency: (params.currency || "CRC").toUpperCase(),
     description: params.description,
     orderReference: params.orderReference,
-    additional: { customer, products },
+    ...(incluirAdicional ? { additional: { customer, products } } : {}),
   };
 
   const url = `${BASE_URL[env]}/createOrder`;
