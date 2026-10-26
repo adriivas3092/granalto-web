@@ -99,15 +99,44 @@ export async function crearOrdenGreenpay(params: CrearOrdenParams): Promise<Orde
     },
   };
 
-  const res = await fetch(`${BASE_URL[env]}/createOrder`, {
-    method: "POST",
-    headers: { Accept: "application/json", "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-    cache: "no-store",
-  });
+  const url = `${BASE_URL[env]}/createOrder`;
+  let res: Response;
+  let bodyText = "";
+  try {
+    res = await fetch(url, {
+      method: "POST",
+      headers: { Accept: "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      cache: "no-store",
+    });
+    bodyText = await res.text();
+  } catch (e) {
+    console.error("[greenpay] createOrder fetch error", url, env, e instanceof Error ? e.message : e);
+    throw new Error("No se pudo contactar a GreenPay. Intentá de nuevo.");
+  }
 
-  const json = (await res.json().catch(() => null)) as { session?: string; token?: string } | null;
+  let json: { session?: string; token?: string } | null = null;
+  try {
+    json = bodyText ? JSON.parse(bodyText) : null;
+  } catch {
+    json = null;
+  }
+
   if (!res.ok || !json?.session || !json?.token) {
+    // Diagnóstico (sin exponer el secret) — visible en los logs de Vercel.
+    console.error(
+      "[greenpay] createOrder fallo",
+      JSON.stringify({
+        url,
+        env,
+        status: res.status,
+        currency: body.currency,
+        terminal: terminalId,
+        amount: body.amount,
+        merchantId: process.env.GREENPAY_MERCHANT_ID,
+        response: bodyText.slice(0, 1000),
+      }),
+    );
     throw new Error("GreenPay no pudo crear la orden. Intentá de nuevo o contactanos.");
   }
   return { session: json.session, token: json.token, terminalId, env };
