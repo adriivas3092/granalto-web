@@ -85,6 +85,39 @@ export async function crearOrdenGreenpay(params: CrearOrdenParams): Promise<Orde
   if (!terminalId) throw new Error("No hay terminal configurado para la moneda del pedido.");
 
   const env = greenpayEnv();
+
+  // Dirección por defecto (Costa Rica). El cobro no depende de estos datos,
+  // pero GreenPay valida que la estructura del cliente esté completa.
+  const direccion = {
+    country: "CR",
+    province: "San José",
+    city: "San José",
+    street1: "-",
+    street2: "-",
+    zip: "10101",
+  };
+
+  const customer = {
+    name: params.customer?.name || "Cliente Granalto",
+    email: params.customer?.email || "ventas@granalto.net",
+    identification: params.customer?.identification || "000000000",
+    billingAddress: direccion,
+    shippingAddress: direccion,
+  };
+
+  const products =
+    params.products && params.products.length > 0
+      ? params.products
+      : [
+          {
+            description: params.description,
+            skuId: params.orderReference.slice(0, 20),
+            quantity: 1,
+            price: Number(params.amount.toFixed(2)),
+            type: "TD",
+          },
+        ];
+
   const body = {
     secret: process.env.GREENPAY_SECRET,
     merchantId: process.env.GREENPAY_MERCHANT_ID,
@@ -93,10 +126,7 @@ export async function crearOrdenGreenpay(params: CrearOrdenParams): Promise<Orde
     currency: (params.currency || "CRC").toUpperCase(),
     description: params.description,
     orderReference: params.orderReference,
-    additional: {
-      ...(params.customer ? { customer: params.customer } : {}),
-      ...(params.products ? { products: params.products } : {}),
-    },
+    additional: { customer, products },
   };
 
   const url = `${BASE_URL[env]}/createOrder`;
