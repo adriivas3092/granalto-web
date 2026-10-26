@@ -160,11 +160,9 @@ export async function crearOrdenGreenpay(params: CrearOrdenParams): Promise<Orde
         url,
         env,
         status: res.status,
-        currency: body.currency,
-        terminal: terminalId,
-        amount: body.amount,
-        merchantId: process.env.GREENPAY_MERCHANT_ID,
-        response: bodyText.slice(0, 1000),
+        secretLen: process.env.GREENPAY_SECRET?.length ?? 0,
+        bodySent: { ...body, secret: "<redactado>" },
+        response: bodyText.slice(0, 1500),
       }),
     );
     throw new Error("GreenPay no pudo crear la orden. Intentá de nuevo o contactanos.");
