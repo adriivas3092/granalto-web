@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, unstable_rethrow } from "next/navigation";
 import { Loader2, ShoppingBag } from "lucide-react";
 import { useCart } from "@/store/cartStore";
 import { formatPrice } from "@/lib/store/format";
@@ -49,7 +49,11 @@ export function CheckoutForm({ defaultName, defaultPhone, defaultAddress, email 
     clear();
     try {
       await createOrder(formData);
-    } catch {
+    } catch (e) {
+      // createOrder termina con redirect() a /checkout/pago; esa excepción de
+      // control de Next NO debe capturarse: la relanzamos para que el redirect
+      // ocurra. Solo si fue un error real volvemos al carrito.
+      unstable_rethrow(e);
       setSubmitting(false);
       router.push("/carrito");
     }

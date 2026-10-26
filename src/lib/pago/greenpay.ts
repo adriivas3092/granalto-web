@@ -29,6 +29,17 @@ export function greenpayEnv(): GreenpayEnv {
   return process.env.GREENPAY_ENV === "prod" ? "prod" : "sbx";
 }
 
+/**
+ * URL base del Checkout. Por defecto según el ambiente, pero se puede forzar
+ * con GREENPAY_CHECKOUT_BASE (p. ej. el host QA: https://checkoutv2.greenpayqa.me)
+ * cuando las credenciales pertenecen a un entorno distinto al estándar.
+ */
+export function checkoutBase(env: GreenpayEnv): string {
+  const override = process.env.GREENPAY_CHECKOUT_BASE?.trim();
+  if (override) return override.replace(/\/+$/, "");
+  return BASE_URL[env];
+}
+
 export function greenpayConfigurado(): boolean {
   return Boolean(
     process.env.GREENPAY_SECRET &&
@@ -71,6 +82,8 @@ export type OrdenGreenpay = {
   token: string;
   terminalId: string;
   env: GreenpayEnv;
+  /** Host del Checkout (por si se usa un override de entorno, p. ej. QA). */
+  apiUrl: string;
 };
 
 /**
@@ -132,7 +145,7 @@ export async function crearOrdenGreenpay(params: CrearOrdenParams): Promise<Orde
     ...(incluirAdicional ? { additional: { customer, products } } : {}),
   };
 
-  const url = `${BASE_URL[env]}/createOrder`;
+  const url = `${checkoutBase(env)}/createOrder`;
   let res: Response;
   let bodyText = "";
   try {
@@ -170,5 +183,5 @@ export async function crearOrdenGreenpay(params: CrearOrdenParams): Promise<Orde
     );
     throw new Error("GreenPay no pudo crear la orden. Intentá de nuevo o contactanos.");
   }
-  return { session: json.session, token: json.token, terminalId, env };
+  return { session: json.session, token: json.token, terminalId, env, apiUrl: checkoutBase(env) };
 }

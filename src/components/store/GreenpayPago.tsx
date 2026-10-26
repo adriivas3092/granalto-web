@@ -43,6 +43,7 @@ export function GreenpayPago({ order }: { order: OrderLite }) {
     terminalId: string;
   } | null>(null);
   const [env, setEnv] = useState<OrdenGreenpay["env"]>("sbx");
+  const [apiUrl, setApiUrl] = useState<string | undefined>(undefined);
 
   const numeroLimpio = cardNumber.replace(/\s+/g, "");
   const formularioValido =
@@ -79,6 +80,7 @@ export function GreenpayPago({ order }: { order: OrderLite }) {
     };
 
     setEnv(res.orden.env);
+    setApiUrl(res.orden.apiUrl);
     setOrderData({
       cardData: { ed: toBase64(JSON.stringify(cardData)), session: res.orden.session },
       sessionToken: res.orden.token,
@@ -140,7 +142,7 @@ export function GreenpayPago({ order }: { order: OrderLite }) {
             <Loader2 className="h-4 w-4 animate-spin" /> {estado || "Procesando…"}
           </div>
           <GreenPay3DSPayment
-            config={{ environment: env }}
+            config={{ environment: env, ...(apiUrl ? { apiUrl } : {}) }}
             orderData={orderData}
             onSuccess={onSuccess}
             onFailure={onFailure}
