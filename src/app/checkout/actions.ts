@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { bnConfigurado, crearTransaccionBN } from "@/lib/pago/bn";
+import { crearOrdenGreenpay, greenpayConfigurado, type OrdenGreenpay } from "@/lib/pago/greenpay";
 import { debeBloquearPorStock } from "@/lib/store/stock";
 import { getStockAlertaActiva } from "@/lib/store/settings";
 import { getSiteUrl } from "@/config/site";
@@ -161,4 +162,93 @@ export async function iniciarPagoBN(orderId: string) {
 
   if (tx?.redirectUrl) redirect(tx.redirectUrl);
   redirect(`/checkout/gracias?pedido=${orderId}&pago=coordinar`);
+}
+
+export type IniciarGreenpayResult =
+  | { ok: true; orden: OrdenGreenpay; amount: number; currency: string }
+  | { ok: false; error: string };
+
+/**
+ * Crea la orden de pago en GreenPay para un pedido del usuario y devuelve los
+ * datos ({ session, token, terminalId, env }) que el navegador usará con el
+ * SDK oficial para capturar la tarjeta y correr el 3D Secure. El `secret` solo
+ * se usa aquí, en el servidor.
+ */
+export async function crearOrdenPagoGreenpay(orderId: string): Promise<IniciarGreenpayResult> {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Tu sesión expiró. Iniciá sesión de nuevo." };
+
+  const { data: order } = await supabase
+    .from("orders")
+    .select("id, customer_id, status, total, currency, customer_name, customer_email")
+    .eq("id", orderId)
+    .maybeSingle();
+
+  if (!order || order.customer_id !== user.id) return { ok: false, error: "Pedido no encontrado." };
+  if (order.status !== "pendiente")
+    return { ok: false, error: "Este pedido ya no está pendiente de pago." };
+  if (!greenpayConfigurado())
+    return { ok: false, error: "La pasarela de pago no está configurada todavía." };
+
+  try {
+    const orden = await crearOrdenGreenpay({
+      amount: order.total,
+      currency: order.currency,
+      description: `Pedido Granalto ${order.id.slice(0, 8).toUpperCase()}`,
+      orderReference: order.id,
+      customer: {
+        name: order.customer_name || undefined,
+        email: order.customer_email || undefined,
+      },
+    });
+    return { ok: true, orden, amount: order.total, currency: order.currency };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : "No se pudo iniciar el pago." };
+  }
+}
+
+/**
+ * Marca un pedido como pagado tras un 3D Secure exitoso en el navegador.
+ *
+ * NOTA DE SEGURIDAD: la confirmación autoritativa del pago debe venir del
+ * WEBHOOK de GreenPay (servidor-a-servidor). Mientras integramos ese webhook,
+ * esta acción marca el pedido como pagado a partir del resultado del navegador.
+ * Pendiente: validar contra el webhook/estado real de GreenPay antes de
+ * producción.
+ */
+export async function confirmarPagoGreenpay(
+  orderId: string,
+  referencia?: string,
+): Promise<{ ok: boolean }> {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false };
+
+  const { data: order } = await supabase
+    .from("orders")
+    .select("id, customer_id, status, notes")
+    .eq("id", orderId)
+    .maybeSingle();
+  if (!order || order.customer_id !== user.id) return { ok: false };
+  if (order.status === "pagado") return { ok: true };
+
+  const service = createSupabaseServiceClient();
+  const client = service ?? supabase;
+  const patch: { status: string; notes?: string } = { status: "pagado" };
+  if (referencia) {
+    const ref = referencia.slice(0, 200);
+    patch.notes = [order.notes, `Pago GreenPay: ${ref}`].filter(Boolean).join("\n");
+  }
+  const { error } = await client.from("orders").update(patch).eq("id", orderId);
+  if (error) return { ok: false };
+
+  revalidatePath("/cuenta");
+  revalidatePath("/cuenta/pedidos");
+  revalidatePath("/admin/pedidos");
+  return { ok: true };
 }

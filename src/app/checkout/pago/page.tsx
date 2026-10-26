@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { PagoCheckout } from "@/components/store/PagoCheckout";
 import { getMyOrderById } from "@/lib/store/account";
+import { greenpayConfigurado } from "@/lib/pago/greenpay";
 import { buildMetadata } from "@/lib/metadata";
 
 export const dynamic = "force-dynamic";
@@ -23,6 +24,8 @@ export default async function PagoPage({
   if (!order) redirect("/carrito");
   if (order.status !== "pendiente") redirect(`/checkout/gracias?pedido=${order.id}`);
 
+  const metodo = greenpayConfigurado() ? "greenpay" : "coordinar";
+
   return (
     <div className="mx-auto max-w-5xl px-4 pb-24 pt-28 sm:px-6 lg:pt-36">
       <Breadcrumbs
@@ -34,10 +37,11 @@ export default async function PagoPage({
       />
       <h1 className="mb-2 mt-3 text-3xl md:text-4xl">Pago seguro</h1>
       <p className="mb-8 max-w-2xl text-charcoal/80">
-        Estás a un paso. Revisá tu pedido y completá el pago. El cobro lo procesa el Banco Nacional en su página
-        segura.
+        Estás a un paso. Revisá tu pedido y completá el pago con tarjeta. El cobro se procesa con verificación
+        3D Secure y tus datos de tarjeta no se almacenan en nuestro sitio.
       </p>
       <PagoCheckout
+        metodo={metodo}
         order={{
           id: order.id,
           total: order.total,

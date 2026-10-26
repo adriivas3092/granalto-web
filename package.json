@@ -11,6 +11,8 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@greenpay_prod/3ds-react": "^0.2.0",
+    "@greenpay_prod/3ds-sdk": "^0.2.0",
     "@hookform/resolvers": "^5.4.0",
     "@react-three/drei": "^10.7.9",
     "@react-three/fiber": "^9.8.1",
