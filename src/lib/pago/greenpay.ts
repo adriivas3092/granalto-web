@@ -134,6 +134,9 @@ export async function crearOrdenGreenpay(params: CrearOrdenParams): Promise<Orde
   // `additional` es opcional. Lo incluimos solo si GREENPAY_SEND_ADDITIONAL
   // está activo; así podemos aislar si el rechazo de validación viene de ahí.
   const incluirAdicional = process.env.GREENPAY_SEND_ADDITIONAL === "true";
+  // GreenPay valida el largo de orderReference; un UUID completo (36) lo
+  // rechaza. Usamos una referencia corta derivada del id (hex sin guiones).
+  const orderRef = params.orderReference.replace(/-/g, "").slice(0, 15);
   const body = {
     secret: process.env.GREENPAY_SECRET,
     merchantId: process.env.GREENPAY_MERCHANT_ID,
@@ -141,7 +144,7 @@ export async function crearOrdenGreenpay(params: CrearOrdenParams): Promise<Orde
     amount: params.amount.toFixed(2),
     currency: (params.currency || "CRC").toUpperCase(),
     description: params.description,
-    orderReference: params.orderReference,
+    orderReference: orderRef,
     ...(incluirAdicional ? { additional: { customer, products } } : {}),
   };
 
