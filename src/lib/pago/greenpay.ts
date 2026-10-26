@@ -94,7 +94,11 @@ export async function crearOrdenGreenpay(params: CrearOrdenParams): Promise<Orde
   if (!greenpayConfigurado()) {
     throw new Error("GreenPay no está configurado (faltan variables de entorno).");
   }
-  const terminalId = terminalParaMoneda(params.currency);
+  // Diagnóstico: permite forzar una moneda (p. ej. USD) para aislar si el
+  // terminal CRC del sandbox es el que rechaza. En producción no se usa.
+  const monedaForzada = process.env.GREENPAY_FORCE_CURRENCY?.trim().toUpperCase();
+  const moneda = monedaForzada || (params.currency || "CRC").toUpperCase();
+  const terminalId = terminalParaMoneda(moneda);
   if (!terminalId) throw new Error("No hay terminal configurado para la moneda del pedido.");
 
   const env = greenpayEnv();
@@ -142,7 +146,7 @@ export async function crearOrdenGreenpay(params: CrearOrdenParams): Promise<Orde
     merchantId: process.env.GREENPAY_MERCHANT_ID,
     terminal: terminalId,
     amount: params.amount.toFixed(2),
-    currency: (params.currency || "CRC").toUpperCase(),
+    currency: moneda,
     description: params.description,
     orderReference: orderRef,
     ...(incluirAdicional ? { additional: { customer, products } } : {}),
