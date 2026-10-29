@@ -10,9 +10,15 @@
  * directamente a GreenPay; nunca pasa por nuestro servidor. Aquí solo se crea
  * la orden con el `secret`, que vive únicamente en variables de entorno.
  *
+ * Autenticación (GreenPay 2.0): createOrder está protegido. Primero se pide un
+ * JWT a POST {auth}/auth/token con { api_key, api_secret } (generados en la
+ * consola) y luego se llama a createOrder con `Authorization: Bearer <jwt>`.
+ *
  * Variables de entorno (en Vercel, nunca en el código):
  *   GREENPAY_ENV            → "sbx" (pruebas) | "prod" (producción)
- *   GREENPAY_SECRET         → secret del comercio (base64)   [solo servidor]
+ *   GREENPAY_API_KEY        → API key de la consola (gp_test_… / gp_live_…)
+ *   GREENPAY_API_SECRET     → API secret de la consola (sk_…)   [solo servidor]
+ *   GREENPAY_SECRET         → secret del comercio (va en el cuerpo de createOrder)
  *   GREENPAY_MERCHANT_ID    → id del comercio
  *   GREENPAY_TERMINAL_CRC   → terminal para cobros en colones
  *   GREENPAY_TERMINAL_USD   → terminal para cobros en dólares
@@ -24,6 +30,52 @@ const BASE_URL: Record<GreenpayEnv, string> = {
   sbx: "https://checkoutv2.greenpaysbx.me",
   prod: "https://checkoutv2.greenpay.me",
 };
+
+const AUTH_URL: Record<GreenpayEnv, string> = {
+  sbx: "https://auth.greenpaysbx.me",
+  prod: "https://auth.greenpay.me",
+};
+
+/**
+ * Obtiene un access token (JWT) de GreenPay 2.0 usando api_key/api_secret.
+ * El token es válido 1 hora; aquí pedimos uno fresco por cada orden.
+ */
+async function obtenerAccessToken(env: GreenpayEnv): Promise<string> {
+  const api_key = process.env.GREENPAY_API_KEY;
+  const api_secret = process.env.GREENPAY_API_SECRET;
+  if (!api_key || !api_secret) {
+    throw new Error("Faltan GREENPAY_API_KEY / GREENPAY_API_SECRET.");
+  }
+  const url = `${AUTH_URL[env]}/auth/token`;
+  let res: Response;
+  let text = "";
+  try {
+    res = await fetch(url, {
+      method: "POST",
+      headers: { Accept: "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify({ api_key, api_secret }),
+      cache: "no-store",
+    });
+    text = await res.text();
+  } catch (e) {
+    console.error("[greenpay] auth/token fetch error", url, e instanceof Error ? e.message : e);
+    throw new Error("No se pudo autenticar con GreenPay.");
+  }
+  let json: { access_token?: string; code?: string; message?: string } | null = null;
+  try {
+    json = text ? JSON.parse(text) : null;
+  } catch {
+    json = null;
+  }
+  if (!res.ok || !json?.access_token) {
+    console.error(
+      "[greenpay] auth/token fallo",
+      JSON.stringify({ url, status: res.status, response: text.slice(0, 500) }),
+    );
+    throw new Error("GreenPay rechazó las credenciales de API (api_key/api_secret).");
+  }
+  return json.access_token;
+}
 
 export function greenpayEnv(): GreenpayEnv {
   return process.env.GREENPAY_ENV === "prod" ? "prod" : "sbx";
@@ -42,7 +94,9 @@ export function checkoutBase(env: GreenpayEnv): string {
 
 export function greenpayConfigurado(): boolean {
   return Boolean(
-    process.env.GREENPAY_SECRET &&
+    process.env.GREENPAY_API_KEY &&
+      process.env.GREENPAY_API_SECRET &&
+      process.env.GREENPAY_SECRET &&
       process.env.GREENPAY_MERCHANT_ID &&
       (process.env.GREENPAY_TERMINAL_CRC || process.env.GREENPAY_TERMINAL_USD),
   );
@@ -158,13 +212,20 @@ export async function crearOrdenGreenpay(params: CrearOrdenParams): Promise<Orde
     ...(incluirAdicional ? { additional: { customer, products } } : {}),
   };
 
+  // Autenticación: obtenemos el JWT y lo mandamos como Bearer en createOrder.
+  const accessToken = await obtenerAccessToken(env);
+
   const url = `${checkoutBase(env)}/createOrder`;
   let res: Response;
   let bodyText = "";
   try {
     res = await fetch(url, {
       method: "POST",
-      headers: { Accept: "application/json", "Content-Type": "application/json" },
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
       body: JSON.stringify(body),
       cache: "no-store",
     });
