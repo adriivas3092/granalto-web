@@ -104,18 +104,22 @@ export async function crearOrdenGreenpay(params: CrearOrdenParams): Promise<Orde
   const env = greenpayEnv();
 
   // Dirección por defecto (Costa Rica). El cobro no depende de estos datos,
-  // pero GreenPay valida que la estructura del cliente esté completa.
+  // pero si se envía `additional`, GreenPay valida longitudes (cada campo de
+  // dirección: mín. 2 caracteres).
   const direccion = {
     country: "CR",
     province: "San José",
     city: "San José",
-    street1: "-",
-    street2: "-",
+    street1: "Sin detalle",
+    street2: "Sin detalle",
     zip: "10101",
   };
 
+  const nombre = params.customer?.name && params.customer.name.length >= 5
+    ? params.customer.name
+    : "Cliente Granalto";
   const customer = {
-    name: params.customer?.name || "Cliente Granalto",
+    name: nombre,
     email: params.customer?.email || "ventas@granalto.net",
     identification: params.customer?.identification || "000000000",
     billingAddress: direccion,
@@ -135,9 +139,10 @@ export async function crearOrdenGreenpay(params: CrearOrdenParams): Promise<Orde
           },
         ];
 
-  // `additional` es opcional (el esquema de createOrder no lo exige). Lo
-  // incluimos solo si GREENPAY_SEND_ADDITIONAL está activo.
-  const incluirAdicional = process.env.GREENPAY_SEND_ADDITIONAL === "true";
+  // `additional` es opcional en el esquema, pero GreenPay recomienda enviar
+  // todos los datos; lo incluimos siempre (salvo que se desactive con
+  // GREENPAY_SEND_ADDITIONAL=false).
+  const incluirAdicional = process.env.GREENPAY_SEND_ADDITIONAL !== "false";
   // orderReference admite 4..100 chars; usamos el id del pedido (UUID).
   const orderRef = params.orderReference.slice(0, 100);
   const body = {
