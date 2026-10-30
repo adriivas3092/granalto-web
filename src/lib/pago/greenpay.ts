@@ -1,27 +1,29 @@
 /**
  * Adaptador de la pasarela GreenPay — Checkout V2.
  *
- * Arquitectura (según el ejemplo oficial de GreenPay, checkout-v2-nodejs):
+ * Flujo (según el ejemplo oficial de GreenPay, checkout-v2-nodejs):
  *   1. SERVIDOR (aquí): POST {base}/createOrder con el `secret` → { session, token }.
  *   2. NAVEGADOR: con @greenpay_prod/3ds-react arma el pago (cardData {ed, session},
  *      sessionToken=token, terminalId) y corre el 3D Secure (vía Evervault).
+ *   3. SERVIDOR (aquí): POST {base}/ (autorización) con { session, ed } y header
+ *      session-token → se cobra la tarjeta.
  *
- * SEGURIDAD: el número de tarjeta se captura y envía desde el NAVEGADOR
- * directamente a GreenPay; nunca pasa por nuestro servidor. Aquí solo se crea
- * la orden con el `secret`, que vive únicamente en variables de entorno.
+ * SEGURIDAD: el `secret` del comercio vive únicamente en variables de entorno y
+ * solo se usa en el servidor.
  *
- * Autenticación (GreenPay 2.0): createOrder está protegido. Primero se pide un
- * JWT a POST {auth}/auth/token con { api_key, api_secret } (generados en la
- * consola) y luego se llama a createOrder con `Authorization: Bearer <jwt>`.
+ * Autenticación: este comercio usa el flujo directo (el `secret` va en el cuerpo
+ * de createOrder, sin JWT). Si en producción se habilitan api_key/api_secret de
+ * la consola, el adaptador pide el JWT a {auth}/auth/token y lo manda como
+ * Bearer automáticamente.
  *
  * Variables de entorno (en Vercel, nunca en el código):
  *   GREENPAY_ENV            → "sbx" (pruebas) | "prod" (producción)
- *   GREENPAY_API_KEY        → API key de la consola (gp_test_… / gp_live_…)
- *   GREENPAY_API_SECRET     → API secret de la consola (sk_…)   [solo servidor]
  *   GREENPAY_SECRET         → secret del comercio (va en el cuerpo de createOrder)
  *   GREENPAY_MERCHANT_ID    → id del comercio
  *   GREENPAY_TERMINAL_CRC   → terminal para cobros en colones
  *   GREENPAY_TERMINAL_USD   → terminal para cobros en dólares
+ *   GREENPAY_API_KEY        → (opcional) API key de la consola, activa el JWT
+ *   GREENPAY_API_SECRET     → (opcional) API secret de la consola  [solo servidor]
  */
 
 export type GreenpayEnv = "sbx" | "prod";
@@ -81,14 +83,8 @@ export function greenpayEnv(): GreenpayEnv {
   return process.env.GREENPAY_ENV === "prod" ? "prod" : "sbx";
 }
 
-/**
- * URL base del Checkout. Por defecto según el ambiente, pero se puede forzar
- * con GREENPAY_CHECKOUT_BASE (p. ej. el host QA: https://checkoutv2.greenpayqa.me)
- * cuando las credenciales pertenecen a un entorno distinto al estándar.
- */
+/** URL base del Checkout según el ambiente. */
 export function checkoutBase(env: GreenpayEnv): string {
-  const override = process.env.GREENPAY_CHECKOUT_BASE?.trim();
-  if (override) return override.replace(/\/+$/, "");
   return BASE_URL[env];
 }
 
@@ -146,10 +142,7 @@ export async function crearOrdenGreenpay(params: CrearOrdenParams): Promise<Orde
   if (!greenpayConfigurado()) {
     throw new Error("GreenPay no está configurado (faltan variables de entorno).");
   }
-  // Diagnóstico: permite forzar una moneda (p. ej. USD) para aislar si el
-  // terminal CRC del sandbox es el que rechaza. En producción no se usa.
-  const monedaForzada = process.env.GREENPAY_FORCE_CURRENCY?.trim().toUpperCase();
-  const moneda = monedaForzada || (params.currency || "CRC").toUpperCase();
+  const moneda = (params.currency || "CRC").toUpperCase();
   const terminalId = terminalParaMoneda(moneda);
   if (!terminalId) throw new Error("No hay terminal configurado para la moneda del pedido.");
 
@@ -191,10 +184,6 @@ export async function crearOrdenGreenpay(params: CrearOrdenParams): Promise<Orde
           },
         ];
 
-  // `additional` es opcional en el esquema, pero GreenPay recomienda enviar
-  // todos los datos; lo incluimos siempre (salvo que se desactive con
-  // GREENPAY_SEND_ADDITIONAL=false).
-  const incluirAdicional = process.env.GREENPAY_SEND_ADDITIONAL !== "false";
   // orderReference admite 4..100 chars; usamos el id del pedido (UUID).
   const orderRef = params.orderReference.slice(0, 100);
   const body = {
@@ -207,7 +196,7 @@ export async function crearOrdenGreenpay(params: CrearOrdenParams): Promise<Orde
     currency: moneda,
     description: params.description,
     orderReference: orderRef,
-    ...(incluirAdicional ? { additional: { customer, products } } : {}),
+    additional: { customer, products },
   };
 
   // Autenticación opcional: si hay api_key/api_secret, pedimos el JWT y lo
@@ -244,17 +233,10 @@ export async function crearOrdenGreenpay(params: CrearOrdenParams): Promise<Orde
   }
 
   if (!res.ok || !json?.session || !json?.token) {
-    // Diagnóstico (sin exponer el secret) — visible en los logs de Vercel.
+    // Error conciso (sin datos sensibles) para los logs de Vercel.
     console.error(
       "[greenpay] createOrder fallo",
-      JSON.stringify({
-        url,
-        env,
-        status: res.status,
-        secretLen: process.env.GREENPAY_SECRET?.length ?? 0,
-        bodySent: { ...body, secret: "<redactado>" },
-        response: bodyText.slice(0, 1500),
-      }),
+      JSON.stringify({ env, status: res.status, response: bodyText.slice(0, 500) }),
     );
     throw new Error("GreenPay no pudo crear la orden. Intentá de nuevo o contactanos.");
   }
@@ -353,4 +335,62 @@ export async function autorizarGreenpay(params: {
     brand: json?.brand,
     mensaje: json?.gp_error?.message,
   };
+}
+
+export type WebhookGreenpay = {
+  /** orderReference que enviamos en createOrder (= id del pedido). */
+  orderId: string;
+  aprobado: boolean;
+  /** Referencia legible (Aut/Tx) para anotar en el pedido. */
+  referencia?: string;
+};
+
+/**
+ * Interpreta el cuerpo del webhook de GreenPay (confirmación servidor-a-servidor).
+ *
+ * El parseo es defensivo: GreenPay puede anidar los datos bajo `data`/`result`/
+ * `order`/`transaction`, así que se buscan las claves en todas esas fuentes. La
+ * ruta registra el payload crudo la primera vez que GreenPay llama, para poder
+ * afinar el mapeo con la forma real si hiciera falta.
+ *
+ * Devuelve null si no se reconoce el pedido en el payload.
+ */
+export function parsearWebhookGreenpay(payload: unknown): WebhookGreenpay | null {
+  if (!payload || typeof payload !== "object") return null;
+  const raiz = payload as Record<string, unknown>;
+
+  // Fuentes donde buscar las claves (raíz + objetos anidados comunes).
+  const fuentes: Record<string, unknown>[] = [raiz];
+  for (const k of ["data", "result", "order", "transaction"]) {
+    const v = raiz[k];
+    if (v && typeof v === "object") fuentes.push(v as Record<string, unknown>);
+  }
+  const leer = (...claves: string[]): unknown => {
+    for (const f of fuentes)
+      for (const k of claves) if (f[k] !== undefined && f[k] !== null) return f[k];
+    return undefined;
+  };
+
+  const ref = leer("orderReference", "reference", "orderId", "id");
+  if (typeof ref !== "string" || ref.length < 4) return null;
+
+  const status = leer("status", "statusCode");
+  const estado = String(leer("state", "status") ?? "").toLowerCase();
+  const authorization = leer("authorization", "authorizationCode");
+  const transactionId = leer("transactionId", "transaction_id", "txId");
+  const aprobado =
+    status === 200 ||
+    status === "200" ||
+    ["approved", "paid", "success", "completed", "aprobado", "pagado"].includes(estado) ||
+    (Boolean(authorization) && status !== 400);
+
+  const referencia = [
+    authorization && `Aut: ${authorization}`,
+    transactionId && `Tx: ${transactionId}`,
+  ]
+    .filter(Boolean)
+    .join(" · ")
+    .slice(0, 200);
+
+  return { orderId: ref, aprobado, referencia: referencia || undefined };
 }

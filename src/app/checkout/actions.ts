@@ -217,49 +217,6 @@ export async function crearOrdenPagoGreenpay(orderId: string): Promise<IniciarGr
 }
 
 /**
- * Marca un pedido como pagado tras un 3D Secure exitoso en el navegador.
- *
- * NOTA DE SEGURIDAD: la confirmación autoritativa del pago debe venir del
- * WEBHOOK de GreenPay (servidor-a-servidor). Mientras integramos ese webhook,
- * esta acción marca el pedido como pagado a partir del resultado del navegador.
- * Pendiente: validar contra el webhook/estado real de GreenPay antes de
- * producción.
- */
-export async function confirmarPagoGreenpay(
-  orderId: string,
-  referencia?: string,
-): Promise<{ ok: boolean }> {
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false };
-
-  const { data: order } = await supabase
-    .from("orders")
-    .select("id, customer_id, status, notes")
-    .eq("id", orderId)
-    .maybeSingle();
-  if (!order || order.customer_id !== user.id) return { ok: false };
-  if (order.status === "pagado") return { ok: true };
-
-  const service = createSupabaseServiceClient();
-  const client = service ?? supabase;
-  const patch: { status: string; notes?: string } = { status: "pagado" };
-  if (referencia) {
-    const ref = referencia.slice(0, 200);
-    patch.notes = [order.notes, `Pago GreenPay: ${ref}`].filter(Boolean).join("\n");
-  }
-  const { error } = await client.from("orders").update(patch).eq("id", orderId);
-  if (error) return { ok: false };
-
-  revalidatePath("/cuenta");
-  revalidatePath("/cuenta/pedidos");
-  revalidatePath("/admin/pedidos");
-  return { ok: true };
-}
-
-/**
  * Autoriza (cobra) el pago de un pedido tras el 3D Secure. Corre en el
  * servidor: recibe los datos de la tarjeta del navegador, construye el `ed`
  * estándar y llama al endpoint de autorización de GreenPay con la session y el
