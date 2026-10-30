@@ -5,7 +5,13 @@ import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { bnConfigurado, crearTransaccionBN } from "@/lib/pago/bn";
-import { crearOrdenGreenpay, greenpayConfigurado, type OrdenGreenpay } from "@/lib/pago/greenpay";
+import {
+  crearOrdenGreenpay,
+  greenpayConfigurado,
+  autorizarGreenpay,
+  type OrdenGreenpay,
+  type TarjetaAutorizacion,
+} from "@/lib/pago/greenpay";
 import { debeBloquearPorStock } from "@/lib/store/stock";
 import { getStockAlertaActiva } from "@/lib/store/settings";
 import { getSiteUrl } from "@/config/site";
@@ -246,6 +252,74 @@ export async function confirmarPagoGreenpay(
   }
   const { error } = await client.from("orders").update(patch).eq("id", orderId);
   if (error) return { ok: false };
+
+  revalidatePath("/cuenta");
+  revalidatePath("/cuenta/pedidos");
+  revalidatePath("/admin/pedidos");
+  return { ok: true };
+}
+
+/**
+ * Autoriza (cobra) el pago de un pedido tras el 3D Secure. Corre en el
+ * servidor: recibe los datos de la tarjeta del navegador, construye el `ed`
+ * estándar y llama al endpoint de autorización de GreenPay con la session y el
+ * token de la orden. Si el banco aprueba, marca el pedido como pagado.
+ */
+export async function autorizarPagoGreenpay(
+  orderId: string,
+  session: string,
+  token: string,
+  card: TarjetaAutorizacion,
+): Promise<{ ok: boolean; error?: string }> {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Tu sesión expiró. Iniciá sesión de nuevo." };
+
+  const { data: order } = await supabase
+    .from("orders")
+    .select("id, customer_id, status, notes")
+    .eq("id", orderId)
+    .maybeSingle();
+  if (!order || order.customer_id !== user.id) return { ok: false, error: "Pedido no encontrado." };
+  if (order.status === "pagado") return { ok: true };
+  if (order.status !== "pendiente")
+    return { ok: false, error: "Este pedido ya no está pendiente de pago." };
+
+  let r;
+  try {
+    r = await autorizarGreenpay({ token, session, card });
+  } catch {
+    return { ok: false, error: "No se pudo procesar el cobro. Intentá de nuevo." };
+  }
+  if (!r.aprobado) {
+    return {
+      ok: false,
+      error:
+        r.mensaje ||
+        "El pago no fue aprobado por el banco. Revisá los datos o probá con otra tarjeta.",
+    };
+  }
+
+  const service = createSupabaseServiceClient();
+  const client = service ?? supabase;
+  const ref = [
+    r.authorization && `Aut: ${r.authorization}`,
+    r.transactionId && `Tx: ${r.transactionId}`,
+    r.brand && r.last4 && `${r.brand} ****${r.last4}`,
+  ]
+    .filter(Boolean)
+    .join(" · ")
+    .slice(0, 200);
+  const { error } = await client
+    .from("orders")
+    .update({
+      status: "pagado",
+      notes: [order.notes, `Pago GreenPay · ${ref}`].filter(Boolean).join("\n"),
+    })
+    .eq("id", orderId);
+  if (error) return { ok: false, error: "El cobro se aprobó pero no se pudo actualizar el pedido." };
 
   revalidatePath("/cuenta");
   revalidatePath("/cuenta/pedidos");

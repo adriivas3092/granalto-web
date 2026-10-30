@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { CreditCard, ShieldCheck, Lock, Loader2 } from "lucide-react";
 import { formatPrice } from "@/lib/store/format";
-import { crearOrdenPagoGreenpay, confirmarPagoGreenpay } from "@/app/checkout/actions";
+import { crearOrdenPagoGreenpay, autorizarPagoGreenpay } from "@/app/checkout/actions";
 import type { OrdenGreenpay } from "@/lib/pago/greenpay";
 
 // El componente 3DS usa Evervault (solo navegador): se carga sin SSR.
@@ -46,7 +46,7 @@ export function GreenpayPago({ order }: { order: OrderLite }) {
 
   const numeroLimpio = cardNumber.replace(/\s+/g, "");
   const formularioValido =
-    cardHolder.trim().length > 1 &&
+    cardHolder.trim().length >= 5 &&
     numeroLimpio.length >= 13 &&
     /^\d{1,2}$/.test(mes) &&
     Number(mes) >= 1 &&
@@ -100,20 +100,28 @@ export function GreenpayPago({ order }: { order: OrderLite }) {
     setEstado("Iniciando la verificación 3D Secure…");
   }
 
-  async function onSuccess(result: { statusCode: number; data: Record<string, unknown> }) {
-    const aprobado = result?.statusCode === 200;
-    if (!aprobado) {
-      setError("El pago no fue aprobado. Revisá los datos o probá con otra tarjeta.");
+  async function onSuccess() {
+    // Tras el 3DS exitoso, cobramos el pago (autorización) en el servidor.
+    if (!orderData) return;
+    setEstado("Procesando el cobro…");
+    const r = await autorizarPagoGreenpay(
+      order.id,
+      orderData.cardData.session,
+      orderData.sessionToken,
+      {
+        cardHolder: cardHolder.trim(),
+        cardNumber: numeroLimpio,
+        expMonth: mes.padStart(2, "0"),
+        expYear: anio,
+        cvc,
+      },
+    );
+    if (!r.ok) {
+      setError(r.error || "El pago no pudo completarse.");
       setFase("form");
       setOrderData(null);
       return;
     }
-    setEstado("Confirmando tu pago…");
-    const ref =
-      (result?.data && (result.data.reference as string)) ||
-      (result?.data && (result.data.authorization as string)) ||
-      "";
-    await confirmarPagoGreenpay(order.id, String(ref));
     router.push(`/checkout/gracias?pedido=${order.id}`);
   }
 

@@ -260,3 +260,97 @@ export async function crearOrdenGreenpay(params: CrearOrdenParams): Promise<Orde
   }
   return { session: json.session, token: json.token, terminalId, env, apiUrl: checkoutBase(env) };
 }
+
+export type TarjetaAutorizacion = {
+  cardHolder: string;
+  cardNumber: string;
+  expMonth: string;
+  expYear: string;
+  cvc: string;
+};
+
+export type ResultadoAutorizacion = {
+  aprobado: boolean;
+  authorization?: string | null;
+  transactionId?: string;
+  last4?: string;
+  brand?: string;
+  mensaje?: string;
+};
+
+/**
+ * Autoriza (cobra) el pago de una orden ya creada (y, si aplica, autenticada
+ * con 3DS). Se corre en el SERVIDOR (recomendación de GreenPay). El cuerpo es
+ * solo { session, ed } + header session-token; GreenPay adjunta el resultado
+ * 3DS almacenado por su cuenta — no se envían campos 3DS.
+ */
+export async function autorizarGreenpay(params: {
+  token: string;
+  session: string;
+  card: TarjetaAutorizacion;
+}): Promise<ResultadoAutorizacion> {
+  const env = greenpayEnv();
+  // `ed` ESTÁNDAR para autorización (distinto al del 3DS): lleva cardHolder,
+  // cardNumber, cvc y channelData.
+  const edPayload = {
+    card: {
+      cardHolder: params.card.cardHolder,
+      expirationDate: { month: params.card.expMonth, year: params.card.expYear },
+      cardNumber: params.card.cardNumber,
+      cvc: params.card.cvc,
+    },
+    additional: { channelData: { channel: "01", source: "API_CARD" } },
+  };
+  const ed = Buffer.from(JSON.stringify(edPayload)).toString("base64");
+
+  const url = `${checkoutBase(env)}/`;
+  let res: Response;
+  let text = "";
+  try {
+    res = await fetch(url, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        "session-token": params.token,
+      },
+      body: JSON.stringify({ session: params.session, ed }),
+      cache: "no-store",
+    });
+    text = await res.text();
+  } catch (e) {
+    console.error("[greenpay] authorize fetch error", e instanceof Error ? e.message : e);
+    return { aprobado: false, mensaje: "No se pudo contactar a GreenPay." };
+  }
+
+  let json:
+    | { status?: number; authorization?: string | null; transactionId?: string; last4?: string; brand?: string; errors?: unknown[]; gp_error?: { message?: string } }
+    | null = null;
+  try {
+    json = text ? JSON.parse(text) : null;
+  } catch {
+    json = null;
+  }
+
+  const aprobado =
+    res.ok &&
+    json?.status === 200 &&
+    (json?.errors?.length ?? 0) === 0 &&
+    Boolean(json?.authorization);
+
+  if (!aprobado) {
+    console.error(
+      "[greenpay] authorize fallo",
+      JSON.stringify({ httpStatus: res.status, response: text.slice(0, 800) }),
+    );
+  }
+
+  return {
+    aprobado: Boolean(aprobado),
+    authorization: json?.authorization ?? null,
+    transactionId: json?.transactionId,
+    last4: json?.last4,
+    brand: json?.brand,
+    mensaje: json?.gp_error?.message,
+  };
+}
