@@ -40,10 +40,8 @@ export function GreenpayPago({ order }: { order: OrderLite }) {
   const [orderData, setOrderData] = useState<{
     cardData: { ed: string; session: string };
     sessionToken: string;
-    terminalId: string;
   } | null>(null);
   const [env, setEnv] = useState<OrdenGreenpay["env"]>("sbx");
-  const [apiUrl, setApiUrl] = useState<string | undefined>(undefined);
 
   const numeroLimpio = cardNumber.replace(/\s+/g, "");
   const formularioValido =
@@ -69,22 +67,31 @@ export function GreenpayPago({ order }: { order: OrderLite }) {
       return;
     }
 
-    const cardData = {
+    // Estructura EXACTA del payload `ed` que exige el 3DS de GreenPay
+    // (distinta a la de createOrder): card.number/expiry, merchant, payment
+    // (monto en CENTAVOS = monto × 100), moneda en minúsculas.
+    const edPayload = {
       card: {
-        cardHolder: cardHolder.trim(),
-        expirationDate: { month: mes.padStart(2, "0"), year: anio },
-        cardNumber: numeroLimpio,
-        cvc,
+        number: numeroLimpio,
+        expiry: { month: mes.padStart(2, "0"), year: anio },
       },
-      additional: { channelData: { channel: "01", source: "API_CARD" } },
+      merchant: {
+        name: "Granalto",
+        website: "https://granaltocr.net",
+        categoryCode: "5999",
+        country: "cr",
+      },
+      payment: {
+        type: "one-off",
+        amount: Math.round(order.total * 100),
+        currency: order.currency.toLowerCase(),
+      },
     };
 
     setEnv(res.orden.env);
-    setApiUrl(res.orden.apiUrl);
     setOrderData({
-      cardData: { ed: toBase64(JSON.stringify(cardData)), session: res.orden.session },
+      cardData: { ed: toBase64(JSON.stringify(edPayload)), session: res.orden.session },
       sessionToken: res.orden.token,
-      terminalId: res.orden.terminalId,
     });
     setEstado("Iniciando la verificación 3D Secure…");
   }
@@ -142,7 +149,7 @@ export function GreenpayPago({ order }: { order: OrderLite }) {
             <Loader2 className="h-4 w-4 animate-spin" /> {estado || "Procesando…"}
           </div>
           <GreenPay3DSPayment
-            config={{ environment: env, ...(apiUrl ? { apiUrl } : {}) }}
+            config={{ environment: env }}
             orderData={orderData}
             onSuccess={onSuccess}
             onFailure={onFailure}
