@@ -94,9 +94,7 @@ export function checkoutBase(env: GreenpayEnv): string {
 
 export function greenpayConfigurado(): boolean {
   return Boolean(
-    process.env.GREENPAY_API_KEY &&
-      process.env.GREENPAY_API_SECRET &&
-      process.env.GREENPAY_SECRET &&
+    process.env.GREENPAY_SECRET &&
       process.env.GREENPAY_MERCHANT_ID &&
       (process.env.GREENPAY_TERMINAL_CRC || process.env.GREENPAY_TERMINAL_USD),
   );
@@ -212,8 +210,11 @@ export async function crearOrdenGreenpay(params: CrearOrdenParams): Promise<Orde
     ...(incluirAdicional ? { additional: { customer, products } } : {}),
   };
 
-  // Autenticación: obtenemos el JWT y lo mandamos como Bearer en createOrder.
-  const accessToken = await obtenerAccessToken(env);
+  // Autenticación opcional: si hay api_key/api_secret, pedimos el JWT y lo
+  // mandamos como Bearer. Si no, se llama a createOrder directo con el secret
+  // en el cuerpo (flujo que indicó GreenPay para este comercio).
+  const usarAuth = Boolean(process.env.GREENPAY_API_KEY && process.env.GREENPAY_API_SECRET);
+  const accessToken = usarAuth ? await obtenerAccessToken(env) : null;
 
   const url = `${checkoutBase(env)}/createOrder`;
   let res: Response;
@@ -224,7 +225,7 @@ export async function crearOrdenGreenpay(params: CrearOrdenParams): Promise<Orde
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
+        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
       },
       body: JSON.stringify(body),
       cache: "no-store",
