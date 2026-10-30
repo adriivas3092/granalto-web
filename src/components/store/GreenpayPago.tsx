@@ -40,6 +40,7 @@ export function GreenpayPago({ order }: { order: OrderLite }) {
   const [orderData, setOrderData] = useState<{
     cardData: { ed: string; session: string };
     sessionToken: string;
+    terminalId: string;
   } | null>(null);
   const [env, setEnv] = useState<OrdenGreenpay["env"]>("sbx");
 
@@ -92,6 +93,9 @@ export function GreenpayPago({ order }: { order: OrderLite }) {
     setOrderData({
       cardData: { ed: toBase64(JSON.stringify(edPayload)), session: res.orden.session },
       sessionToken: res.orden.token,
+      // Obligatorio en /3ds/create-session: GreenPay resuelve con él las
+      // credenciales del acquirer según la marca de tarjeta.
+      terminalId: res.orden.terminalId,
     });
     setEstado("Iniciando la verificación 3D Secure…");
   }
