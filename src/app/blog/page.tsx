@@ -4,9 +4,11 @@ import { ArrowRight } from "lucide-react";
 import { CTASection } from "@/components/sections/CTASection";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { BlogExplorer } from "@/components/sections/BlogExplorer";
-import { getBlogPosts } from "@/data/blog";
+import { getBlogPostsPublic } from "@/lib/blog/queries";
 import { buildMetadata } from "@/lib/metadata";
 import { formatDate } from "@/lib/utils";
+
+export const dynamic = "force-dynamic";
 
 export const metadata = buildMetadata({
   title: "Blog | Ideas, materiales e inspiración",
@@ -15,8 +17,8 @@ export const metadata = buildMetadata({
   path: "/blog",
 });
 
-export default function BlogPage() {
-  const posts = getBlogPosts();
+export default async function BlogPage() {
+  const posts = await getBlogPostsPublic();
   const [featured, ...rest] = posts;
 
   return (

@@ -5,20 +5,18 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { BlogCard } from "@/components/cards/BlogCard";
 import { JsonLd } from "@/components/ui/JsonLd";
-import { getBlogPosts, getBlogPostBySlug, getRelatedPosts } from "@/data/blog";
+import { getBlogPostBySlugPublic, getRelatedPostsPublic } from "@/lib/blog/queries";
 import { articleSchema } from "@/lib/schema";
 import { buildMetadata } from "@/lib/metadata";
 import { formatDate } from "@/lib/utils";
 
-type Params = { slug: string };
+export const dynamic = "force-dynamic";
 
-export function generateStaticParams(): Params[] {
-  return getBlogPosts().map((p) => ({ slug: p.slug }));
-}
+type Params = { slug: string };
 
 export async function generateMetadata({ params }: { params: Promise<Params> }) {
   const { slug } = await params;
-  const post = getBlogPostBySlug(slug);
+  const post = await getBlogPostBySlugPublic(slug);
   if (!post) return {};
   return buildMetadata({ ...post.seo, path: `/blog/${post.slug}` });
 }
@@ -44,10 +42,10 @@ function renderContent(content: string) {
 
 export default async function BlogPostPage({ params }: { params: Promise<Params> }) {
   const { slug } = await params;
-  const post = getBlogPostBySlug(slug);
+  const post = await getBlogPostBySlugPublic(slug);
   if (!post) notFound();
 
-  const related = getRelatedPosts(post.slug, 3);
+  const related = await getRelatedPostsPublic(post.slug, 3);
 
   return (
     <>

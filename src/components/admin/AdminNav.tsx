@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Package, Tags, ShoppingBag, FileText, Users, Layers } from "lucide-react";
+import { LayoutDashboard, Package, Tags, ShoppingBag, FileText, Users, Layers, Newspaper } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const items = [
@@ -12,6 +12,7 @@ const items = [
   { href: "/admin/materiales", label: "Materiales cotizador", icon: Layers },
   { href: "/admin/pedidos", label: "Pedidos", icon: ShoppingBag },
   { href: "/admin/solicitudes", label: "Pedidos de sobres", icon: FileText },
+  { href: "/admin/blog", label: "Blog", icon: Newspaper },
   { href: "/admin/clientes", label: "Clientes", icon: Users },
 ];
 
