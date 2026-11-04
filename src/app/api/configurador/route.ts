@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { z } from "zod";
 import { rateLimit, clientIp } from "@/lib/api/rate-limit";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { buildFicha } from "@/lib/configurador/ficha";
 import { enviarNotificaciones } from "@/lib/configurador/email";
 import { getDisponibilidad } from "@/lib/configurador/disponibilidad";
+import { configuradorSchema, generarFolio } from "@/lib/configurador/schema";
 
 /**
  * POST /api/configurador — registra una configuración de sobre (Documento 4).
@@ -13,46 +13,7 @@ import { getDisponibilidad } from "@/lib/configurador/disponibilidad";
  * posterior; aquí siempre devolvemos el folio para confirmar al cliente.
  */
 
-const medidaSchema = z.object({
-  largo: z.coerce.number().nonnegative(),
-  prof: z.coerce.number().nonnegative(),
-});
-
-const bodySchema = z.object({
-  geometriaId: z.string().min(1),
-  materialId: z.string().nullable().optional(),
-  colorId: z.string().nullable().optional(),
-  medidas: z.record(z.string(), medidaSchema).optional(),
-  acabado: z.enum(["brillo", "mate"]).nullable().optional(),
-  moldura: z.boolean().nullable().optional(),
-  molduraGrosorCm: z.coerce.number().nonnegative().nullable().optional(),
-  molduraPerfil: z.coerce.number().int().min(1).max(12).nullable().optional(),
-  salpicaderoTipo: z.enum(["no", "10", "custom"]).optional(),
-  salpicaderoAlturaCm: z.coerce.number().nonnegative().optional(),
-  lUnion: z.enum(["izquierda", "derecha"]).nullable().optional(),
-  notas: z.string().max(600).optional(),
-  unidad: z.enum(["mm", "cm", "m"]).optional(),
-  derivar: z.boolean().optional(),
-  personalizado: z.boolean().optional(),
-  area: z.coerce.number().nonnegative().optional(),
-  cliente: z.object({
-    nombre: z.string().min(2),
-    telefono: z.string().min(6),
-    correo: z.string().email(),
-    provincia: z.string().min(2),
-    canton: z.string().min(2),
-    direccion: z.string().optional().default(""),
-    retiro: z.boolean().optional().default(false),
-    acepta: z.literal(true, { message: "Debe aceptar los términos." }),
-  }),
-});
-
-function generarFolio(): string {
-  const d = new Date();
-  const ymd = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;
-  const rand = Math.random().toString(36).slice(2, 6).toUpperCase();
-  return `GRA-${ymd}-${rand}`;
-}
+const bodySchema = configuradorSchema;
 
 export async function POST(req: Request) {
   if (!rateLimit(`configurador:${clientIp(req)}`, 20, 60_000)) {

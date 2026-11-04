@@ -23,6 +23,8 @@ import {
 } from "@/data/configurador";
 import { calcularPrecio } from "@/lib/configurador/pricing";
 import { useConfigurador, PASOS, MM_POR_UNIDAD, type Unidad } from "@/store/configuradorStore";
+import { crearPedidoSobre } from "@/app/cotizar/actions";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 const card =
   "group relative flex w-full flex-col rounded-sm border p-4 text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2";
@@ -949,6 +951,8 @@ export function StepResumen() {
 
 /* ── Paso 7 — Datos y confirmación ─────────────────────────── */
 const PROVINCIAS = ["San José", "Alajuela", "Cartago", "Heredia", "Guanacaste", "Puntarenas", "Limón"];
+/** Clave temporal para conservar los datos del cliente al pasar por el login. */
+const CLIENTE_STASH = "granalto-cotizar-cliente";
 
 export function StepDatos() {
   const router = useRouter();
@@ -960,6 +964,42 @@ export function StepDatos() {
   const setFolio = s.setFolio;
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // null = sin determinar todavía; true/false = sesión conocida.
+  const [autenticado, setAutenticado] = useState<boolean | null>(null);
+
+  const price = calcularPrecio(s);
+  // Hay que cobrar cuando el cotizador muestra un "Costo final" real.
+  const requierePago = !esPersonalizado && price.tienePrecio && !price.agotado && price.total > 0;
+
+  // Estado de sesión (para el pago con login obligatorio).
+  useEffect(() => {
+    let vivo = true;
+    createSupabaseBrowserClient()
+      .auth.getUser()
+      .then(({ data }) => {
+        if (vivo) setAutenticado(Boolean(data.user));
+      })
+      .catch(() => {
+        if (vivo) setAutenticado(false);
+      });
+    return () => {
+      vivo = false;
+    };
+  }, []);
+
+  // Restaura los datos del cliente al volver del login (no se persisten en el store).
+  useEffect(() => {
+    try {
+      const guardado = sessionStorage.getItem(CLIENTE_STASH);
+      if (guardado) {
+        setCliente(JSON.parse(guardado));
+        sessionStorage.removeItem(CLIENTE_STASH);
+      }
+    } catch {
+      /* sessionStorage no disponible */
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c.correo);
   const telOk = c.telefono.replace(/\D/g, "").length >= 8;
@@ -967,34 +1007,73 @@ export function StepDatos() {
   const puedeEnviar =
     c.nombre.trim().length > 1 && emailOk && telOk && c.provincia && c.canton.trim().length > 1 && dirOk && c.acepta;
 
+  const payload = () => ({
+    geometriaId: s.geometriaId,
+    materialId: s.materialId,
+    colorId: s.colorId,
+    medidas: s.medidas,
+    acabado: s.acabado,
+    moldura: s.moldura,
+    molduraGrosorCm: s.molduraGrosorCm,
+    molduraPerfil: s.molduraPerfil,
+    salpicaderoTipo: s.salpicaderoTipo,
+    salpicaderoAlturaCm: s.salpicaderoAlturaCm,
+    lUnion: s.lUnion,
+    notas: s.notas,
+    unidad: s.unidad,
+    derivar: s.derivar,
+    personalizado: esPersonalizado,
+    area: price.areaTotal,
+    cliente: c,
+  });
+
+  // Guarda los datos del cliente y manda al login, para volver a /cotizar.
+  const irAlLogin = () => {
+    try {
+      sessionStorage.setItem(CLIENTE_STASH, JSON.stringify(c));
+    } catch {
+      /* sin sessionStorage: se re-ingresan los datos */
+    }
+    router.push(`/cuenta/login?next=${encodeURIComponent("/cotizar")}`);
+  };
+
   const submit = async () => {
     if (!puedeEnviar || busy) return;
     setBusy(true);
     setError(null);
+
+    // Camino con PAGO: crea el pedido y va a la pasarela (requiere sesión).
+    if (requierePago) {
+      if (autenticado === false) {
+        irAlLogin();
+        return;
+      }
+      try {
+        const r = await crearPedidoSobre(payload());
+        if (!r.ok) {
+          if (r.needLogin) {
+            irAlLogin();
+            return;
+          }
+          setError(r.error);
+          setBusy(false);
+          return;
+        }
+        setFolio(r.folio);
+        router.push(`/checkout/pago?pedido=${r.orderId}`);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "No se pudo iniciar el pago.");
+        setBusy(false);
+      }
+      return;
+    }
+
+    // Camino SIN pago (personalizado / a confirmar): solo registra la solicitud.
     try {
-      const price = calcularPrecio(s);
       const res = await fetch("/api/configurador", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          geometriaId: s.geometriaId,
-          materialId: s.materialId,
-          colorId: s.colorId,
-          medidas: s.medidas,
-          acabado: s.acabado,
-          moldura: s.moldura,
-          molduraGrosorCm: s.molduraGrosorCm,
-          molduraPerfil: s.molduraPerfil,
-          salpicaderoTipo: s.salpicaderoTipo,
-          salpicaderoAlturaCm: s.salpicaderoAlturaCm,
-          lUnion: s.lUnion,
-          notas: s.notas,
-          unidad: s.unidad,
-          derivar: s.derivar,
-          personalizado: esPersonalizado,
-          area: price.areaTotal,
-          cliente: c,
-        }),
+        body: JSON.stringify(payload()),
       });
       const data = await res.json();
       if (!res.ok || !data?.folio) throw new Error(data?.message || "No se pudo enviar.");
@@ -1016,7 +1095,9 @@ export function StepDatos() {
         subtitle={
           esPersonalizado
             ? "Un asesor te contacta para cotizar tu proyecto personalizado."
-            : "Con estos datos generamos tu pedido y te enviamos la confirmación."
+            : requierePago
+              ? "Con estos datos generás tu pedido y pagás en línea de forma segura."
+              : "Con estos datos generamos tu pedido y te enviamos la confirmación."
         }
       />
       <div className="grid gap-4 sm:grid-cols-2">
@@ -1075,14 +1156,27 @@ export function StepDatos() {
 
       {error && <p className="mt-4 rounded-sm bg-[#a03826]/10 px-3 py-2 text-sm text-[#a03826]">{error}</p>}
 
+      {requierePago && autenticado === false && (
+        <p className="mt-4 rounded-sm border border-stone-beige bg-ivory/60 px-3 py-2 text-xs leading-relaxed text-charcoal/85">
+          Para pagar tu pedido necesitás una cuenta. Iniciá sesión o registrate; volvés a
+          esta pantalla automáticamente.
+        </p>
+      )}
+
       <button
         type="button"
-        onClick={submit}
-        disabled={!puedeEnviar || busy}
+        onClick={requierePago && autenticado === false ? irAlLogin : submit}
+        disabled={busy || (!(requierePago && autenticado === false) && !puedeEnviar)}
         className="mt-6 inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-sm bg-ink px-6 py-3 text-sm font-medium text-ivory transition-colors hover:bg-charcoal disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto"
       >
         {busy && <Loader2 className="h-4 w-4 animate-spin" />}
-        {esPersonalizado ? "Enviar solicitud" : "Enviar pedido"}
+        {requierePago
+          ? autenticado === false
+            ? "Iniciar sesión para pagar"
+            : `Pagar ${formatPrice(price.total, price.moneda)}`
+          : esPersonalizado
+            ? "Enviar solicitud"
+            : "Enviar pedido"}
       </button>
     </div>
   );
