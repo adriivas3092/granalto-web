@@ -1,110 +1,114 @@
-# Migración de granaltocr.net a la web nueva (Vercel)
+# Migración de granaltocr.net a la web nueva (Vercel) — SIN la agencia
 
-Guía para apuntar el dominio **granaltocr.net** a la web nueva **sin perder el
-correo** de Google Workspace y sin depender de la agencia.
-
-> Vos sos dueño del dominio en el registrador. El DNS hoy lo administra
-> **SiteGround** (nameservers `ns1.siteground.net` / `ns2.siteground.net`) y el
-> correo está en **Google Workspace**.
+Objetivo: que **granaltocr.net** muestre la web nueva (Vercel) y que el **correo
+de Google Workspace siga funcionando**, tomando el control del DNS desde tu
+registrador para **no depender de la agencia**.
 
 ---
 
-## Estado actual (verificado en Vercel)
+## Diagnóstico real (leído del DNS en vivo)
 
-- `granaltocr.net` y `www.granaltocr.net` **ya están agregados y verificados** en
-  el proyecto de Vercel (`granalto-web`). El apex redirige a `www` (308).
-- Pero el DNS **todavía apunta al servidor viejo** (`A → 35.212.77.162`), por eso
-  Vercel marca el dominio como `misconfigured`. Falta **solo un paso**: cambiar
-  los registros A/CNAME en SiteGround.
+- **Registrador:** Squarespace Domains (ex–Google Domains). Vos tenés acceso.
+- **DNS actual:** nameservers `ns1/ns2.siteground.net` → **lo maneja la agencia**
+  (no tenés acceso a editar registros ahí).
+- **Web vieja:** `A → 35.212.77.162` (SiteGround).
+- **Correo:** los `MX` apuntan a `mx10/20/30.mailspamprotection.com` (filtro
+  antispam de SiteGround) que **reenvía a tu Google Workspace**. El buzón real
+  es Google. ✅
+- **Vercel:** `granaltocr.net` y `www` ya están **agregados y verificados**; solo
+  falta que el DNS apunte a Vercel.
 
-## Estrategia recomendada (riesgo mínimo)
+## Estrategia
 
-**Dejamos el DNS en SiteGround y el correo intacto.** Solo cambiamos 2 registros
-(el A del dominio y el CNAME de www). **NO** tocamos los nameservers ni los
-registros de correo (MX/TXT). Así el email de Google Workspace sigue funcionando
-sin interrupción y la web nueva queda en línea.
+Como la agencia controla el DNS en SiteGround, **movemos el DNS a un proveedor
+tuyo** cambiando los *nameservers* en el registrador (Squarespace). Ahí recreamos
+TODOS los registros: web → Vercel y correo → **Google directo** (ya no por el
+filtro de SiteGround).
 
-> No hace falta migrar a Cloudflare para lanzar. Esa migración es opcional y se
-> puede hacer después con calma.
-
----
-
-## Pasos (en el panel DNS de SiteGround)
-
-Entrá a **SiteGround → Site Tools → Domain → DNS Zone Editor** del dominio
-`granaltocr.net`.
-
-### 1. Registro A del dominio raíz (@)
-Editá el registro **A** del host `@` (o `granaltocr.net`):
-
-| Campo | Valor nuevo |
-|-------|-------------|
-| Tipo  | `A` |
-| Host  | `@` |
-| Apunta a | `216.198.79.1` |
-| TTL   | el más bajo que permita (p. ej. 300 / 1 hora) |
-
-- Valor anterior a reemplazar: `35.212.77.162`.
-- Si SiteGround deja agregar un segundo A para `@`, añadí también `64.29.17.1`
-  (mejora la tolerancia a fallos). Si solo permite uno, con `216.198.79.1` basta.
-- Alternativa válida si esas IP dieran problema: `76.76.21.21`.
-
-### 2. Registro CNAME de www
-Editá (o creá) el registro **CNAME** del host `www`:
-
-| Campo | Valor nuevo |
-|-------|-------------|
-| Tipo  | `CNAME` |
-| Host  | `www` |
-| Apunta a | `35e029bbc4e998c5.vercel-dns-017.com.` |
-| TTL   | el más bajo que permita |
-
-- Alternativa válida: `cname.vercel-dns.com.`
-- Si existe un registro **A** viejo en `www` (apuntando a `35.212.77.162`),
-  borralo: `www` debe ser CNAME, no A.
-
-### 3. Correo: NO TOCAR
-Dejá **sin cambios** todos los registros de correo de Google Workspace:
-- Los **MX** (apuntan a Google: `smtp.google.com` o los `aspmx…`).
-- Los **TXT** de SPF (`v=spf1 include:_spf.google.com …`), DKIM (`google._domainkey`)
-  y DMARC (`_dmarc`).
-
-Como no cambiamos nameservers ni estos registros, el correo sigue igual.
+> Recomendado: **Cloudflare** (gratis) como nuevo DNS, porque al agregar el
+> dominio **importa automáticamente** los registros actuales (red de seguridad
+> por si hubiera algo que no listamos). Alternativa sin crear otra cuenta: usar
+> el **DNS propio de Squarespace**. Los registros a poner son los mismos.
 
 ---
 
-## Verificación (después de guardar)
+## Registros a crear en el DNS nuevo
 
-La propagación tarda desde unos minutos hasta unas horas (según el TTL anterior).
+### 🌐 Web (Vercel)
+| Tipo | Host | Valor | Notas |
+|------|------|-------|-------|
+| A | `@` | `216.198.79.1` | IP de Vercel (rank 1). Podés añadir también `64.29.17.1`. |
+| CNAME | `www` | `35e029bbc4e998c5.vercel-dns-017.com` | Alternativa válida: `cname.vercel-dns.com` |
 
-1. Comprobá el DNS en https://dnschecker.org:
-   - `granaltocr.net` tipo **A** → debe mostrar `216.198.79.1` en la mayoría de
-     ubicaciones.
-   - `www.granaltocr.net` tipo **CNAME** → debe mostrar el valor `vercel-dns`.
-2. En **Vercel → proyecto granalto-web → Settings → Domains**, el dominio debe
-   pasar de `Invalid Configuration` a **válido** (check verde). Vercel emite el
-   certificado SSL automáticamente.
-3. Abrí `https://granaltocr.net` → debe redirigir a `https://www.granaltocr.net`
-   y mostrar la web nueva, con candado (HTTPS).
-4. Mandá/recibí un correo de prueba para confirmar que el email sigue bien.
+- Borrá el A viejo de `@` y de `www` que apuntan a `35.212.77.162`.
+- Alternativa de IP si esas dieran problema: `76.76.21.21`.
+
+### ✉️ Correo (Google Workspace) — ¡no omitir!
+| Tipo | Host | Prioridad | Valor |
+|------|------|-----------|-------|
+| MX | `@` | 1 | `smtp.google.com` |
+
+> Opción clásica (si tu panel no acepta el registro único, poné estos 5):
+> `1 ASPMX.L.GOOGLE.COM` · `5 ALT1.ASPMX.L.GOOGLE.COM` · `5 ALT2.ASPMX.L.GOOGLE.COM`
+> · `10 ALT3.ASPMX.L.GOOGLE.COM` · `10 ALT4.ASPMX.L.GOOGLE.COM`
+
+| Tipo | Host | Valor | Qué es |
+|------|------|-------|--------|
+| TXT | `@` | `v=spf1 include:_spf.google.com ~all` | SPF de Google (reemplaza el de SiteGround) |
+| TXT | `_dmarc` | `v=DMARC1; p=none; aspf=r; adkim=r;` | DMARC (igual al actual) |
+
+**DKIM (recomendado, mejora la entregabilidad):** hoy no hay DKIM de Google
+publicado. En **admin.google.com → Apps → Google Workspace → Gmail → Autenticar
+correo electrónico**, generá la clave para granaltocr.net y agregá el TXT que te
+dé Google (host tipo `google._domainkey`). No es obligatorio para que el correo
+funcione, pero conviene.
+
+> ⚠️ **No** copies el SPF viejo de SiteGround (`...dnssmarthost.net...`): al mover
+> el correo a Google directo, ese deja de aplicar.
 
 ---
 
-## Si algo sale mal (rollback)
+## Orden de ejecución (sin cortes)
 
-Volvé a poner el registro A de `@` en `35.212.77.162` (y el `www` como estaba).
-En minutos regresa al estado anterior. El correo nunca se ve afectado porque no
-se toca.
+### Opción A — Cloudflare (recomendada)
+1. Creá cuenta en **cloudflare.com** → **Add a site** → `granaltocr.net` (plan Free).
+2. Cloudflare escanea e **importa** los registros actuales. Revisá la lista.
+3. **Editá** para que quede como la tabla de arriba:
+   - `A @` → `216.198.79.1` (borrá el `35.212.77.162`).
+   - `CNAME www` → valor de Vercel.
+   - `MX @` → `smtp.google.com` (borrá los `mailspamprotection.com`).
+   - `TXT @` SPF → el de Google (borrá el de SiteGround).
+   - `TXT _dmarc` → dejalo como está.
+   - (Web/A) poné el "proxy" (nube naranja) en **DNS only / gris** para `@` y
+     `www` — Vercel maneja su propio SSL.
+4. Cloudflare te da **2 nameservers** (p. ej. `xxx.ns.cloudflare.com`).
+5. En **Squarespace Domains → granaltocr.net → Nameservers**, cambiá de los de
+   SiteGround a los **de Cloudflare**. Guardá.
+6. Esperá la propagación (minutos a pocas horas). Cloudflare te avisa "Active".
+
+### Opción B — DNS propio de Squarespace (sin otra cuenta)
+1. En **Squarespace Domains → granaltocr.net → DNS**, cambiá a **nameservers de
+   Squarespace** (dejar de usar los de SiteGround).
+2. En **Custom records**, creá TODOS los registros de las tablas de arriba
+   (web + correo). Asegurate de incluir los MX y el SPF de Google.
 
 ---
 
-## Opcional — más adelante: mover el DNS a Cloudflare
+## Verificación (después de propagar)
 
-Solo si se quiere administrar el DNS fuera de SiteGround:
-1. Crear cuenta en Cloudflare y agregar el dominio → Cloudflare **copia** los
-   registros actuales (revisar que estén TODOS: A, CNAME, MX y TXT de Google).
-2. Cambiar los **nameservers** en el registrador a los que indique Cloudflare.
-3. Verificar que los MX/TXT de Google quedaron idénticos **antes** de confirmar.
+1. **dnschecker.org**: `granaltocr.net` tipo A → `216.198.79.1`; tipo MX →
+   `smtp.google.com`.
+2. **Vercel → proyecto granalto-web → Settings → Domains**: pasa de "Invalid
+   Configuration" a **válido** (SSL automático).
+3. Abrí `https://granaltocr.net` → redirige a `https://www.granaltocr.net` con la
+   web nueva y candado (HTTPS).
+4. **Correo:** enviá y recibí un correo de prueba con tu cuenta @granaltocr.net.
 
-Esta ruta cambia los nameservers (más delicado por el correo), por eso no es
-necesaria para lanzar: la estrategia de arriba ya deja la web nueva en línea.
+## Rollback
+Si algo sale mal, volvé a poner en Squarespace los **nameservers de SiteGround**
+(`ns1.siteground.net`, `ns2.siteground.net`). En un rato regresa al estado
+anterior.
+
+## Después de migrar (opcional)
+- La web vieja y el filtro de correo de SiteGround quedan sin uso; podés darlos
+  de baja con la agencia cuando quieras (ya no dependés de ellos).
