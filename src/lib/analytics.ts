@@ -1,4 +1,5 @@
 import type { AnalyticsEvent } from "@/types";
+import { ADS_ID, ADS_CONVERSIONS } from "@/config/tracking";
 
 /**
  * Capa de eventos analíticos.
@@ -14,10 +15,19 @@ type DataLayerWindow = Window & {
   fbq?: (...args: unknown[]) => void;
 };
 
+/** Último evento enviado, para no contar dos veces el mismo clic. */
+let ultimo = { name: "", at: 0 };
+
 export function trackEvent(event: AnalyticsEvent): void {
   if (typeof window === "undefined") return;
   const w = window as DataLayerWindow;
   const params = "params" in event ? event.params : undefined;
+
+  // Un mismo clic puede reportarse desde el enlace y desde el rastreador
+  // global de contactos: se ignora el duplicado inmediato.
+  const ahora = Date.now();
+  if (ultimo.name === event.name && ahora - ultimo.at < 800) return;
+  ultimo = { name: event.name, at: ahora };
 
   // Google Tag Manager / dataLayer
   w.dataLayer = w.dataLayer ?? [];
@@ -26,6 +36,12 @@ export function trackEvent(event: AnalyticsEvent): void {
   // Google Analytics 4 (gtag directo)
   if (typeof w.gtag === "function") {
     w.gtag("event", event.name, params ?? {});
+  }
+
+  // Conversión de Google Ads (si el evento tiene etiqueta configurada)
+  const etiqueta = ADS_CONVERSIONS[event.name];
+  if (ADS_ID && etiqueta && typeof w.gtag === "function") {
+    w.gtag("event", "conversion", { send_to: `${ADS_ID}/${etiqueta}` });
   }
 
   // Meta Pixel

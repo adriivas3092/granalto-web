@@ -7,6 +7,7 @@ import { Footer } from "@/components/layout/Footer";
 import { CookieBanner } from "@/components/layout/CookieBanner";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
+import { ContactClickTracker } from "@/components/analytics/ContactClickTracker";
 import { JsonLd } from "@/components/ui/JsonLd";
 import { organizationSchema } from "@/lib/schema";
 
@@ -60,6 +61,7 @@ export default function RootLayout({
         <Footer />
         <CookieBanner />
         <GoogleAnalytics />
+        <ContactClickTracker />
         <WhatsAppButton />
       </body>
     </html>
