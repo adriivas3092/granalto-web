@@ -72,6 +72,9 @@ export function ContactForm() {
       });
       setStatus("success");
       setData(initialData);
+      // Carga completa de la página de gracias: su URL es la que usa Google
+      // Tag Manager para registrar la conversión de formulario.
+      window.location.assign("/gracias-por-su-mensaje/enviado");
     } catch {
       setStatus("error");
     }
