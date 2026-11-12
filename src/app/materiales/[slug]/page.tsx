@@ -4,7 +4,6 @@ import { HeroSection } from "@/components/sections/HeroSection";
 import { CTASection } from "@/components/sections/CTASection";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
-import { ImageGallery } from "@/components/galleries/ImageGallery";
 import { CatalogCard } from "@/components/cards/CatalogCard";
 import { ProjectCard } from "@/components/cards/ProjectCard";
 import { ViewTracker } from "@/components/sections/ViewTracker";
@@ -122,19 +121,6 @@ export default async function MaterialPage({ params }: { params: Promise<Params>
           {materialVariabilityNote}
         </p>
       </section>
-
-      {material.gallery.length > 0 && (
-        <section className="bg-white py-16 md:py-24">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <SectionHeading
-              eyebrow="Galería"
-              title={`${material.name} en ambientes`}
-              description="Imágenes pendientes de reemplazo por fotografías reales."
-            />
-            <ImageGallery images={material.gallery} />
-          </div>
-        </section>
-      )}
 
       {relatedCatalogs.length > 0 && (
         <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-24 lg:px-8">

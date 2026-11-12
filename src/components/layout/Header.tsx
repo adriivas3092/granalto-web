@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { MessageCircle, User } from "lucide-react";
 import { Logo } from "@/components/layout/Logo";
 import { CartButton } from "@/components/store/CartButton";
+import { COMPRA_EN_LINEA } from "@/config/tienda";
 import { getWhatsAppUrl, siteConfig } from "@/config/site";
 import { trackEvent } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
@@ -61,7 +62,7 @@ export function Header() {
             <MessageCircle aria-hidden="true" className="h-5 w-5" />
           </a>
 
-          <CartButton isTransparent={isTransparent} />
+          {COMPRA_EN_LINEA && <CartButton isTransparent={isTransparent} />}
 
           <Link
             href="/cuenta"

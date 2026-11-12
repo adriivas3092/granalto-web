@@ -4,8 +4,9 @@ import { Check, MessageCircle } from "lucide-react";
 import { CTASection } from "@/components/sections/CTASection";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { AddToCartButton } from "@/components/store/AddToCartButton";
+import { COMPRA_EN_LINEA } from "@/config/tienda";
 import { getProductBySlug, formatPrice } from "@/lib/store/queries";
-import { getWhatsAppUrl } from "@/config/site";
+import { getWhatsAppUrl, siteConfig } from "@/config/site";
 import { buildMetadata } from "@/lib/metadata";
 
 export const dynamic = "force-dynamic";
@@ -112,26 +113,40 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               </dl>
             )}
 
-            <div className="mt-8">
-              <AddToCartButton product={product} />
-            </div>
-
-            <div className="mt-4">
-              <a
-                href={getWhatsAppUrl(waMessage)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex min-h-[44px] items-center gap-2 rounded-sm border border-stone-beige px-6 py-2.5 text-sm font-medium text-charcoal transition-colors hover:border-ink"
-              >
-                <MessageCircle aria-hidden="true" className="h-4 w-4" />
-                Consultar por WhatsApp
-              </a>
-            </div>
-            <p className="mt-3 text-xs text-mineral">
-              Agregue al carrito y finalice su pedido en línea. El pago con tarjeta
-              estará disponible próximamente; por ahora coordinamos el pago al
-              confirmar el pedido.
-            </p>
+            {COMPRA_EN_LINEA ? (
+              <>
+                <div className="mt-8">
+                  <AddToCartButton product={product} />
+                </div>
+                <div className="mt-4">
+                  <a
+                    href={getWhatsAppUrl(waMessage)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex min-h-[44px] items-center gap-2 rounded-sm border border-stone-beige px-6 py-2.5 text-sm font-medium text-charcoal transition-colors hover:border-ink"
+                  >
+                    <MessageCircle aria-hidden="true" className="h-4 w-4" />
+                    Consultar por WhatsApp
+                  </a>
+                </div>
+              </>
+            ) : (
+              <div className="mt-8">
+                <a
+                  href={getWhatsAppUrl(`Hola, quiero comprar el producto "${product.name}"${product.sku ? ` (SKU ${product.sku})` : ""}.`)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-sm bg-ink px-7 py-3 text-sm font-medium text-ivory transition-colors hover:bg-charcoal sm:w-auto"
+                >
+                  <MessageCircle aria-hidden="true" className="h-4 w-4" />
+                  Comprar por WhatsApp
+                </a>
+                <p className="mt-3 text-sm text-charcoal/80">
+                  Para comprar este producto, comunicate con nosotros al{" "}
+                  <strong className="text-ink">{siteConfig.contact.whatsapp}</strong>.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </section>

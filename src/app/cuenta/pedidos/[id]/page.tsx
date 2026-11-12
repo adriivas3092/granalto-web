@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { COMPRA_EN_LINEA } from "@/config/tienda";
 import { notFound, redirect } from "next/navigation";
 import { Lock } from "lucide-react";
 import { getSessionUser, getMyOrderById } from "@/lib/store/account";
@@ -39,7 +40,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
       <p className="mt-2 text-sm text-mineral">{fmtDate(order.created_at)}</p>
 
       {/* Pendiente de pago → el cliente puede pagar ahora */}
-      {order.status === "pendiente" && (
+      {COMPRA_EN_LINEA && order.status === "pendiente" && (
         <div className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-sm border border-ink/30 bg-ivory/60 p-5">
           <div>
             <p className="font-medium text-ink">Tu pedido está pendiente de pago</p>

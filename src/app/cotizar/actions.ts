@@ -8,6 +8,7 @@ import { buildFicha } from "@/lib/configurador/ficha";
 import { getDisponibilidad } from "@/lib/configurador/disponibilidad";
 import { enviarNotificaciones } from "@/lib/configurador/email";
 import { configuradorSchema, generarFolio } from "@/lib/configurador/schema";
+import { COMPRA_EN_LINEA } from "@/config/tienda";
 
 export type CrearPedidoSobreResult =
   | { ok: true; orderId: string; folio: string }
@@ -24,6 +25,7 @@ export type CrearPedidoSobreResult =
  *   notificaciones internas, igual que el envío normal del cotizador.
  */
 export async function crearPedidoSobre(payload: unknown): Promise<CrearPedidoSobreResult> {
+  if (!COMPRA_EN_LINEA) return { ok: false, error: "El pago en línea no está disponible por el momento." };
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },

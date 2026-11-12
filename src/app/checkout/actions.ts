@@ -15,6 +15,7 @@ import {
 import { debeBloquearPorStock } from "@/lib/store/stock";
 import { getStockAlertaActiva } from "@/lib/store/settings";
 import { getSiteUrl } from "@/config/site";
+import { COMPRA_EN_LINEA } from "@/config/tienda";
 import type { Product } from "@/types/store";
 
 type IncomingItem = { id: string; quantity: number };
@@ -25,6 +26,7 @@ type IncomingItem = { id: string; quantity: number };
  * para no confiar en valores del cliente.
  */
 export async function createOrder(formData: FormData) {
+  if (!COMPRA_EN_LINEA) redirect("/tienda");
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
@@ -181,6 +183,7 @@ export type IniciarGreenpayResult =
  * se usa aquí, en el servidor.
  */
 export async function crearOrdenPagoGreenpay(orderId: string): Promise<IniciarGreenpayResult> {
+  if (!COMPRA_EN_LINEA) return { ok: false, error: "El pago en línea no está disponible por el momento." };
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
@@ -228,6 +231,7 @@ export async function autorizarPagoGreenpay(
   token: string,
   card: TarjetaAutorizacion,
 ): Promise<{ ok: boolean; error?: string }> {
+  if (!COMPRA_EN_LINEA) return { ok: false, error: "El pago en línea no está disponible por el momento." };
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
