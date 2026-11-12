@@ -15,8 +15,9 @@ import { ADS_ID, GTM_ID } from "@/config/tracking";
  */
 const CONSENT_KEY = "granalto-cookie-consent";
 
-// ID de medición GA4 (público). Se puede sobrescribir con NEXT_PUBLIC_GA_ID.
-const GA_DEFAULT_ID = "G-4669154452";
+// GA4 se carga desde el contenedor de GTM (ya tiene sus etiquetas de Google).
+// Solo se carga directo si se define NEXT_PUBLIC_GA_ID.
+const GA_DEFAULT_ID = "";
 
 type GtagWindow = Window & { gtag?: (...args: unknown[]) => void };
 

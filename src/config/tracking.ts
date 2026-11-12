@@ -9,11 +9,13 @@
  * Con un valor vacío la etiqueta correspondiente no se carga.
  */
 export const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID || "GTM-P6CPG97";
-export const ADS_ID = process.env.NEXT_PUBLIC_GADS_ID || "AW-978695125";
+// Google Ads (AW-978695125) y sus conversiones ya se disparan DESDE el
+// contenedor de GTM. Se deja vacío para no cargarlo ni contarlo dos veces.
+export const ADS_ID = process.env.NEXT_PUBLIC_GADS_ID || "";
 
 /** Eventos del sitio que cuentan como conversión → etiqueta de Google Ads. */
 export const ADS_CONVERSIONS: Record<string, string> = {
-  whatsapp_click: "YMrqCOzX_u0YENXn1tlD",
+  whatsapp_click: "",
   contact_form_submit: "",
   phone_click: "",
   directions_click: "",
