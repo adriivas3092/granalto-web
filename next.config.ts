@@ -17,18 +17,21 @@ const nextConfig: NextConfig = {
     // visor 3D; aun así se restringe de qué dominios se cargan scripts.
     // Dominios de medición de Google (Tag Manager, Analytics y Google Ads),
     // según la lista recomendada por Google para sitios con CSP.
+    // Kommo NO está autorizado a propósito: así el botón de chat que inserta
+    // el contenedor de GTM no se carga. Para volver a usarlo, agregar
+    // https://*.kommo.com a script-src, style-src, font-src, connect-src y frame-src.
     const csp = [
       "default-src 'self'",
       "base-uri 'self'",
       "object-src 'none'",
       "frame-ancestors 'self'",
       "form-action 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://www.googleadservices.com https://googleads.g.doubleclick.net https://www.google.com https://va.vercel-scripts.com https://*.vercel-insights.com https://*.kommo.com https://*.amocrm.com https://*.evervault.com https://*.evervault.app https://*.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com https://*.googleadservices.com https://*.googlesyndication.com https://*.doubleclick.net https://*.google.com https://google.com",
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.kommo.com https://*.amocrm.com https://*.evervault.com",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://www.googleadservices.com https://googleads.g.doubleclick.net https://www.google.com https://va.vercel-scripts.com https://*.vercel-insights.com https://*.evervault.com https://*.evervault.app https://*.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com https://*.googleadservices.com https://*.googlesyndication.com https://*.doubleclick.net https://*.google.com https://google.com",
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.evervault.com",
       "img-src 'self' data: blob: https:",
-      "font-src 'self' data: https://fonts.gstatic.com https://*.kommo.com https://*.amocrm.com",
-      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://*.google-analytics.com https://www.googletagmanager.com https://www.googleadservices.com https://googleads.g.doubleclick.net https://www.google.com https://*.doubleclick.net https://*.vercel-insights.com https://vitals.vercel-insights.com https://*.kommo.com wss://*.kommo.com https://*.amocrm.com wss://*.amocrm.com https://checkoutv2.greenpay.me https://checkoutv2.greenpaysbx.me https://*.evervault.com https://*.evervault.app https://*.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com https://*.googleadservices.com https://*.googlesyndication.com https://*.doubleclick.net https://*.google.com https://google.com",
-      "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://www.google.com https://www.googletagmanager.com https://td.doubleclick.net https://*.kommo.com https://*.amocrm.com https://*.evervault.com https://*.evervault.app https://*.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com https://*.googleadservices.com https://*.googlesyndication.com https://*.doubleclick.net https://*.google.com https://google.com",
+      "font-src 'self' data: https://fonts.gstatic.com",
+      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://*.google-analytics.com https://www.googletagmanager.com https://www.googleadservices.com https://googleads.g.doubleclick.net https://www.google.com https://*.doubleclick.net https://*.vercel-insights.com https://vitals.vercel-insights.com https://checkoutv2.greenpay.me https://checkoutv2.greenpaysbx.me https://*.evervault.com https://*.evervault.app https://*.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com https://*.googleadservices.com https://*.googlesyndication.com https://*.doubleclick.net https://*.google.com https://google.com",
+      "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://www.google.com https://www.googletagmanager.com https://td.doubleclick.net https://*.evervault.com https://*.evervault.app https://*.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com https://*.googleadservices.com https://*.googlesyndication.com https://*.doubleclick.net https://*.google.com https://google.com",
       "worker-src 'self' blob:",
       "upgrade-insecure-requests",
     ].join("; ");
