@@ -6,7 +6,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { CookieBanner } from "@/components/layout/CookieBanner";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
-import { KommoChat } from "@/components/integrations/KommoChat";
+import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
 import { JsonLd } from "@/components/ui/JsonLd";
 import { organizationSchema } from "@/lib/schema";
 
@@ -60,7 +60,7 @@ export default function RootLayout({
         <Footer />
         <CookieBanner />
         <GoogleAnalytics />
-        <KommoChat />
+        <WhatsAppButton />
       </body>
     </html>
   );
