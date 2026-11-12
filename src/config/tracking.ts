@@ -8,12 +8,12 @@
  *
  * Con un valor vacío la etiqueta correspondiente no se carga.
  */
-export const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID || "";
-export const ADS_ID = process.env.NEXT_PUBLIC_GADS_ID || "";
+export const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID || "GTM-P6CPG97";
+export const ADS_ID = process.env.NEXT_PUBLIC_GADS_ID || "AW-978695125";
 
 /** Eventos del sitio que cuentan como conversión → etiqueta de Google Ads. */
 export const ADS_CONVERSIONS: Record<string, string> = {
-  whatsapp_click: "",
+  whatsapp_click: "YMrqCOzX_u0YENXn1tlD",
   contact_form_submit: "",
   phone_click: "",
   directions_click: "",
