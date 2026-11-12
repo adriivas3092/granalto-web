@@ -12,7 +12,21 @@ export const metadata = buildMetadata({
 // Dinámica: la disponibilidad de materiales puede cambiar desde el admin.
 export const dynamic = "force-dynamic";
 
+/**
+ * Mientras se afinan detalles, el cotizador queda oculto y la página muestra
+ * solo un aviso. Para volver a publicarlo, poner en `false`.
+ */
+const EN_CONSTRUCCION = true;
+
 export default async function CotizarPage() {
+  if (EN_CONSTRUCCION) {
+    return (
+      <section className="mx-auto flex min-h-[60svh] max-w-6xl items-center justify-center px-4 pb-16 pt-24 text-center sm:px-6 lg:px-8 lg:pt-32">
+        <h1 className="font-serif text-3xl text-ink md:text-4xl">Bajo construcción</h1>
+      </section>
+    );
+  }
+
   const disponibilidad = await getDisponibilidad();
   return (
     <section className="mx-auto max-w-6xl px-4 pb-16 pt-24 sm:px-6 lg:px-8 lg:pt-32">
