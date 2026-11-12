@@ -1,5 +1,5 @@
 import type { AnalyticsEvent } from "@/types";
-import { ADS_ID, ADS_CONVERSIONS } from "@/config/tracking";
+import { ADS_ID, ADS_CONVERSIONS, GTM_EVENT_ALIASES } from "@/config/tracking";
 
 /**
  * Capa de eventos analíticos.
@@ -32,6 +32,8 @@ export function trackEvent(event: AnalyticsEvent): void {
   // Google Tag Manager / dataLayer
   w.dataLayer = w.dataLayer ?? [];
   w.dataLayer.push({ event: event.name, ...params });
+  const alias = GTM_EVENT_ALIASES[event.name];
+  if (alias) w.dataLayer.push({ event: alias, ...params });
 
   // Google Analytics 4 (gtag directo)
   if (typeof w.gtag === "function") {

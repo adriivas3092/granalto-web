@@ -21,3 +21,16 @@ export const ADS_CONVERSIONS: Record<string, string> = {
   directions_click: "",
   email_click: "",
 };
+
+/**
+ * Nombres de evento que esperan los activadores del contenedor de GTM (se
+ * heredaron de la web anterior). Cada evento del sitio se reenvía además con
+ * ese nombre exacto (GTM distingue mayúsculas) para disparar su conversión.
+ *
+ * "Click to Chat" → activador "Click WhatsApp" → etiqueta "WhatsApp".
+ * No se envía "click to chat" (minúsculas): su etiqueta comparte el código de
+ * conversión del formulario y contaría cada clic en dos acciones.
+ */
+export const GTM_EVENT_ALIASES: Record<string, string> = {
+  whatsapp_click: "Click to Chat",
+};
