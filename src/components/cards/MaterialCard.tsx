@@ -20,7 +20,11 @@ export function MaterialCard({ material }: { material: Material }) {
           src={material.coverImage.src}
           alt={material.coverImage.alt}
           fill
-          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+          // Las fotos son apaisadas (16:9) y la tarjeta es cuadrada: al recortar,
+          // la imagen se muestra ~1,8× más ancha que la tarjeta. `sizes` lo
+          // contempla para que el navegador pida una versión con definición
+          // suficiente (antes pedía una muy chica y se veía borrosa).
+          sizes="(max-width: 640px) 130vw, (max-width: 768px) 85vw, (max-width: 1024px) 60vw, 45vw"
           className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
         />
       </div>
