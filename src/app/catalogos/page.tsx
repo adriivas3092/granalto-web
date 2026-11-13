@@ -20,8 +20,8 @@ export default function CatalogsPage() {
       <HeroSection
         size="medium"
         image={{
-          src: "/images/placeholders/material-marmol.svg",
-          alt: "Superficies y materiales de catálogo — imagen pendiente de reemplazo",
+          src: "/images/materiales/header-catalogos.jpg",
+          alt: "Superficies de piedra y láminas decorativas de los catálogos Granalto",
         }}
         eyebrow="Recursos"
         title="Catálogos y recursos"

@@ -69,9 +69,6 @@ export const catalogFilters = [
   "Granalto",
   "Tenax",
   "Wilsonart",
-  "Superficies",
-  "Mantenimiento",
-  "Arquitectura y diseño",
 ] as const;
 
 export function getCatalogs(): Catalog[] {

@@ -20,8 +20,8 @@ export default function MaterialsPage() {
       <HeroSection
         size="medium"
         image={{
-          src: "/images/placeholders/material-cuarcita.svg",
-          alt: "Detalle de veta en piedra natural — imagen pendiente de reemplazo",
+          src: "/images/materiales/header-materiales.jpg",
+          alt: "Muestras de mármol, cuarzo, travertino, cuarcita, granito, HPL, Cambria y porcelánico",
         }}
         eyebrow="Materiales"
         title="Materiales seleccionados para proyectos únicos"

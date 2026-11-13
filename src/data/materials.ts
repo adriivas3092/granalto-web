@@ -247,7 +247,7 @@ export const materials: Material[] = [
     id: "mat-hpl",
     slug: "hpl",
     name: "HPL",
-    category: "tecnico",
+    category: "decorativo",
     shortDescription:
       "Laminado de alta presión: versátil, liviano y eficiente para mobiliario.",
     description:

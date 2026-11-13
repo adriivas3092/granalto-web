@@ -32,6 +32,9 @@ export function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // El panel de administración tiene su propia barra superior.
+  if (pathname.startsWith("/admin")) return null;
+
   return (
     <header
       className={cn(
