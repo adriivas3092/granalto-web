@@ -1,9 +1,9 @@
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Check, MessageCircle } from "lucide-react";
 import { CTASection } from "@/components/sections/CTASection";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { AddToCartButton } from "@/components/store/AddToCartButton";
+import { ProductGallery } from "@/components/store/ProductGallery";
 import { COMPRA_EN_LINEA } from "@/config/tienda";
 import { getProductBySlug, formatPrice } from "@/lib/store/queries";
 import { getWhatsAppUrl, siteConfig } from "@/config/site";
@@ -44,22 +44,10 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
       <section className="mx-auto max-w-7xl px-4 pb-20 pt-6 sm:px-6 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-2">
-          <div className="relative aspect-square overflow-hidden rounded-sm bg-stone-beige">
-            {product.image_url ? (
-              <Image
-                src={product.image_url}
-                alt={product.name}
-                fill
-                priority
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                className="object-cover"
-              />
-            ) : (
-              <div className="flex h-full items-center justify-center text-sm text-mineral">
-                Sin imagen
-              </div>
-            )}
-          </div>
+          <ProductGallery
+            images={[product.image_url, ...(product.gallery ?? [])].filter((x): x is string => Boolean(x))}
+            alt={product.name}
+          />
 
           <div>
             {product.attributes?.material && (
