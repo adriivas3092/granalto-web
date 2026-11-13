@@ -201,6 +201,24 @@ export async function deleteOrder(id: string) {
   redirect("/admin/pedidos");
 }
 
+/**
+ * Elimina en bloque los pedidos seleccionados (por id). Devuelve cuántos se
+ * borraron realmente: si la base no tiene la política de borrado para admins
+ * (supabase/admin-pedidos.sql), RLS no borra nada y el resultado es 0.
+ */
+export async function bulkDeleteOrders(ids: string[]): Promise<{ borrados: number }> {
+  await requireAdmin();
+  const clean = Array.from(new Set(ids.filter(Boolean)));
+  if (clean.length === 0) return { borrados: 0 };
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase.from("orders").delete().in("id", clean).select("id");
+  if (error) throw new Error(error.message);
+  revalidatePath("/admin");
+  revalidatePath("/admin/pedidos");
+  revalidatePath("/cuenta");
+  return { borrados: data?.length ?? 0 };
+}
+
 /** Actualizar una solicitud del cotizador (estado y notas internas). */
 export async function updateSolicitud(id: string, formData: FormData) {
   await requireAdmin();
