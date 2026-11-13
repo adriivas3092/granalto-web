@@ -21,12 +21,27 @@ export default function AdminLoginPage() {
     setLoading(true);
     setError(null);
     const supabase = createSupabaseBrowserClient();
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
-    if (error) {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error || !data.user) {
+      setLoading(false);
       setError("Credenciales incorrectas. Verifique correo y contraseña.");
       return;
     }
+    // El panel es solo para administradores: si la cuenta es de un cliente de
+    // la tienda, se cierra la sesión y se responde igual que a una clave
+    // incorrecta (no se revela que la cuenta existe).
+    const { data: adminRow } = await supabase
+      .from("admins")
+      .select("user_id")
+      .eq("user_id", data.user.id)
+      .maybeSingle();
+    if (!adminRow) {
+      await supabase.auth.signOut();
+      setLoading(false);
+      setError("Credenciales incorrectas. Verifique correo y contraseña.");
+      return;
+    }
+    setLoading(false);
     router.replace("/admin");
     router.refresh();
   }
