@@ -19,10 +19,6 @@ export default function LocationsPage() {
     <>
       <HeroSection
         size="medium"
-        image={{
-          src: "/images/photos/showroom-escazu.jpg",
-          alt: "Showroom de Granalto en Guachipelín, Escazú",
-        }}
         eyebrow="Ubicaciones"
         title="Visítenos y viva los materiales"
         description="En piedra natural cada lámina es única. Le esperamos en nuestros showrooms para acompañarle en la selección."

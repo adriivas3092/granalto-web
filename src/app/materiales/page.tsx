@@ -19,10 +19,6 @@ export default function MaterialsPage() {
     <>
       <HeroSection
         size="medium"
-        image={{
-          src: "/images/materiales/header-materiales.jpg",
-          alt: "Muestras de mármol, cuarzo, travertino, cuarcita, granito, HPL, Cambria y porcelánico",
-        }}
         eyebrow="Materiales"
         title="Materiales seleccionados para proyectos únicos"
         description="Explore una selección de superficies naturales, técnicas y decorativas para cocinas, baños, mobiliario, revestimientos y espacios arquitectónicos."

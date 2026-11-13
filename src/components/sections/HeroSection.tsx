@@ -4,7 +4,8 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 type Props = {
-  image: Media;
+  /** Sin imagen, el hero queda en negro sólido. */
+  image?: Media;
   title: string;
   eyebrow?: string;
   description?: string;
@@ -26,21 +27,26 @@ export function HeroSection({
   return (
     <section
       className={cn(
-        "relative flex items-end overflow-hidden bg-ink text-ivory",
+        "relative flex items-end overflow-hidden text-ivory",
+        image ? "bg-ink" : "bg-black",
         size === "full" && "min-h-svh",
         size === "large" && "min-h-[70svh]",
         size === "medium" && "min-h-[46svh] pt-24",
       )}
     >
-      <Image
-        src={image.src}
-        alt={image.alt}
-        fill
-        priority
-        sizes="100vw"
-        className="object-cover"
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/30 to-ink/20" />
+      {image && (
+        <>
+          <Image
+            src={image.src}
+            alt={image.alt}
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/30 to-ink/20" />
+        </>
+      )}
       <div className="relative mx-auto w-full max-w-7xl px-4 pb-14 sm:px-6 md:pb-20 lg:px-8">
         {eyebrow && (
           <p className="mb-4 text-xs font-medium uppercase tracking-[0.25em] text-stone-beige">

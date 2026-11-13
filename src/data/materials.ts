@@ -12,9 +12,14 @@ const placeholder = (name: string, file: string) => ({
   alt: `${name} — imagen pendiente de reemplazo`,
 });
 
-/** Foto real de material (slab/textura), guardada en public/images/materiales. */
+/**
+ * Foto real de material (slab/textura), guardada en public/images/materiales.
+ * El sufijo -v2 es a propósito: al reemplazar una foto hay que cambiar el nombre
+ * del archivo, porque el optimizador de imágenes guarda en caché por nombre y
+ * seguiría sirviendo la versión anterior (pixelada).
+ */
 const real = (name: string, slug: string, alt?: string) => ({
-  src: `/images/materiales/${slug}.jpg`,
+  src: `/images/materiales/${slug}-v2.jpg`,
   alt: alt ?? `${name} — textura real del material`,
 });
 
