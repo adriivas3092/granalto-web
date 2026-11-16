@@ -54,7 +54,7 @@ export default async function StorePage({
   return (
     <>
       <section className="bg-ink pb-14 pt-28 text-ivory md:pb-16 md:pt-36">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-7xl flex-col items-center px-4 text-center sm:px-6 lg:px-8">
           <Image
             src="/images/brand/granalto-home-blanco.png"
             alt="Granalto Home"
@@ -64,7 +64,8 @@ export default async function StorePage({
             className="h-auto w-56 md:w-80"
           />
           <h1 className="mt-6 max-w-3xl text-3xl leading-[1.08] md:text-5xl">
-            Productos y accesorios
+            Productos
+            <br />y accesorios
           </h1>
         </div>
       </section>
