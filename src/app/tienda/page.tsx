@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Search } from "lucide-react";
 import { CTASection } from "@/components/sections/CTASection";
@@ -54,16 +55,17 @@ export default async function StorePage({
     <>
       <section className="bg-ink pb-14 pt-28 text-ivory md:pb-16 md:pt-36">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <p className="mb-4 text-xs font-medium uppercase tracking-[0.25em] text-stone-beige">
-            Tienda
-          </p>
-          <h1 className="max-w-3xl text-4xl leading-[1.08] md:text-6xl">
-            Superficies y productos
+          <Image
+            src="/images/brand/granalto-home-blanco.png"
+            alt="Granalto Home"
+            width={600}
+            height={195}
+            priority
+            className="h-auto w-56 md:w-80"
+          />
+          <h1 className="mt-6 max-w-3xl text-3xl leading-[1.08] md:text-5xl">
+            Productos y accesorios
           </h1>
-          <p className="mt-5 max-w-xl text-base leading-relaxed text-ivory/85 md:text-lg">
-            Explore nuestros productos con precio y disponibilidad. Solicite una
-            cotización o consúltenos por WhatsApp.
-          </p>
         </div>
       </section>
 
