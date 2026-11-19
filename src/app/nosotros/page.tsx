@@ -76,6 +76,13 @@ export default function AboutPage() {
             con propietarios, arquitectos, diseñadores, constructoras y
             fabricantes de mobiliario en todo el país.
           </p>
+          <p>
+            Con más de 15 años de experiencia en el sector, contamos con
+            showrooms en Lagunilla (Heredia), Guachipelín (Escazú) y Liberia
+            (Guanacaste), donde puede ver y elegir las láminas en persona.
+            Trabajamos con marcas como Cambria, ABK, Wilsonart, Tenax, Newform
+            y Flaminia, además de nuestra propia selección de piedra natural.
+          </p>
         </div>
       </section>
 

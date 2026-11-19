@@ -7,6 +7,8 @@ import { getCollections, getCollectionBySlug } from "@/data/collections";
 import { getProjectsByCategory } from "@/data/projects";
 import { buildMetadata } from "@/lib/metadata";
 import { KitchenCountertopGuide } from "@/components/sections/KitchenCountertopGuide";
+import { CollectionGuide } from "@/components/sections/CollectionGuide";
+import { getCollectionGuide } from "@/data/collectionGuides";
 import type { Project } from "@/types";
 
 type Params = { slug: string };
@@ -32,6 +34,7 @@ export default async function CollectionPage({ params }: { params: Promise<Param
     ? getProjectsByCategory(slug as Project["category"])
     : [];
   const showcaseProjects = projects.filter((p) => p.gallery.length > 0);
+  const guide = getCollectionGuide(collection.slug);
 
   return (
     <>
@@ -61,6 +64,7 @@ export default async function CollectionPage({ params }: { params: Promise<Param
       </section>
 
       {collection.slug === "cocina" && <KitchenCountertopGuide />}
+      {guide && <CollectionGuide guide={guide} />}
 
       {showcaseProjects.length > 0 && (
         <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-24 lg:px-8">
