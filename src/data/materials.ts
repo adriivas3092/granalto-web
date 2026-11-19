@@ -132,7 +132,7 @@ export const materials: Material[] = [
     catalogIds: [],
     featured: true,
     seo: {
-      title: "Mármol en Costa Rica | Superficies y revestimientos",
+      title: "Mármol en Costa Rica | Baños y revestimientos",
       description:
         "Mármol natural para baños, revestimientos, chimeneas y piezas a la medida. Asesoría y fabricación en Costa Rica.",
     },

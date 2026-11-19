@@ -42,7 +42,7 @@ export const siteConfig = {
     defaultTitle: "Granalto | Superficies y acabados premium en Costa Rica",
     titleTemplate: "%s | Granalto",
     defaultDescription:
-      "Granalto selecciona, comercializa y transforma superficies premium: cuarcita, granito, mármol, cuarzo, porcelánico y más, para cocinas, baños y proyectos arquitectónicos en Costa Rica.",
+      "Superficies premium en Costa Rica: cuarcita, granito, mármol, cuarzo y porcelánico para cocinas y baños. Showrooms en Heredia, Escazú y Liberia.",
     defaultOgImage: "/images/og/og-default.svg", // PENDIENTE_VALIDAR: imagen OG definitiva (1200x630 JPG/PNG)
     locale: "es_CR",
   },

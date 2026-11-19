@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }) 
   if (!location) return {};
   return buildMetadata({
     title: `Showroom ${location.name}`,
-    description: `Visite el showroom de Granalto en ${location.name}: ${location.address}. Asesoría personalizada y selección de materiales.`,
+    description: `Showroom de Granalto en ${location.name}: ${location.address.replace(/, Costa Rica$/, "")}. Asesoría y selección de materiales.`,
     path: `/ubicaciones/${location.slug}`,
   });
 }

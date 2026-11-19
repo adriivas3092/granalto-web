@@ -6,7 +6,7 @@ import { getLocations } from "@/data/locations";
 import { buildMetadata } from "@/lib/metadata";
 
 export const metadata = buildMetadata({
-  title: "Ubicaciones | Showrooms en Heredia, Escazú y Liberia",
+  title: "Showrooms en Heredia, Escazú y Liberia",
   description:
     "Visite los showrooms de Granalto en Lagunilla de Heredia, Guachipelín de Escazú y Liberia, Guanacaste. Conozca los materiales en persona.",
   path: "/ubicaciones",

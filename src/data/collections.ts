@@ -43,7 +43,7 @@ export const collections: Collection[] = [
     ],
     featured: true,
     seo: {
-      title: "Sobres de cocina en Costa Rica: cuarzo, granito y cuarcita",
+      title: "Sobres de cocina en Costa Rica | Cuarzo y granito",
       description:
         "Sobres de cocina, islas, salpicaderos y superficies premium en piedra natural, cuarzo y porcelánico. Asesoría, fabricación e instalación en Costa Rica.",
     },
