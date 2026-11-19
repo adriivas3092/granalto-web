@@ -17,9 +17,11 @@ function Stars({ rating, className = "h-4 w-4" }: { rating: number; className?: 
   );
 }
 
-/** Reseñas de Google (en vivo con API o respaldo manual). */
+/** Reseñas de Google en vivo. Sin API configurada, la sección no se renderiza. */
 export async function GoogleReviews() {
-  const { rating, total, reviews, profileUrl } = await getReviews();
+  const data = await getReviews();
+  if (!data) return null;
+  const { rating, total, reviews, profileUrl } = data;
   const container = "mx-auto max-w-7xl px-4 sm:px-6 lg:px-8";
 
   return (

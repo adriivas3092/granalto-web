@@ -180,7 +180,7 @@ export const projects: Project[] = [
     location: undefined, // PENDIENTE_VALIDAR: publicar solo con autorización
     materials: ["cuarcita"],
     description:
-      "Isla protagonista y salpicadero en piedra natural con veta continua, integrados con mobiliario de madera. (Datos del proyecto pendientes de validación.)",
+      "Isla protagonista y salpicadero en piedra natural con veta continua, integrados con mobiliario de madera.",
     coverImage: {
       src: "/images/photos/hero-5.jpg",
       alt: "Cocina con isla en cuarcita beige y mobiliario de madera clara",
@@ -195,7 +195,7 @@ export const projects: Project[] = [
     category: "bano",
     materials: ["marmol"],
     description:
-      "Sobre de baño y revestimientos en piedra clara con tina esculpida y grifería dorada. (Datos del proyecto pendientes de validación.)",
+      "Sobre de baño y revestimientos en piedra clara con tina esculpida y grifería dorada.",
     coverImage: {
       src: "/images/photos/hero-4.jpg",
       alt: "Baño principal con sobre de piedra clara, tina esculpida y grifería dorada",
@@ -210,7 +210,7 @@ export const projects: Project[] = [
     category: "exteriores",
     materials: [],
     description:
-      "Isla exterior en piedra de vetas doradas con área de asado integrada, resistente a la intemperie. (Datos del proyecto pendientes de validación.)",
+      "Isla exterior en piedra de vetas doradas con área de asado integrada, resistente a la intemperie.",
     coverImage: {
       src: "/images/photos/hero-2.jpg",
       alt: "Cocina exterior junto a la piscina con isla en piedra de vetas doradas",

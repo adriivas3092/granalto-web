@@ -138,7 +138,7 @@ export default function HomePage() {
         <SectionHeading
           eyebrow="Proyectos"
           title="Proyectos que hablan por nosotros"
-          description="Una selección de espacios transformados con nuestras superficies. Los proyectos mostrados son de demostración y serán reemplazados por proyectos reales documentados."
+          description="Una selección de espacios transformados con nuestras superficies."
         />
         <div className="grid gap-8 md:grid-cols-3">
           {projects.map((project) => (

@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getSiteUrl } from "@/config/site";
+import { COTIZADOR_EN_CONSTRUCCION } from "@/lib/configurador/estado";
 import { getCollections } from "@/data/collections";
 import { getMaterials } from "@/data/materials";
 import { getBlogPosts } from "@/data/blog";
@@ -13,7 +14,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "",
     "/colecciones",
     "/materiales",
-    "/cotizar",
+    ...(COTIZADOR_EN_CONSTRUCCION ? [] : ["/cotizar"]),
     "/como-funciona",
     "/portafolio",
     "/catalogos",

@@ -53,7 +53,7 @@ export default function CollectionsPage() {
           <SectionHeading
             eyebrow="Proyectos"
             title="Proyectos destacados"
-            description="Espacios transformados con nuestras superficies (contenido de demostración, pendiente de proyectos reales)."
+            description="Espacios transformados con nuestras superficies."
           />
           <div className="grid gap-8 md:grid-cols-3">
             {projects.map((project) => (

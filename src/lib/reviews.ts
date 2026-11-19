@@ -1,4 +1,4 @@
-import { manualReviews, reviewsConfig, type Review } from "@/data/reviews";
+import { reviewsConfig, type Review } from "@/data/reviews";
 
 export type ReviewsData = {
   rating: number;
@@ -9,11 +9,12 @@ export type ReviewsData = {
 };
 
 /**
- * Devuelve la calificación y reseñas. Si hay GOOGLE_PLACES_API_KEY y
- * GOOGLE_PLACE_ID, consulta la API de Google Places (Place Details) y cachea
- * el resultado; si no, usa las reseñas manuales de respaldo.
+ * Devuelve la calificación y reseñas reales desde Google Places (requiere
+ * GOOGLE_PLACES_API_KEY y GOOGLE_PLACE_ID). Si no hay API o Google no
+ * devuelve reseñas, retorna null y la sección no se muestra: nunca se
+ * publican reseñas ni calificaciones inventadas.
  */
-export async function getReviews(): Promise<ReviewsData> {
+export async function getReviews(): Promise<ReviewsData | null> {
   const key = process.env.GOOGLE_PLACES_API_KEY;
   const placeId = process.env.GOOGLE_PLACE_ID;
 
@@ -28,7 +29,7 @@ export async function getReviews(): Promise<ReviewsData> {
 
       const res = await fetch(url, { next: { revalidate: 86400 } }); // 1 día
       const data = await res.json();
-      if (data.status === "OK" && data.result) {
+      if (data.status === "OK" && data.result && (data.result.reviews ?? []).length > 0) {
         const r = data.result;
         const reviews: Review[] = (r.reviews ?? []).slice(0, 6).map((rev: Record<string, unknown>) => ({
           author: String(rev.author_name ?? "Cliente"),
@@ -38,23 +39,17 @@ export async function getReviews(): Promise<ReviewsData> {
           avatarUrl: rev.profile_photo_url as string | undefined,
         }));
         return {
-          rating: Number(r.rating ?? reviewsConfig.fallbackRating),
-          total: Number(r.user_ratings_total ?? reviewsConfig.fallbackTotal),
-          reviews: reviews.length ? reviews : manualReviews,
+          rating: Number(r.rating ?? 0),
+          total: Number(r.user_ratings_total ?? reviews.length),
+          reviews,
           profileUrl: (r.url as string) || reviewsConfig.googleProfileUrl,
           source: "google",
         };
       }
     } catch {
-      /* cae al respaldo manual */
+      /* sin datos reales: no se muestra la sección */
     }
   }
 
-  return {
-    rating: reviewsConfig.fallbackRating,
-    total: reviewsConfig.fallbackTotal,
-    reviews: manualReviews,
-    profileUrl: reviewsConfig.googleProfileUrl,
-    source: "manual",
-  };
+  return null;
 }

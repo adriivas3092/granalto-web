@@ -8,7 +8,7 @@
 export const siteConfig = {
   name: "Granalto",
   legalName: "Granalto Costa Rica",
-  domain: "https://granaltocr.net", // PENDIENTE_VALIDAR: dominio final de producción
+  domain: "https://www.granaltocr.net", // Host canónico: el apex granaltocr.net redirige (308) a www
   description:
     "Superficies, materiales y acabados premium para arquitectura, diseño de interiores y construcción en Costa Rica.",
   tagline: "Superficies que transforman espacios",
@@ -62,5 +62,6 @@ export function getWhatsAppUrl(message?: string): string {
 }
 
 export function getSiteUrl(): string {
-  return process.env.NEXT_PUBLIC_SITE_URL ?? siteConfig.domain;
+  // Sin barra final, para que `${getSiteUrl()}/ruta` no genere "//".
+  return (process.env.NEXT_PUBLIC_SITE_URL ?? siteConfig.domain).replace(/\/+$/, "");
 }
