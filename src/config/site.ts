@@ -28,11 +28,11 @@ export const siteConfig = {
     advisory: "Hola, me gustaría recibir asesoría para un proyecto.",
   },
 
-  // PENDIENTE_VALIDAR: URLs reales de redes sociales. Vacías = no se muestran.
+  // Redes oficiales confirmadas por Granalto. Vacías = no se muestran.
   social: {
-    instagram: "",
-    facebook: "",
-    tiktok: "",
+    instagram: "https://www.instagram.com/granalto/",
+    facebook: "https://www.facebook.com/granalto/",
+    tiktok: "https://www.tiktok.com/@granalto",
     pinterest: "",
     youtube: "",
     linkedin: "",

@@ -11,6 +11,8 @@ import { getMaterials, getMaterialBySlug, materialVariabilityNote } from "@/data
 import { getCatalogsByIds } from "@/data/catalogs";
 import { getProjectsByMaterial } from "@/data/projects";
 import { buildMetadata } from "@/lib/metadata";
+import { getMaterialGuide } from "@/data/materialGuides";
+import { MaterialGuide } from "@/components/sections/MaterialGuide";
 
 type Params = { slug: string };
 
@@ -49,6 +51,7 @@ export default async function MaterialPage({ params }: { params: Promise<Params>
 
   const relatedCatalogs = getCatalogsByIds(material.catalogIds);
   const relatedProjects = getProjectsByMaterial(material.slug);
+  const guide = getMaterialGuide(material.slug);
 
   return (
     <>
@@ -121,6 +124,8 @@ export default async function MaterialPage({ params }: { params: Promise<Params>
           {materialVariabilityNote}
         </p>
       </section>
+
+      {guide && <MaterialGuide guide={guide} materialName={material.name} />}
 
       {relatedCatalogs.length > 0 && (
         <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-24 lg:px-8">
