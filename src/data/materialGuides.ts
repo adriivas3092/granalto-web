@@ -176,6 +176,217 @@ export const materialGuides: Record<string, MaterialGuide> = {
       },
     ],
   },
+
+  porcelanico: {
+    sections: [
+      {
+        heading: "¿Qué es el porcelánico de gran formato?",
+        paragraphs: [
+          "El porcelánico es un material cerámico que se fabrica con arcillas, feldespatos y minerales prensados y cocidos a muy alta temperatura. El resultado es una lámina muy densa, con una absorción de agua mínima, que se produce en grandes formatos y espesores reducidos.",
+          "En Granalto trabajamos porcelánico de la marca italiana ABK, con diseños que reproducen mármoles, piedras, cementos y maderas con gran realismo.",
+        ],
+      },
+      {
+        heading: "Ventajas en cocina, baño y exteriores",
+        paragraphs: [
+          "Al ser prácticamente no poroso, el porcelánico resiste manchas, humedad y productos de limpieza, y no necesita sellado. También tolera muy bien el calor y, a diferencia de los materiales con resinas, no se decolora con el sol, por lo que funciona en terrazas, fachadas y cocinas exteriores.",
+          "El gran formato permite revestir pisos, paredes y sobres con muy pocas juntas, logrando superficies continuas y fáciles de limpiar.",
+        ],
+      },
+      {
+        heading: "Qué tener en cuenta",
+        paragraphs: [
+          "Las láminas de gran formato requieren cortes e instalación con equipo y mano de obra especializados. En algunos diseños el color y la veta están solo en la superficie, por lo que el tipo de canto se define junto con el asesor para lograr el mejor acabado.",
+          "Para la limpieza diaria basta agua y jabón neutro.",
+        ],
+      },
+    ],
+    faqs: [
+      {
+        question: "¿El porcelánico sirve para sobres de cocina?",
+        answer:
+          "Sí. Resiste calor, manchas y rayado, y no necesita sellado. Su fabricación e instalación como sobre requieren mano de obra especializada en gran formato.",
+      },
+      {
+        question: "¿Se puede usar porcelánico en exteriores?",
+        answer:
+          "Sí. Es resistente a los rayos UV y a la humedad, por lo que se usa en fachadas, terrazas, áreas de piscina y cocinas exteriores.",
+      },
+      {
+        question: "¿Porcelánico o cuarzo?",
+        answer:
+          "Ambos son no porosos. El porcelánico tolera mejor el calor y el sol, y llega en formatos más grandes; el cuarzo tiene más cuerpo y es más sencillo de trabajar en cantos gruesos.",
+      },
+    ],
+  },
+
+  "superficie-solida": {
+    sections: [
+      {
+        heading: "¿Qué es la superficie sólida?",
+        paragraphs: [
+          "La superficie sólida (solid surface) es un material compuesto de resinas acrílicas o de poliéster y cargas minerales. Su composición es igual en todo el espesor, lo que permite unir piezas con juntas casi invisibles y dar forma a curvas mediante calor (termoformado).",
+          "En Granalto trabajamos superficie sólida de Wilsonart, en blancos, colores sólidos y diseños con aspecto de piedra.",
+        ],
+      },
+      {
+        heading: "Dónde funciona mejor",
+        paragraphs: [
+          "Su gran ventaja es la continuidad: permite sobres con lavamanos integrados en una sola pieza, mostradores curvos, recepciones y mobiliario sin juntas visibles. Al no ser porosa, es higiénica y fácil de limpiar, por lo que se usa mucho en clínicas, laboratorios, comercios y baños.",
+          "Otra ventaja es que se puede reparar: las rayas superficiales o pequeños daños se pueden lijar y pulir para devolverle su aspecto original.",
+        ],
+      },
+      {
+        heading: "Cuidado y límites",
+        paragraphs: [
+          "Es más sensible al calor y al rayado que la piedra, por lo que conviene usar protectores bajo ollas calientes y tablas para cortar. Se limpia con agua, jabón neutro o limpiadores no abrasivos.",
+        ],
+      },
+    ],
+    faqs: [
+      {
+        question: "¿La superficie sólida se puede reparar?",
+        answer:
+          "Sí. Como el material es igual en todo su espesor, las rayas superficiales y pequeños daños se pueden lijar y pulir.",
+      },
+      {
+        question: "¿Se puede poner una olla caliente sobre superficie sólida?",
+        answer:
+          "No se recomienda. El calor directo puede marcarla; siempre conviene usar un protector.",
+      },
+      {
+        question: "¿Para qué proyectos se recomienda?",
+        answer:
+          "Para lavamanos integrados, mobiliario clínico y comercial, recepciones, mostradores y piezas con curvas donde la continuidad y la higiene son prioridad.",
+      },
+    ],
+  },
+
+  travertino: {
+    sections: [
+      {
+        heading: "El travertino, una piedra con historia",
+        paragraphs: [
+          "El travertino es una piedra caliza sedimentaria que se forma por la precipitación de minerales en aguas termales y manantiales. Esa formación le da sus poros y cavidades característicos y sus tonos cálidos: beige, crema, nuez y plata.",
+          "Se ha usado en arquitectura desde la antigüedad y hoy vuelve con fuerza en diseño de interiores por su textura natural y su calidez.",
+        ],
+      },
+      {
+        heading: "Poro abierto o resinado",
+        paragraphs: [
+          "El travertino puede dejarse con poro abierto, que resalta su textura natural, o con los poros rellenos de resina, que dan una superficie más lisa y fácil de limpiar. También se trabaja en acabado honed (mate) o cepillado, este último con un tacto más rústico y antideslizante.",
+          "Para pisos de exteriores y áreas de piscina suelen preferirse acabados con textura, que reducen el riesgo de resbalones.",
+        ],
+      },
+      {
+        heading: "Cuidado y mantenimiento",
+        paragraphs: [
+          "Al ser una caliza, el travertino es sensible a los ácidos y tiene porosidad natural, por lo que requiere sellado y limpieza con productos de pH neutro. Es una excelente opción para pisos, paredes y baños; en sobres de cocina conviene considerar su mayor sensibilidad a manchas y ácidos.",
+        ],
+      },
+    ],
+    faqs: [
+      {
+        question: "¿El travertino sirve para exteriores?",
+        answer:
+          "Sí, se usa en terrazas y áreas de piscina. Para pisos exteriores se recomiendan acabados con textura y un sellado adecuado.",
+      },
+      {
+        question: "¿Qué diferencia hay entre travertino con poro abierto y resinado?",
+        answer:
+          "El de poro abierto conserva las cavidades naturales y una apariencia más rústica; el resinado rellena los poros para una superficie más lisa y fácil de limpiar.",
+      },
+      {
+        question: "¿El travertino se mancha?",
+        answer:
+          "Es poroso y sensible a los ácidos, por lo que debe mantenerse sellado y limpiarse con productos neutros, limpiando los derrames pronto.",
+      },
+    ],
+  },
+
+  hpl: {
+    sections: [
+      {
+        heading: "¿Qué es el HPL?",
+        paragraphs: [
+          "El HPL (High Pressure Laminate o laminado de alta presión) se fabrica prensando capas de papel impregnadas con resinas bajo alta presión y temperatura, con una capa decorativa superior protegida con melamina. El resultado es una lámina delgada, resistente y muy versátil.",
+          "En Granalto distribuimos HPL de Wilsonart, con una amplia variedad de diseños en madera, colores sólidos, piedra y metálicos.",
+        ],
+      },
+      {
+        heading: "Usos más comunes",
+        paragraphs: [
+          "El HPL se adhiere sobre tableros para revestir mobiliario de cocina, closets, puertas, paneles de pared y mobiliario comercial y de oficina. Es liviano, fácil de trabajar y ofrece una excelente relación entre costo y desempeño.",
+          "Su superficie resiste bien el desgaste diario, los impactos leves y las manchas comunes, por lo que es ideal para muebles de uso intenso.",
+        ],
+      },
+      {
+        heading: "Cuidado y límites",
+        paragraphs: [
+          "Se limpia con un paño húmedo y jabón neutro. No se recomienda para superficies expuestas a calor intenso ni a humedad permanente sin el soporte y sellado de cantos adecuados.",
+        ],
+      },
+    ],
+    faqs: [
+      {
+        question: "¿Qué diferencia hay entre HPL y melamina?",
+        answer:
+          "Ambos son laminados decorativos, pero el HPL se fabrica a alta presión con varias capas de papel y resina, por lo que es más resistente al impacto y al desgaste que la melamina de baja presión.",
+      },
+      {
+        question: "¿El HPL sirve para sobres de cocina?",
+        answer:
+          "Se usa principalmente en mobiliario y superficies verticales. Para sobres de cocina con calor y humedad constantes suelen recomendarse cuarzo, granito o porcelánico.",
+      },
+      {
+        question: "¿Qué diseños hay disponibles?",
+        answer:
+          "Hay maderas, colores sólidos, aspectos de piedra y acabados metálicos, en texturas mate, texturizadas y de alto brillo.",
+      },
+    ],
+  },
+
+  cambria: {
+    sections: [
+      {
+        heading: "¿Qué es Cambria?",
+        paragraphs: [
+          "Cambria es una marca estadounidense de superficies de cuarzo de alta gama, fabricada en Estados Unidos. Como todo cuarzo para sobres, combina cuarzo natural con resinas, lo que da una superficie no porosa, resistente y de bajo mantenimiento.",
+          "Se distingue por sus diseños exclusivos, muchos de ellos inspirados en mármoles y piedras naturales, con una gran consistencia de color y patrón entre láminas.",
+        ],
+      },
+      {
+        heading: "Ventajas para cocinas y baños",
+        paragraphs: [
+          "Al no ser poroso, Cambria no necesita sellado y resiste las manchas de café, vino y aceite. Es una opción ideal para quien busca la estética del mármol en la cocina sin su sensibilidad a los ácidos.",
+          "Su uniformidad lo hace práctico en proyectos grandes o con varias piezas, donde se busca que todas las superficies coincidan.",
+        ],
+      },
+      {
+        heading: "Cuidado y límites",
+        paragraphs: [
+          "Se limpia con agua y jabón neutro. Como todo cuarzo, es sensible al calor directo, por lo que conviene usar protectores bajo ollas calientes, y no se recomienda para exteriores con sol directo.",
+        ],
+      },
+    ],
+    faqs: [
+      {
+        question: "¿Cambria es cuarzo?",
+        answer:
+          "Sí. Cambria es una marca de superficies de cuarzo de alta gama, no porosas y sin necesidad de sellado.",
+      },
+      {
+        question: "¿Cambria o mármol?",
+        answer:
+          "Cambria ofrece diseños con aspecto de mármol pero sin su sensibilidad a ácidos y manchas. El mármol natural, en cambio, tolera mejor el calor y cada lámina es única.",
+      },
+      {
+        question: "¿Cambria se puede usar en exteriores?",
+        answer:
+          "No se recomienda en exteriores con sol directo, porque la radiación UV puede alterar el color de las resinas.",
+      },
+    ],
+  },
 };
 
 export function getMaterialGuide(slug: string): MaterialGuide | undefined {
