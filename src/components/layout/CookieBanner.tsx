@@ -22,6 +22,16 @@ export function CookieBanner() {
     }
   }, []);
 
+  // Mientras el banner está abierto, el botón de WhatsApp se ubica encima.
+  useEffect(() => {
+    const root = document.documentElement;
+    if (visible) root.dataset.cookieBanner = "open";
+    else delete root.dataset.cookieBanner;
+    return () => {
+      delete root.dataset.cookieBanner;
+    };
+  }, [visible]);
+
   const decide = (value: "accepted" | "rejected") => {
     try {
       localStorage.setItem(STORAGE_KEY, value);
@@ -43,22 +53,25 @@ export function CookieBanner() {
     <div
       role="region"
       aria-label="Aviso de cookies"
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-stone-beige bg-white p-4 shadow-[0_-2px_12px_rgba(17,17,17,0.06)] md:p-5"
+      className="fixed inset-x-0 bottom-0 z-50 border-t border-stone-beige bg-white px-4 py-3 shadow-[0_-2px_12px_rgba(17,17,17,0.06)] md:p-5"
     >
-      <div className="mx-auto flex max-w-7xl flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <p className="max-w-2xl text-sm text-charcoal">
-          Utilizamos cookies para mejorar su experiencia y analizar el uso del
-          sitio. Puede conocer más en nuestra{" "}
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 md:gap-6">
+        <p className="text-xs leading-snug text-charcoal md:max-w-2xl md:text-sm">
+          <span className="md:hidden">Usamos cookies. </span>
+          <span className="hidden md:inline">
+            Utilizamos cookies para mejorar su experiencia y analizar el uso del sitio. Puede conocer más en nuestra{" "}
+          </span>
           <Link href="/politica-de-privacidad" className="link-editorial">
-            política de privacidad
+            <span className="md:hidden">Ver política</span>
+            <span className="hidden md:inline">política de privacidad</span>
           </Link>
-          .
+          <span className="hidden md:inline">.</span>
         </p>
-        <div className="flex gap-3">
-          <Button variant="outline" onClick={() => decide("rejected")} className="px-4 py-2">
+        <div className="flex shrink-0 gap-2 md:gap-3">
+          <Button variant="outline" onClick={() => decide("rejected")} className="min-h-[40px]! px-3! py-1.5! text-xs! md:px-4! md:py-2! md:text-sm!">
             Rechazar
           </Button>
-          <Button onClick={() => decide("accepted")} className="px-4 py-2">
+          <Button onClick={() => decide("accepted")} className="min-h-[40px]! px-3! py-1.5! text-xs! md:px-4! md:py-2! md:text-sm!">
             Aceptar
           </Button>
         </div>

@@ -25,7 +25,7 @@ export default function Error({
       <p className="text-xs font-medium uppercase tracking-[0.25em] text-mineral">Algo salió mal</p>
       <h1 className="mt-4 text-3xl leading-tight text-ink md:text-4xl">Tuvimos un inconveniente</h1>
       <p className="mt-4 max-w-md text-base leading-relaxed text-charcoal/80">
-        Ocurrió un error inesperado. Podés reintentar o volver al inicio. Si persiste, escribinos y lo resolvemos.
+        Ocurrió un error inesperado. Puede reintentar o volver al inicio. Si persiste, escríbanos y lo resolvemos.
       </p>
       <div className="mt-8 flex flex-wrap justify-center gap-3">
         <button

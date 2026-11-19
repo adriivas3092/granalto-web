@@ -13,6 +13,7 @@ import { getProjectsByMaterial } from "@/data/projects";
 import { buildMetadata } from "@/lib/metadata";
 import { getMaterialGuide } from "@/data/materialGuides";
 import { MaterialGuide } from "@/components/sections/MaterialGuide";
+import { HeroQuoteActions } from "@/components/sections/HeroQuoteActions";
 
 type Params = { slug: string };
 
@@ -63,7 +64,9 @@ export default async function MaterialPage({ params }: { params: Promise<Params>
         eyebrow="Material"
         title={`${material.name} en Costa Rica`}
         description={material.shortDescription}
-      />
+      >
+        <HeroQuoteActions label={["HPL", "Cambria"].includes(material.name) ? material.name : material.name.toLowerCase()} source={`material-hero-${material.slug}`} />
+      </HeroSection>
 
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <Breadcrumbs

@@ -7,20 +7,20 @@ import { buildMetadata } from "@/lib/metadata";
 export const metadata = buildMetadata({
   title: "Cómo funciona",
   description:
-    "Del material a la instalación: así trabajamos en Granalto. Elegí tu superficie, cotizá en línea y nosotros medimos, fabricamos e instalamos.",
+    "Del material a la instalación: así trabajamos en Granalto. Elija su superficie, solicite su cotización y nosotros medimos, fabricamos e instalamos.",
   path: "/como-funciona",
 });
 
 const STEPS = [
   {
     icon: Layers,
-    title: "Elegí tu material",
-    text: "Explorá nuestra selección de piedras naturales y superficies técnicas. ¿No te decidís? Compará hasta 4 opciones en el cotizador.",
+    title: "Elija su material",
+    text: "Explore nuestra selección de piedras naturales y superficies técnicas. ¿No se decide? Un asesor le ayuda a comparar opciones.",
   },
   {
     icon: Calculator,
-    title: "Cotizá en línea",
-    text: "Ingresá la forma y medidas de tu proyecto, el acabado y los extras. Obtené una estimación al instante, por m² o por metro lineal.",
+    title: "Solicite su cotización",
+    text: "Cuéntenos la forma y las medidas de su proyecto, el acabado y los extras, y le enviamos una cotización por m² o por metro lineal.",
   },
   {
     icon: Ruler,
@@ -30,12 +30,12 @@ const STEPS = [
   {
     icon: Hammer,
     title: "Fabricación a medida",
-    text: "Cortamos, pulimos y preparamos tu superficie con precisión, incluyendo cantos, cortes de fregadero y perforaciones.",
+    text: "Cortamos, pulimos y preparamos su superficie con precisión, incluyendo cantos, cortes de fregadero y perforaciones.",
   },
   {
     icon: Truck,
     title: "Instalación y entrega",
-    text: "Instalamos tu superficie con acabado profesional y dejamos tu espacio listo para usar.",
+    text: "Instalamos su superficie con acabado profesional y dejamos su espacio listo para usar.",
   },
 ];
 
@@ -84,7 +84,7 @@ export default function ComoFuncionaPage() {
 
         <p className="mt-6 flex items-center justify-center gap-2 text-sm text-mineral">
           <MessageCircle aria-hidden="true" className="h-4 w-4" />
-          ¿Dudas? Escribinos y te asesoramos sin compromiso.
+          ¿Dudas? Escríbanos y le asesoramos sin compromiso.
         </p>
       </section>
 

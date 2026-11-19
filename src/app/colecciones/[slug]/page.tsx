@@ -8,6 +8,7 @@ import { getProjectsByCategory } from "@/data/projects";
 import { buildMetadata } from "@/lib/metadata";
 import { KitchenCountertopGuide } from "@/components/sections/KitchenCountertopGuide";
 import { CollectionGuide } from "@/components/sections/CollectionGuide";
+import { HeroQuoteActions } from "@/components/sections/HeroQuoteActions";
 import { getCollectionGuide } from "@/data/collectionGuides";
 import type { Project } from "@/types";
 
@@ -35,6 +36,8 @@ export default async function CollectionPage({ params }: { params: Promise<Param
     : [];
   const showcaseProjects = projects.filter((p) => p.gallery.length > 0);
   const guide = getCollectionGuide(collection.slug);
+  const quoteLabel =
+    { cocina: "mi sobre de cocina", bano: "mi proyecto de baño" }[collection.slug] ?? "mi proyecto";
 
   return (
     <>
@@ -44,7 +47,9 @@ export default async function CollectionPage({ params }: { params: Promise<Param
         eyebrow="Colección"
         title={collection.h1 ?? collection.name}
         description={collection.shortDescription}
-      />
+      >
+        <HeroQuoteActions label={quoteLabel} source={`collection-hero-${collection.slug}`} />
+      </HeroSection>
 
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <Breadcrumbs

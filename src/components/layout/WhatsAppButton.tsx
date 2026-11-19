@@ -10,7 +10,7 @@ import { trackEvent } from "@/lib/analytics";
  */
 export function WhatsAppButton() {
   return (
-    <div className="group fixed bottom-5 right-5 z-40 md:bottom-8 md:right-8">
+    <div className="group fixed bottom-5 right-5 z-40 transition-[bottom] duration-300 md:bottom-8 md:right-8 [[data-cookie-banner=open]_&]:bottom-20 md:[[data-cookie-banner=open]_&]:bottom-28">
       <span
         role="tooltip"
         id="whatsapp-tooltip"

@@ -26,7 +26,7 @@ export default function CartPage() {
       {items.length === 0 ? (
         <div className="mt-10 rounded-sm border border-stone-beige bg-white p-10 text-center">
           <ShoppingBag aria-hidden="true" className="mx-auto h-8 w-8 text-mineral" />
-          <p className="mt-4 text-charcoal">Tu carrito está vacío.</p>
+          <p className="mt-4 text-charcoal">Su carrito está vacío.</p>
           <Link
             href="/tienda"
             className="mt-6 inline-flex min-h-[44px] items-center gap-2 rounded-sm bg-ink px-6 py-3 text-sm font-medium text-ivory hover:bg-charcoal"

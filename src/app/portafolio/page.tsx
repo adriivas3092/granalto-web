@@ -61,7 +61,7 @@ export default function PortafolioPage() {
       <CTASection
         source="portafolio"
         title="¿Te gustó lo que viste?"
-        description="Contanos sobre tu proyecto y te ayudamos a elegir el material y el acabado ideal."
+        description="Cuéntenos sobre su proyecto y le ayudamos a elegir el material y el acabado ideal."
       />
     </>
   );

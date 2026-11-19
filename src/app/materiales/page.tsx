@@ -8,7 +8,7 @@ import { buildMetadata } from "@/lib/metadata";
 export const metadata = buildMetadata({
   title: "Materiales | Piedra natural y superficies técnicas",
   description:
-    "Explore cuarcita, granito, mármol, cuarzo, porcelánico, superficie sólida, HPL, travertino, ónix y terrazzo. Muestrario digital de Granalto Costa Rica.",
+    "Explore cuarcita, granito, mármol, cuarzo, porcelánico, superficie sólida, HPL, travertino y terrazzo. Muestrario digital de Granalto Costa Rica.",
   path: "/materiales",
 });
 

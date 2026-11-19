@@ -30,6 +30,9 @@ export function HeroCarousel({
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
+  // Solo se montan (y descargan) la diapositiva visible y la siguiente:
+  // las demás se cargan a medida que avanza el carrusel.
+  const [loadedUpTo, setLoadedUpTo] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -39,6 +42,16 @@ export function HeroCarousel({
     mq.addEventListener("change", onChange);
     return () => mq.removeEventListener("change", onChange);
   }, []);
+
+  useEffect(() => {
+    // Tras la carga inicial, precargar la siguiente diapositiva.
+    const t = setTimeout(() => setLoadedUpTo((u) => Math.max(u, 1)), 1500);
+    return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    setLoadedUpTo((u) => Math.max(u, active + 1));
+  }, [active]);
 
   useEffect(() => {
     if (paused || reducedMotion || slides.length < 2) return;
@@ -66,22 +79,24 @@ export function HeroCarousel({
             i === active ? "opacity-100" : "opacity-0",
           )}
         >
-          <Image
-            src={slide.src}
-            alt={slide.alt}
-            fill
-            priority={i === 0}
-            sizes="100vw"
-            className={cn(
-              "object-cover will-change-transform",
-              // Zoom continuo mediante transición de transform (no keyframe):
-              // la escala cambia de forma animada al activar/desactivar, sin
-              // el reinicio brusco que producía el "golpe" en el cambio.
-              !reducedMotion &&
-                "transition-transform duration-[7000ms] ease-out motion-reduce:transition-none",
-              !reducedMotion && (i === active ? "scale-[1.06]" : "scale-100"),
-            )}
-          />
+          {(i === 0 || i === active || i <= loadedUpTo) && (
+            <Image
+              src={slide.src}
+              alt={slide.alt}
+              fill
+              priority={i === 0}
+              sizes="100vw"
+              className={cn(
+                "object-cover will-change-transform",
+                // Zoom continuo mediante transición de transform (no keyframe):
+                // la escala cambia de forma animada al activar/desactivar, sin
+                // el reinicio brusco que producía el "golpe" en el cambio.
+                !reducedMotion &&
+                  "transition-transform duration-[7000ms] ease-out motion-reduce:transition-none",
+                !reducedMotion && (i === active ? "scale-[1.06]" : "scale-100"),
+              )}
+            />
+          )}
         </div>
       ))}
 
@@ -96,7 +111,9 @@ export function HeroCarousel({
             {description}
           </p>
         )}
-        {children && <div className="mt-8 flex flex-wrap gap-3">{children}</div>}
+        {children && (
+          <div className="mt-8 flex flex-wrap gap-3">{children}</div>
+        )}
 
         {slides.length > 1 && (
           <div className="mt-10 flex items-center gap-4">
@@ -112,7 +129,11 @@ export function HeroCarousel({
                 <Pause aria-hidden="true" className="h-4 w-4" />
               )}
             </button>
-            <div role="tablist" aria-label="Diapositivas" className="flex gap-2.5">
+            <div
+              role="tablist"
+              aria-label="Diapositivas"
+              className="flex gap-2.5"
+            >
               {slides.map((slide, i) => (
                 <button
                   key={slide.src}

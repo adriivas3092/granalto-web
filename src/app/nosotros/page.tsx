@@ -66,7 +66,7 @@ export default function AboutPage() {
           <p>
             Granalto es una empresa costarricense especializada en la
             importación, corte e instalación de superficies sólidas: granito,
-            cuarcita, mármol, cuarzo, porcelánico, superficies sólidas y ónix,
+            cuarcita, mármol, cuarzo, porcelánico y superficies sólidas,
             entre otros materiales.
           </p>
           <p>
