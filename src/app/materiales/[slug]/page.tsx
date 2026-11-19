@@ -58,7 +58,7 @@ export default async function MaterialPage({ params }: { params: Promise<Params>
         size="large"
         image={material.coverImage}
         eyebrow="Material"
-        title={material.name}
+        title={`${material.name} en Costa Rica`}
         description={material.shortDescription}
       />
 

@@ -38,7 +38,7 @@ export default async function CollectionPage({ params }: { params: Promise<Param
         size="large"
         image={collection.coverImage}
         eyebrow="Colección"
-        title={collection.name}
+        title={collection.h1 ?? collection.name}
         description={collection.shortDescription}
       />
 

@@ -3,7 +3,8 @@ import { siteConfig } from "@/config/site";
 
 /**
  * Showrooms y ubicaciones de Granalto.
- * PENDIENTE_VALIDAR: horarios, teléfonos directos, coordenadas y URLs de
+ * Horarios tomados del post "Granito en Costa Rica" del blog (publicado por Granalto).
+ * PENDIENTE_VALIDAR: teléfonos directos, coordenadas y URLs de
  * Google Maps de cada sede (ver CONTENT_TODO.md). No se inventan datos:
  * los campos sin confirmar quedan vacíos/undefined y la UI los omite.
  */
@@ -14,7 +15,9 @@ export const locations: Location[] = [
     name: "Lagunilla, Heredia",
     address: "Bodegas Lagunilla #2, Lagunilla de Heredia, Costa Rica",
     province: "Heredia",
-    schedule: [], // PENDIENTE_VALIDAR: horario de atención
+    schedule: ["Lunes a viernes: 8:00 a.m. a 5:00 p.m.", "Sábados: 8:00 a.m. a 1:00 p.m."],
+    openingHours: [{ days: ["Monday","Tuesday","Wednesday","Thursday","Friday"], opens: "08:00", closes: "17:00" }, { days: ["Saturday"], opens: "08:00", closes: "13:00" }],
+    locality: "Lagunilla",
     phone: siteConfig.contact.phone,
     whatsapp: siteConfig.contact.whatsapp,
     email: siteConfig.contact.email,
@@ -32,7 +35,9 @@ export const locations: Location[] = [
     name: "Guachipelín, Escazú",
     address: "Diagonal a Distrito Cuatro, Guachipelín de Escazú, Costa Rica",
     province: "San José",
-    schedule: [], // PENDIENTE_VALIDAR
+    schedule: ["Lunes a viernes: 8:00 a.m. a 5:00 p.m.", "Sábados: 9:00 a.m. a 2:00 p.m."],
+    openingHours: [{ days: ["Monday","Tuesday","Wednesday","Thursday","Friday"], opens: "08:00", closes: "17:00" }, { days: ["Saturday"], opens: "09:00", closes: "14:00" }],
+    locality: "Escazú",
     phone: siteConfig.contact.phone,
     whatsapp: siteConfig.contact.whatsapp,
     email: siteConfig.contact.email,
@@ -50,7 +55,9 @@ export const locations: Location[] = [
     name: "Liberia, Guanacaste",
     address: "Solarium, bodega 9, Liberia, Guanacaste, Costa Rica",
     province: "Guanacaste",
-    schedule: [], // PENDIENTE_VALIDAR
+    schedule: ["Lunes a viernes: 8:30 a.m. a 5:30 p.m.", "Sábados: 8:00 a.m. a 1:00 p.m."],
+    openingHours: [{ days: ["Monday","Tuesday","Wednesday","Thursday","Friday"], opens: "08:30", closes: "17:30" }, { days: ["Saturday"], opens: "08:00", closes: "13:00" }],
+    locality: "Liberia",
     phone: siteConfig.contact.phone,
     whatsapp: siteConfig.contact.whatsapp,
     email: siteConfig.contact.email,

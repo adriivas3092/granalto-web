@@ -145,6 +145,7 @@ export default async function LocationPage({ params }: { params: Promise<Params>
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover"
+                priority
               />
             </div>
           )}

@@ -9,6 +9,7 @@ export const collections: Collection[] = [
     id: "col-cocina",
     slug: "cocina",
     name: "Cocina",
+    h1: "Sobres de cocina en Costa Rica",
     shortDescription:
       "Superficies, sobres, islas, salpicaderos y detalles diseñados para convertir la cocina en el centro del hogar.",
     description:
@@ -42,7 +43,7 @@ export const collections: Collection[] = [
     ],
     featured: true,
     seo: {
-      title: "Colección Cocina | Sobres y superficies para cocina",
+      title: "Sobres de cocina en Costa Rica: cuarzo, granito y cuarcita",
       description:
         "Sobres de cocina, islas, salpicaderos y superficies premium en piedra natural, cuarzo y porcelánico. Asesoría, fabricación e instalación en Costa Rica.",
     },
@@ -51,6 +52,7 @@ export const collections: Collection[] = [
     id: "col-bano",
     slug: "bano",
     name: "Baño",
+    h1: "Sobres y superficies para baño",
     shortDescription:
       "Superficies, revestimientos, lavamanos, mobiliario, grifería y soluciones para crear espacios funcionales y sofisticados.",
     description:
@@ -80,7 +82,7 @@ export const collections: Collection[] = [
     ],
     featured: true,
     seo: {
-      title: "Colección Baño | Superficies y revestimientos para baño",
+      title: "Sobres y superficies para baño en Costa Rica",
       description:
         "Sobres de baño, lavamanos, revestimientos, grifería y sanitarios premium. Soluciones a la medida para baños residenciales y comerciales en Costa Rica.",
     },
@@ -89,6 +91,7 @@ export const collections: Collection[] = [
     id: "col-hogar",
     slug: "hogar",
     name: "Hogar",
+    h1: "Superficies para el hogar",
     shortDescription:
       "Chimeneas, barras, mesas, revestimientos, pisos, paredes, áreas sociales y piezas personalizadas.",
     description:
@@ -115,7 +118,7 @@ export const collections: Collection[] = [
     ],
     featured: true,
     seo: {
-      title: "Colección Hogar | Superficies para espacios residenciales",
+      title: "Superficies para el hogar en Costa Rica",
       description:
         "Chimeneas, mesas, barras, paredes, pisos y piezas personalizadas en piedra natural y superficies técnicas para el hogar en Costa Rica.",
     },

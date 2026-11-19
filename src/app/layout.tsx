@@ -9,7 +9,7 @@ import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
 import { ContactClickTracker } from "@/components/analytics/ContactClickTracker";
 import { JsonLd } from "@/components/ui/JsonLd";
-import { organizationSchema } from "@/lib/schema";
+import { organizationSchema, websiteSchema } from "@/lib/schema";
 
 // Montserrat como única familia: regular (400) para cuerpo y textos,
 // bold (700) para titulares y textos de importancia.
@@ -56,6 +56,7 @@ export default function RootLayout({
           Saltar al contenido principal
         </a>
         <JsonLd data={organizationSchema()} />
+        <JsonLd data={websiteSchema()} />
         <Header />
         <main id="contenido-principal">{children}</main>
         <Footer />

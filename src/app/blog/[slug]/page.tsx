@@ -21,7 +21,20 @@ export async function generateMetadata({ params }: { params: Promise<Params> }) 
   return buildMetadata({ ...post.seo, path: `/blog/${post.slug}` });
 }
 
-/** Convierte el contenido plano (párrafos y "## subtítulos") en bloques. */
+/** Convierte **negritas** en <strong>. */
+function renderInline(text: string) {
+  return text.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
+    part.startsWith("**") && part.endsWith("**") && part.length > 4 ? (
+      <strong key={i} className="font-semibold text-ink">
+        {part.slice(2, -2)}
+      </strong>
+    ) : (
+      part
+    ),
+  );
+}
+
+/** Convierte el contenido plano ("## subtítulos", listas "- " y párrafos) en bloques. */
 function renderContent(content: string) {
   return content.split(/\n\n+/).map((block, i) => {
     const trimmed = block.trim();
@@ -32,9 +45,24 @@ function renderContent(content: string) {
         </h2>
       );
     }
+    const lines = trimmed.split("\n").map((l) => l.trim()).filter(Boolean);
+    if (lines.length > 0 && lines.every((l) => /^[-*] /.test(l))) {
+      return (
+        <ul key={i} className="mt-5 list-disc space-y-2 pl-6 text-base leading-relaxed text-charcoal/85 md:text-lg">
+          {lines.map((l, j) => (
+            <li key={j}>{renderInline(l.replace(/^[-*] /, ""))}</li>
+          ))}
+        </ul>
+      );
+    }
     return (
       <p key={i} className="mt-5 text-base leading-relaxed text-charcoal/85 md:text-lg">
-        {trimmed}
+        {lines.map((l, j) => (
+          <span key={j}>
+            {j > 0 && <br />}
+            {renderInline(l)}
+          </span>
+        ))}
       </p>
     );
   });

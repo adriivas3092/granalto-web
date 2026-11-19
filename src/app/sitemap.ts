@@ -6,9 +6,12 @@ import { getMaterials } from "@/data/materials";
 import { getBlogPosts } from "@/data/blog";
 import { getLocations } from "@/data/locations";
 
+/**
+ * Sin changefreq ni priority (Google los ignora). lastModified solo donde hay
+ * una fecha real (posts); la fecha del build no aporta información.
+ */
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = getSiteUrl();
-  const now = new Date();
 
   const staticRoutes = [
     "",
@@ -27,37 +30,23 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/terminos-y-condiciones",
   ].map((path) => ({
     url: `${base}${path}`,
-    lastModified: now,
-    changeFrequency: "weekly" as const,
-    priority: path === "" ? 1 : 0.8,
   }));
 
   const collections = getCollections().map((c) => ({
     url: `${base}/colecciones/${c.slug}`,
-    lastModified: now,
-    changeFrequency: "weekly" as const,
-    priority: 0.9,
   }));
 
   const materials = getMaterials().map((m) => ({
     url: `${base}/materiales/${m.slug}`,
-    lastModified: now,
-    changeFrequency: "weekly" as const,
-    priority: 0.8,
   }));
 
   const posts = getBlogPosts().map((p) => ({
     url: `${base}/blog/${p.slug}`,
     lastModified: new Date(p.publishedAt),
-    changeFrequency: "monthly" as const,
-    priority: 0.6,
   }));
 
   const locations = getLocations().map((l) => ({
     url: `${base}/ubicaciones/${l.slug}`,
-    lastModified: now,
-    changeFrequency: "monthly" as const,
-    priority: 0.7,
   }));
 
   return [...staticRoutes, ...collections, ...materials, ...posts, ...locations];

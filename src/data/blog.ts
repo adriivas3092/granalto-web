@@ -44,7 +44,7 @@ Elegir cuarcita es apostar por la combinación de lujo y resistencia. Consúltan
     },
     featured: false,
     seo: {
-      title: "Cuarcita: la opción perfecta para cocinas que combinan lujo y durabilidad",
+      title: "Cuarcita para cocinas: lujo y durabilidad",
       description:
         "La cuarcita une la estética del mármol con la resistencia del granito: tolerancia al calor y rayones, diseños exclusivos e instalación de precisión en Granalto Costa Rica.",
     },
@@ -95,7 +95,7 @@ Lunes a viernes: 8:30 a.m. a 5:30 p.m. · Sábados: 8:00 a.m. a 1:00 p.m.`,
     },
     featured: false,
     seo: {
-      title: "Granito en Costa Rica: elegancia natural y resistencia para tu cocina",
+      title: "Granito para cocinas en Costa Rica",
       description:
         "Ventajas del granito para sobres de cocina, islas y baños: resistencia al calor, vetas únicas y bajo mantenimiento. Venta e instalación a la medida en Granalto Costa Rica.",
     },
@@ -187,7 +187,7 @@ En Granalto contamos con una amplia variedad de materiales como cuarzos, granito
     },
     featured: true,
     seo: {
-      title: "¿Cómo elegir el material ideal? | Guía de Granalto",
+      title: "¿Cómo elegir el material ideal para su sobre?",
       description:
         "Guía práctica para elegir el material perfecto según el uso del espacio, la estética, el mantenimiento y el presupuesto. Cuarzos, granitos, cuarcitas, mármoles y piedras sinterizadas en Granalto Costa Rica.",
     },

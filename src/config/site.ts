@@ -40,7 +40,7 @@ export const siteConfig = {
 
   seo: {
     defaultTitle: "Granalto | Superficies y acabados premium en Costa Rica",
-    titleTemplate: "%s | Granalto Costa Rica",
+    titleTemplate: "%s | Granalto",
     defaultDescription:
       "Granalto selecciona, comercializa y transforma superficies premium: cuarcita, granito, mármol, cuarzo, porcelánico y más, para cocinas, baños y proyectos arquitectónicos en Costa Rica.",
     defaultOgImage: "/images/og/og-default.svg", // PENDIENTE_VALIDAR: imagen OG definitiva (1200x630 JPG/PNG)

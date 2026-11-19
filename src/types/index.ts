@@ -25,6 +25,8 @@ export type Collection = {
   id: string;
   slug: string;
   name: string;
+  /** H1 descriptivo para SEO (si falta se usa name). */
+  h1?: string;
   shortDescription: string;
   description: string;
   coverImage: Media;
@@ -92,6 +94,10 @@ export type Location = {
   address: string;
   province: string;
   schedule: string[];
+  /** Horario estructurado para schema.org (días en inglés, horas HH:MM). */
+  openingHours?: { days: string[]; opens: string; closes: string }[];
+  /** Distrito o ciudad (addressLocality). */
+  locality?: string;
   phone?: string;
   whatsapp?: string;
   email?: string;
