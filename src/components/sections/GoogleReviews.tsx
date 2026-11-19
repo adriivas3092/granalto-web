@@ -33,7 +33,7 @@ export async function GoogleReviews() {
           <div className="flex flex-wrap items-center justify-center gap-3">
             <span className="text-3xl font-bold text-ink">{rating.toFixed(1)}</span>
             <Stars rating={rating} className="h-5 w-5" />
-            <span className="text-sm text-mineral">{total}+ reseñas en Google</span>
+            <span className="text-sm text-mineral">{total} reseñas en Google</span>
           </div>
         </div>
 

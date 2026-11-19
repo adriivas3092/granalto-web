@@ -1,4 +1,4 @@
-import { reviewsConfig, type Review } from "@/data/reviews";
+import { manualReviews, reviewsConfig, type Review } from "@/data/reviews";
 
 export type ReviewsData = {
   rating: number;
@@ -9,10 +9,10 @@ export type ReviewsData = {
 };
 
 /**
- * Devuelve la calificación y reseñas reales desde Google Places (requiere
- * GOOGLE_PLACES_API_KEY y GOOGLE_PLACE_ID). Si no hay API o Google no
- * devuelve reseñas, retorna null y la sección no se muestra: nunca se
- * publican reseñas ni calificaciones inventadas.
+ * Devuelve calificación y reseñas reales. Con GOOGLE_PLACES_API_KEY y
+ * GOOGLE_PLACE_ID las trae en vivo de Google; si no, usa las reseñas reales
+ * copiadas a mano en src/data/reviews.ts. Sin datos, retorna null y la
+ * sección no se muestra.
  */
 export async function getReviews(): Promise<ReviewsData | null> {
   const key = process.env.GOOGLE_PLACES_API_KEY;
@@ -47,9 +47,18 @@ export async function getReviews(): Promise<ReviewsData | null> {
         };
       }
     } catch {
-      /* sin datos reales: no se muestra la sección */
+      /* cae a las reseñas copiadas a mano */
     }
   }
 
-  return null;
+  const { fallbackRating, fallbackTotal, googleProfileUrl } = reviewsConfig;
+  if (manualReviews.length === 0 || fallbackRating <= 0 || fallbackTotal <= 0) return null;
+
+  return {
+    rating: fallbackRating,
+    total: fallbackTotal,
+    reviews: manualReviews,
+    profileUrl: googleProfileUrl,
+    source: "manual",
+  };
 }

@@ -21,34 +21,45 @@ export type Review = {
 export const reviewsConfig = {
   /** Enlace público a tu ficha de Google (para "Ver todas en Google"). */
   googleProfileUrl: "https://www.google.com/search?q=Granalto+Costa+Rica",
-  /** Se muestran si no hay API configurada. */
-  fallbackRating: 4.9,
-  fallbackTotal: 87,
+  /** Calificación y total tal como aparecen HOY en la ficha de Google. */
+  fallbackRating: 4.0,
+  fallbackTotal: 63,
 };
 
+/**
+ * Reseñas REALES copiadas a mano de la ficha de Google (nombre como aparece
+ * en Google y texto sin editar). La sección se muestra cuando hay al menos una
+ * reseña y la calificación/total de arriba están completos.
+ */
 export const manualReviews: Review[] = [
   {
-    author: "María F.",
+    author: "Helenna Vilchez",
     rating: 5,
-    text: "Excelente atención y calidad. La encimera de cuarzo quedó impecable y la instalación fue puntual.",
-    relativeTime: "hace 2 semanas",
+    text: "Excelente!!!!!!si buscan granito mármol o cualquier piedra natural aquí es el lugar indicado",
+    relativeTime: "Hace 2 meses",
   },
   {
-    author: "Carlos M.",
+    author: "DILANA GARCIA DAVILA",
     rating: 5,
-    text: "Gran variedad de materiales y muy buen asesoramiento para elegir el granito de la cocina. Recomendados.",
-    relativeTime: "hace 1 mes",
+    text: "Excelente servicio, me siento satisfecha por los trabajos contratados, el seguimiento en el proceso de la compra fue atento y personalizado, productos en vanguardia, bastantes opciones estéticas para elegir, realmente satisfecha por los resultados,",
+    relativeTime: "Hace un año",
   },
   {
-    author: "Ana R.",
+    author: "Edward Turner",
     rating: 5,
-    text: "El proceso fue claro desde la cotización hasta la instalación. El acabado del mármol superó mis expectativas.",
-    relativeTime: "hace 1 mes",
+    text: "Great selection at fair prices. They have everything from standard to wow. Staff is bilingual, knowledgeable and helpful.",
+    relativeTime: "Hace 4 años",
   },
   {
-    author: "Jose P.",
+    author: "Paula Mastroeni Carvajal",
+    rating: 5,
+    text: "Muy buena atención al cliente 👍🏻 fueron amables, me brindaron la información que ocupaba y fui muy bien asesorada con el granito y el cuarzo.",
+    relativeTime: "Hace 5 años",
+  },
+  {
+    author: "Javier Segura",
     rating: 4,
-    text: "Muy buen producto y servicio. Coordinaron la medición en sitio sin problema.",
-    relativeTime: "hace 2 meses",
+    text: "Really good place for stone, quarts and granite tables and furniture tops. Mostly expensive place, but some of the sales assistant are very kind, so, if you need a solution with a more limited budget, asking would for sure, got an option.",
+    relativeTime: "Hace 5 años",
   },
 ];
